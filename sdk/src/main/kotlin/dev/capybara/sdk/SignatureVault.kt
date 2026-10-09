@@ -23,7 +23,7 @@ class SignatureVault(context: Context) {
 
     @Synchronized
     fun saveResearchBaseline(capturePaths: List<String>): ResearchBaseline {
-        require(capturePaths.size == 4) { "A baseline needs exactly four measured positions A-D." }
+        require(capturePaths.isNotEmpty()) { "A baseline needs measured positions." }
         val captures = capturePaths.map { path ->
             val folder = File(path).canonicalFile
             require(folder.parentFile == captureRoot) { "Baseline captures must belong to this application's private capture store." }
@@ -34,19 +34,24 @@ class SignatureVault(context: Context) {
         val labels = captures.map { it.getJSONObject("label") }
         val profileId = labels.first().getString("profile")
         val profile = ProfileEngine.get(profileId)
-        require(labels.map { it.getString("position") }.toSet() == profile.positions.toSet()) {
+        require(captures.size == profile.positions.size) { "A baseline needs every registered position for ${profile.id}." }
+        val positions = labels.map { it.getString("position") }
+        require(positions.toSet() == profile.positions.toSet()) {
             "Each registered position for ${profile.id} must occur once."
         }
+        val orderedCaptures = profile.positions.map { position -> captures[positions.indexOf(position)] }
         for (key in listOf("objectId", "sessionId", "condition")) {
             require(labels.map { it.getString(key) }.distinct().size == 1) { "Baseline $key differs between positions." }
         }
         require(labels.all { it.getString("profile") == profile.id }) { "Baseline profile differs between positions." }
-        require(captures.map { it.getString("captureId") }.distinct().size == 4) { "A capture cannot be reused at another position." }
+        require(captures.map { it.getString("captureId") }.distinct().size == profile.positions.size) {
+            "A capture cannot be reused at another position."
+        }
         val reference = ResearchBaseline(UUID.randomUUID().toString(), labels[0].getString("objectId"), profile.id, System.currentTimeMillis())
         val json = JSONObject().put("schemaVersion", 1).put("id", reference.id).put("objectId", reference.objectId)
             .put("profile", reference.profile).put("createdAtMillis", reference.createdAtMillis)
             .put("modelVersion", JSONObject.NULL).put("calibrationVersion", JSONObject.NULL)
-            .put("status", "RESEARCH_BASELINE_UNCALIBRATED").put("captures", JSONArray(captures))
+            .put("status", "RESEARCH_BASELINE_UNCALIBRATED").put("captures", JSONArray(orderedCaptures))
         check(root.isDirectory || root.mkdirs()) { "Cannot create private reference vault." }
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(Cipher.ENCRYPT_MODE, key())

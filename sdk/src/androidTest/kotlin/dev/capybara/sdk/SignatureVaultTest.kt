@@ -41,4 +41,38 @@ class SignatureVaultTest {
             paths.forEach { assertTrue(File(it).deleteRecursively()) }
         }
     }
+
+    @Test fun genericShowcaseReferenceRequiresBothRegisteredSides() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val sdk = Capybara(context)
+        val vault = SignatureVault(context)
+        val paths = mutableListOf<String>()
+        var referenceId: String? = null
+        try {
+            for (position in listOf("SIDE_1", "SIDE_2")) {
+                paths += sdk.saveCapture(Scan(
+                    CaptureLabel("generic-storage-test", "generic-session", "showcase_enrollment",
+                        position, ProfileEngine.SHOWCASE_OBJECT_ID),
+                    48_000, shortArrayOf(1), emptyList(), emptyList(), 1, 2,
+                    mapOf("purpose" to "test_fixture_not_physical_data")
+                ))
+            }
+            val reference = vault.saveResearchBaseline(paths)
+            referenceId = reference.id
+            val json = vault.readResearchBaseline(reference.id)
+            assertEquals(ProfileEngine.SHOWCASE_OBJECT_ID, json.getString("profile"))
+            assertEquals(2, json.getJSONArray("captures").length())
+            assertEquals("RESEARCH_BASELINE_UNCALIBRATED", json.getString("status"))
+            assertTrue(vault.listResearchBaselines().any { it.id == reference.id })
+            assertThrows(IllegalArgumentException::class.java) {
+                vault.saveResearchBaseline(paths.take(1))
+            }
+            assertThrows(IllegalArgumentException::class.java) {
+                vault.saveResearchBaseline(listOf(paths[0], paths[0]))
+            }
+        } finally {
+            referenceId?.let { File(context.noBackupFilesDir, "capybara/references/$it.ref").delete() }
+            paths.forEach { File(it).deleteRecursively() }
+        }
+    }
 }

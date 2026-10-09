@@ -63,7 +63,6 @@ class MainActivity : ComponentActivity() {
     private var pendingShowcaseEvidence by mutableStateOf<PhysicsEvidence?>(null)
     private var showcasePaths by mutableStateOf<List<String>>(emptyList())
     private var showcaseFingerprint by mutableStateOf<String?>(null)
-    private var showcaseNames by mutableStateOf<List<String>>(emptyList())
     private var logs by mutableStateOf<List<String>>(emptyList())
     private val permission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         microphoneGranted = granted
@@ -85,13 +84,6 @@ class MainActivity : ComponentActivity() {
                 savedCount = capturePaths.size
                 bundle = withContext(Dispatchers.IO) { restoredPaths.map { sdk.getCaptureLabel(it) to it } }
                 baselines = withContext(Dispatchers.IO) { SignatureVault(this@MainActivity).listResearchBaselines() }
-                showcaseNames = withContext(Dispatchers.IO) {
-                    capturePaths.mapNotNull { path ->
-                        runCatching { sdk.getCaptureLabel(path) }.getOrNull()
-                            ?.takeIf { it.profile == ProfileEngine.SHOWCASE_OBJECT_ID && it.condition == "showcase_enrollment" }
-                            ?.objectId
-                    }.distinct()
-                }
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) { problem = "Saved data could not be read."; log("Saved data read failed: ${error.message}") }
         }
@@ -137,7 +129,7 @@ class MainActivity : ComponentActivity() {
         val positions = researchProfile.positions
         val showcasePositions = remember { sdk.getProfile(ProfileEngine.SHOWCASE_OBJECT_ID).positions }
         val showcasePosition = showcasePositions[showcasePositionIndex]
-        val availableNames = (baselines.map { it.objectId } + showcaseNames).distinct()
+        val availableNames = baselines.map { it.objectId }.distinct()
         val drawer = rememberDrawerState(DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
@@ -352,7 +344,6 @@ class MainActivity : ComponentActivity() {
                                                     showcaseStep = "rotate"
                                                 } else {
                                                     showcaseFingerprint = researchFingerprint(showcasePaths)
-                                                    if (showcaseMode == "enroll") showcaseNames = (showcaseNames + showcaseName).distinct()
                                                     showcaseStep = "result"
                                                 }
                                             }
@@ -396,10 +387,13 @@ class MainActivity : ComponentActivity() {
                                                 },
                                                 color = Muted, lineHeight = 21.sp
                                             )
-                                        } else {
+                                        } else if (showcaseReferenceSaved) {
                                             Text("Object added", color = Copper, fontFamily = FontFamily.Serif, fontSize = 32.sp)
-                                            Text("$showcaseName has a two-side capture fingerprint.", color = Sand, fontSize = 18.sp)
-                                            Text("Both real measurements were approved and merged into a provenance fingerprint. It is not yet an integrity signature because models and calibration are unavailable.", color = Muted, lineHeight = 21.sp)
+                                            Text("$showcaseName has a two-side research reference.", color = Sand, fontSize = 18.sp)
+                                            Text("Both real measurements were approved and saved in an encrypted, uncalibrated reference. The digest records capture provenance, not physical identity.", color = Muted, lineHeight = 21.sp)
+                                        } else {
+                                            Text("Reference not saved", color = Copper, fontFamily = FontFamily.Serif, fontSize = 32.sp)
+                                            Text("Both captures remain private research data, but no complete encrypted reference was created. This object is not listed as enrolled.", color = Sand, fontSize = 18.sp)
                                         }
                                         showcaseFingerprint?.let { Text("Measured digest: ${it.take(24)}…", color = Muted, fontSize = 12.sp) }
                                         showcaseEvidence.forEach { (position, measured) -> ShowcaseEvidenceCard(position, measured) }
@@ -531,7 +525,11 @@ class MainActivity : ComponentActivity() {
             try {
                 val path = withContext(Dispatchers.IO) { sdk.saveCapture(captured) }
                 savedCount = withContext(Dispatchers.IO) { sdk.listCaptures().size }
-                val baselineSaved = if (captured.label.condition == "showcase_enrollment" && captured.label.position == "D") {
+                val baselineSaved = if (
+                    captured.label.condition == "showcase_enrollment" &&
+                    captured.label.profile == ProfileEngine.SHOWCASE_OBJECT_ID &&
+                    captured.label.position == ProfileEngine.get(captured.label.profile).positions.last()
+                ) {
                     try {
                         val reference = createResearchBaseline(showcasePaths + path)
                         baselines = listOf(reference) + baselines
@@ -539,7 +537,7 @@ class MainActivity : ComponentActivity() {
                     } catch (cancelled: CancellationException) {
                         throw cancelled
                     } catch (error: Exception) {
-                        problem = "All four captures were saved, but the encrypted research baseline could not be created."
+                        problem = "All registered captures were saved, but the encrypted research baseline could not be created."
                         log("Research baseline save failed: ${error.message}")
                         false
                     }
