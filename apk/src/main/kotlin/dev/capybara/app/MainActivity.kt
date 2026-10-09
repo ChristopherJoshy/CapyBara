@@ -289,7 +289,7 @@ class MainActivity : ComponentActivity() {
                                         "Name the object, then capture two real sides. Keep the phone flat and use the same contact pressure on both sides.",
                                         color = Muted, lineHeight = 21.sp
                                     )
-                                    Text(if (showcaseMode == "enroll") "Create a physical fingerprint" else "Scan a known object", color = Sand, fontFamily = FontFamily.Serif, fontSize = 24.sp)
+                                    Text(if (showcaseMode == "enroll") "Create a research reference" else "Scan a known object", color = Sand, fontFamily = FontFamily.Serif, fontSize = 24.sp)
                                     OutlinedTextField(
                                         value = showcaseName,
                                         onValueChange = { showcaseName = it },
