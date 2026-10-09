@@ -11,9 +11,13 @@ class IntegrityProfile internal constructor(
 /** Catalog of physically specified measurement protocols currently supported by this SDK. */
 object ProfileEngine {
     const val RIGID_CASE_ID = "rigid_case"
+    const val SHOWCASE_OBJECT_ID = "showcase_object"
 
     private val profiles = Collections.unmodifiableList(
-        listOf(IntegrityProfile(RIGID_CASE_ID, Collections.unmodifiableList(listOf("A", "B", "C", "D"))))
+        listOf(
+            IntegrityProfile(RIGID_CASE_ID, Collections.unmodifiableList(listOf("A", "B", "C", "D"))),
+            IntegrityProfile(SHOWCASE_OBJECT_ID, Collections.unmodifiableList(listOf("SIDE_1", "SIDE_2"))),
+        )
     )
 
     fun supportedProfiles(): List<IntegrityProfile> = profiles

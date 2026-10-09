@@ -14,11 +14,11 @@ import java.io.File
 class ShowcaseTest {
     @get:Rule val rule = createAndroidComposeRule<MainActivity>()
 
-    @Test fun scanStartsWithoutAskingForObjectName() {
+    @Test fun scanStartsWithTwoSidePlacementAndNoNamePrompt() {
         rule.onNodeWithText("Scan object").performClick()
-        rule.onNodeWithText("REGISTERED CONTACT POINTS · TOP VIEW").assertIsDisplayed()
-        rule.onNodeWithText("Position 1 of 4").assertIsDisplayed()
-        rule.onNodeWithText("Place the phone at mark A.", substring = true).assertIsDisplayed()
+        rule.onNodeWithText("Place the phone on the object.", substring = true).assertIsDisplayed()
+        rule.onNodeWithText("Side 1 of 2", substring = true).assertIsDisplayed()
+        rule.onNodeWithText("Capture side 1", substring = true).assertIsDisplayed()
         rule.onNodeWithText("Object name").assertDoesNotExist()
         snapshot("scan-start")
     }

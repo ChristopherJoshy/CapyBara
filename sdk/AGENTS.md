@@ -15,3 +15,7 @@ remain private; never upload without the user's authorized training scope.
 Use pure JVM tests for deterministic DSP and guarded decision rules; device tests
 for hardware and Keystore. Record experimental limitations and model availability
 explicitly. Advance one integrated slice at a time and maintain docs/progress.md.
+
+`rigid_case` A–D is the controlled research profile. `showcase_object` SIDE_1/
+SIDE_2 is an honest generic-object acquisition profile only; it must not expose
+MATCH/CHANGED or calibrated confidence without real specialist evidence.

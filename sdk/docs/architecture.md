@@ -14,16 +14,17 @@ and IMU acquisition; raw measurements retain clocks, routes and provenance.
 PhysicsEngine analyzes real captured signals on CPU. CaptureStore commits private
 recordings atomically with labels and SHA256 provenance.
 
-ProfileEngine exposes one measured-workflow profile, `rigid_case`, with
-registered positions A–D. It rejects unsupported profiles and positions at the
-capture boundary, and SignatureVault uses the same profile definition when
-validating four-position research baselines. This profile is an acquisition
-contract only; model availability and calibration remain absent.
+ProfileEngine exposes the measured-workflow profile `rigid_case` with registered
+positions A–D for research, plus `showcase_object` with `SIDE_1` and `SIDE_2`
+for generic-object acquisition. The latter accepts any stable object as raw
+input but is not a claim of cross-object generalization. Capture and baseline
+validation use their respective catalogs.
 
-The guided showcase collects positions A–D for enrollment and scans. A completed
-enrollment stores an encrypted `RESEARCH_BASELINE_UNCALIBRATED` reference; scans
-still return `INCONCLUSIVE` because no validated comparison model or calibration
-is available.
+The guided showcase collects two approved side captures for enrollment and
+scan. Enrollment stores the capture provenance fingerprint and a named pair of
+raw recordings; it does not create a calibrated reference. Scan remains
+`INCONCLUSIVE` because no validated comparison model or calibration is
+available.
 
 ## Implemented stages and limits
 

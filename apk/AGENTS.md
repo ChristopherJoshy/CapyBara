@@ -16,3 +16,9 @@ User-directed showcase layout: keep main screens sparse; no visible V6 label or
 model-training explanation on them. Put hardware/model readiness, true operation
 logs, scientific details and capture configuration in a hamburger-only sidebar.
 Keep unavailable decisions disabled and accurately described in the sidebar.
+
+The judge-facing showcase accepts any stable box/object through the
+`showcase_object` two-side capture flow: name (enrollment only), real side-1
+capture, turn prompt, real side-2 capture, approve/retry/reject, then a
+provenance fingerprint. This must not be presented as calibrated identity
+recognition while specialist weights and calibration are unavailable.

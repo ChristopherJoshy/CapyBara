@@ -5,10 +5,12 @@ import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class ProfileEngineTest {
-    @Test fun exposesOnlyTheSpecifiedResearchProfileAndPositions() {
+    @Test fun exposesResearchAndGenericShowcaseProfiles() {
         val profile = ProfileEngine.get(ProfileEngine.RIGID_CASE_ID)
-        assertEquals(listOf(ProfileEngine.RIGID_CASE_ID), ProfileEngine.supportedProfiles().map { it.id })
+        val showcase = ProfileEngine.get(ProfileEngine.SHOWCASE_OBJECT_ID)
+        assertEquals(listOf(ProfileEngine.RIGID_CASE_ID, ProfileEngine.SHOWCASE_OBJECT_ID), ProfileEngine.supportedProfiles().map { it.id })
         assertEquals(listOf("A", "B", "C", "D"), profile.positions)
+        assertEquals(listOf("SIDE_1", "SIDE_2"), showcase.positions)
     }
 
     @Test fun rejectsUnknownProfilesAndUnregisteredPositions() {

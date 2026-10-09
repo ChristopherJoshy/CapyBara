@@ -10,7 +10,13 @@ explanation appears on the main screens. A hamburger-only modal sidebar contains
 Status, Logs, Capture setup and scientific details. Missing checkpoints, calibration
 and unavailable verification remain truthfully reported in Status; verification
 stays disabled. Logs contain only actual Capybara operations, never other apps' logs.
-The capture guide supports two honest showcase actions: Enroll object and Scan object. Enrollment asks for a label before two real side captures; Scan starts at the placement prompt with a generated anonymous candidate ID and never requests a name. Each flow has a review gate (approve, retry or reject), then displays measured evidence and a digest derived from saved capture provenance. The digest is not an identity signature. Scan ends `INCONCLUSIVE`: saved names/references exist, but no validated model comparison or identity decision is available. The existing four-position research path remains available.
+The showcase supports any stable box or object with two real contact-side
+captures. Enrollment asks for a name, captures side 1, asks the user to turn the
+phone, captures side 2, reviews each response, merges provenance hashes and
+shows an object-added result. Scan uses the same side-1/side-2 approve/retry/
+reject flow without asking for a name. It ends `INCONCLUSIVE`: the provenance
+fingerprint is not an identity signature and no validated model comparison or
+calibration is available. The four-position research path remains separate.
 Actual capture callbacks drive progress. Results never appear before SDK operations complete. Raw recordings stay private.
 
 Microphone permission is requested only when needed. Cancelling or leaving the

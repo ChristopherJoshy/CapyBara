@@ -13,7 +13,13 @@ class ProbeBrainTest {
 
         assertTrue(withHaptics.requestHaptics)
         assertFalse(withoutHaptics.requestHaptics)
-        assertEquals("rigid_case:acoustic_chirp;haptics_unavailable", withoutHaptics.description)
+        assertEquals("rigid_case:stereo_acoustic_chirp;haptics_unavailable", withoutHaptics.description)
+    }
+
+    @Test fun bothPhysicalProbeRequestsUseStereoAudioAndAvailableHaptics() {
+        val withHaptics = ProbeBrain.select(ProfileEngine.SHOWCASE_OBJECT_ID, hapticsAvailable = true)
+        assertTrue(withHaptics.requestHaptics)
+        assertEquals("showcase_object:stereo_acoustic_chirp+all_exposed_haptic_waveforms", withHaptics.description)
     }
 
     @Test fun unsupportedProfilesNeverReceiveAnImplicitProbePlan() {

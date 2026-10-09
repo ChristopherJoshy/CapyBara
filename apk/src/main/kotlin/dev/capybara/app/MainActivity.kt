@@ -63,6 +63,7 @@ class MainActivity : ComponentActivity() {
     private var pendingShowcaseEvidence by mutableStateOf<PhysicsEvidence?>(null)
     private var showcasePaths by mutableStateOf<List<String>>(emptyList())
     private var showcaseFingerprint by mutableStateOf<String?>(null)
+    private var showcaseNames by mutableStateOf<List<String>>(emptyList())
     private var logs by mutableStateOf<List<String>>(emptyList())
     private val permission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         microphoneGranted = granted
@@ -84,6 +85,13 @@ class MainActivity : ComponentActivity() {
                 savedCount = capturePaths.size
                 bundle = withContext(Dispatchers.IO) { restoredPaths.map { sdk.getCaptureLabel(it) to it } }
                 baselines = withContext(Dispatchers.IO) { SignatureVault(this@MainActivity).listResearchBaselines() }
+                showcaseNames = withContext(Dispatchers.IO) {
+                    capturePaths.mapNotNull { path ->
+                        runCatching { sdk.getCaptureLabel(path) }.getOrNull()
+                            ?.takeIf { it.profile == ProfileEngine.SHOWCASE_OBJECT_ID && it.condition == "showcase_enrollment" }
+                            ?.objectId
+                    }.distinct()
+                }
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) { problem = "Saved data could not be read."; log("Saved data read failed: ${error.message}") }
         }
@@ -115,6 +123,8 @@ class MainActivity : ComponentActivity() {
         var position by rememberSaveable { mutableStateOf("A") }
         var section by rememberSaveable { mutableStateOf("Status") }
         var scientificDetails by rememberSaveable { mutableStateOf(false) }
+        var introVisible by remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) { introVisible = true }
         var showcaseMode by remember { mutableStateOf<String?>(null) }
         var showcaseName by remember { mutableStateOf("") }
         var showcaseCaptureId by remember { mutableStateOf("") }
@@ -123,10 +133,11 @@ class MainActivity : ComponentActivity() {
         var showcasePositionIndex by remember { mutableIntStateOf(0) }
         var showcaseReferenceSaved by remember { mutableStateOf(false) }
         var showcaseEvidence by remember { mutableStateOf<List<Pair<String, PhysicsEvidence>>>(emptyList()) }
-        val profile = remember { sdk.getProfile(ProfileEngine.RIGID_CASE_ID) }
-        val positions = profile.positions
-        val showcasePosition = positions[showcasePositionIndex]
-        val availableNames = baselines.map { it.objectId }.distinct()
+        val researchProfile = remember { sdk.getProfile(ProfileEngine.RIGID_CASE_ID) }
+        val positions = researchProfile.positions
+        val showcasePositions = remember { sdk.getProfile(ProfileEngine.SHOWCASE_OBJECT_ID).positions }
+        val showcasePosition = showcasePositions[showcasePositionIndex]
+        val availableNames = (baselines.map { it.objectId } + showcaseNames).distinct()
         val drawer = rememberDrawerState(DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
@@ -282,9 +293,11 @@ class MainActivity : ComponentActivity() {
                             Text(if (showcaseMode == "enroll") "Enroll object" else "Scan object", fontFamily = FontFamily.Serif, fontSize = 34.sp)
                             when (showcaseStep) {
                                 "name" -> {
-                                    Text("Name the object to label its enrollment captures. The label is not an identity decision.", color = Muted, lineHeight = 21.sp)
-                                    PositionGuide("A")
-                                    Text("Mark four repeatable contact points A–D around the closed object. Keep it on a stable surface and hold its orientation fixed.", color = Muted, lineHeight = 21.sp)
+                                    Text(
+                                        "Name the object, then capture two real sides. Keep the phone flat and use the same contact pressure on both sides.",
+                                        color = Muted, lineHeight = 21.sp
+                                    )
+                                    Text(if (showcaseMode == "enroll") "Create a physical fingerprint" else "Scan a known object", color = Sand, fontFamily = FontFamily.Serif, fontSize = 24.sp)
                                     OutlinedTextField(
                                         value = showcaseName,
                                         onValueChange = { showcaseName = it },
@@ -294,18 +307,19 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier.fillMaxWidth()
                                     )
                                     Button(onClick = { startShowcasePosition() }, enabled = showcaseName.isNotBlank() && !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                                        Text(if (microphoneGranted) "Capture position A" else "Enable microphone")
+                                        Text(if (microphoneGranted) "Capture side 1" else "Enable microphone")
                                     }
                                 }
                                 "capture" -> {
-                                    PositionGuide(showcasePosition)
-                                    Text("Position ${showcasePositionIndex + 1} of 4", color = Cyan)
+                                    Text("Place the phone on the object.", color = Sand, fontFamily = FontFamily.Serif, fontSize = 24.sp)
+                                    Text("Side ${showcasePositionIndex + 1} of 2 · approve the measured response before continuing.", color = Cyan)
+                                    ObjectGuide(showcasePositionIndex)
                                     Button(onClick = { startShowcasePosition() }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                                        Text(if (microphoneGranted) "Capture position $showcasePosition" else "Enable microphone")
+                                        Text(if (microphoneGranted) "Capture side ${showcasePositionIndex + 1}" else "Enable microphone")
                                     }
                                 }
                                 "capturing" -> {
-                                    Text("Capturing position $showcasePosition", color = Cyan, fontSize = 18.sp)
+                                    Text("Capturing side ${showcasePositionIndex + 1}", color = Cyan, fontSize = 18.sp)
                                     if (busy) {
                                         LinearProgressIndicator(Modifier.fillMaxWidth(), color = Cyan)
                                         Text(capturePhase(stage), color = Cyan)
@@ -318,54 +332,51 @@ class MainActivity : ComponentActivity() {
                                     val captured = pendingShowcaseScan
                                     val measured = pendingShowcaseEvidence
                                     if (captured != null && measured != null) {
-                                        Text("Position $showcasePosition · measured response", color = Copper, fontSize = 20.sp)
+                                        Text("Side ${showcasePositionIndex + 1} · measured response", color = Copper, fontSize = 20.sp)
                                         Waveform(captured.pcm)
-                                        ShowcaseEvidenceCard("Position $showcasePosition", measured)
-                                        Text("Approve this measured position, retry it, or reject it and end the run.", color = Muted, lineHeight = 21.sp)
+                                        ShowcaseEvidenceCard("Side ${showcasePositionIndex + 1}", measured)
+                                        Text("Approve this real measurement, retry it, or reject the run.", color = Muted, lineHeight = 21.sp)
                                         if (busy) {
                                             LinearProgressIndicator(Modifier.fillMaxWidth(), color = Cyan)
                                             Text(if (committing) "Saving approved capture" else capturePhase(stage), color = Cyan)
                                         }
                                         Button(onClick = {
                                             approveShowcaseCapture { approvedEvidence, path, baselineSaved ->
-                                                showcaseEvidence = showcaseEvidence + ("Position $showcasePosition" to approvedEvidence)
+                                                showcaseEvidence = showcaseEvidence + ("Side ${showcasePositionIndex + 1}" to approvedEvidence)
                                                 showcasePaths = showcasePaths + path
                                                 showcaseReferenceSaved = baselineSaved
                                                 pendingShowcaseScan = null
                                                 pendingShowcaseEvidence = null
-                                                if (showcasePositionIndex < positions.lastIndex) {
+                                                if (showcasePositionIndex < showcasePositions.lastIndex) {
                                                     showcasePositionIndex++
                                                     showcaseStep = "rotate"
                                                 } else {
                                                     showcaseFingerprint = researchFingerprint(showcasePaths)
+                                                    if (showcaseMode == "enroll") showcaseNames = (showcaseNames + showcaseName).distinct()
                                                     showcaseStep = "result"
                                                 }
                                             }
                                         }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                                            Text(if (showcasePositionIndex == positions.lastIndex) "Approve final position" else "Approve position $showcasePosition")
+                                            Text(if (showcasePositionIndex == showcasePositions.lastIndex) "Approve final side" else "Approve side ${showcasePositionIndex + 1}")
                                         }
                                         OutlinedButton(onClick = { startShowcasePosition() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
-                                            Text("Retry position $showcasePosition")
+                                            Text("Retry side ${showcasePositionIndex + 1}")
                                         }
                                         TextButton(onClick = {
-                                            val rejectedPosition = showcasePosition
-                                            val approvedBefore = showcaseEvidence.isNotEmpty()
                                             pendingShowcaseScan = null
                                             pendingShowcaseEvidence = null
                                             showcaseMode = null
                                             showcaseStep = "name"
-                                            if (rejectedPosition != "A" && approvedBefore) {
-                                                problem = "Position $rejectedPosition was rejected; earlier approved captures remain saved as research data."
-                                            }
-                                            log("Showcase position $rejectedPosition rejected; run ended")
+                                            problem = "This run was rejected; approved captures remain saved as research data."
+                                            log("Showcase side ${showcasePositionIndex + 1} rejected; run ended")
                                         }, enabled = !busy) { Text("Reject and end") }
                                     }
                                 }
                                 "rotate" -> {
-                                    PositionGuide(showcasePosition)
-                                    Text("Move the phone to registered point $showcasePosition. Keep the closed object, surface and phone orientation consistent.", color = Sand, lineHeight = 24.sp)
+                                    ObjectGuide(showcasePositionIndex)
+                                    Text("Scan the other side. Keep the object still while you turn the phone to the next contact surface.", color = Sand, lineHeight = 24.sp)
                                     Button(onClick = { startShowcasePosition() }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                                        Text(if (microphoneGranted) "Capture position $showcasePosition" else "Enable microphone")
+                                        Text(if (microphoneGranted) "Scan other side" else "Enable microphone")
                                     }
                                 }
                                 "result" -> AnimatedVisibility(
@@ -376,27 +387,20 @@ class MainActivity : ComponentActivity() {
                                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                         if (showcaseMode == "scan") {
                                             Text("INCONCLUSIVE", color = Copper, fontFamily = FontFamily.Serif, fontSize = 32.sp)
-                                            Text("No known identity was established.", color = Sand, fontSize = 18.sp)
+                                            Text("The physical response was captured, but no validated identity decision is available.", color = Sand, fontSize = 18.sp)
                                             Text(
                                                 if (availableNames.isEmpty()) {
-                                                    "Four measured positions are saved as research data. No saved enrollments are available to identify this anonymous scan."
+                                                    "Two measured sides were saved as private research data. Enroll an object first to create a comparison reference."
                                                 } else {
-                                                    "${availableNames.size} saved enrollment(s) exist, but validated recognition models are unavailable; this four-position scan was not compared or identified."
+                                                    "${availableNames.size} saved object(s) exist, but trained specialists and calibration are unavailable; this scan was not identified."
                                                 },
-                                                color = Muted,
-                                                lineHeight = 21.sp
+                                                color = Muted, lineHeight = 21.sp
                                             )
                                         } else {
-                                            Text("Added to research captures", color = Copper, fontFamily = FontFamily.Serif, fontSize = 28.sp)
-                                            Text("Four measured positions A–D were recorded for $showcaseName.", color = Sand, fontSize = 18.sp)
-                                            Text(
-                                                if (showcaseReferenceSaved) "An encrypted, uncalibrated research baseline was saved. Verification remains unavailable."
-                                                else "Captures were saved, but the encrypted research baseline could not be created.",
-                                                color = Muted,
-                                                lineHeight = 21.sp
-                                            )
+                                            Text("Object added", color = Copper, fontFamily = FontFamily.Serif, fontSize = 32.sp)
+                                            Text("$showcaseName has a two-side capture fingerprint.", color = Sand, fontSize = 18.sp)
+                                            Text("Both real measurements were approved and merged into a provenance fingerprint. It is not yet an integrity signature because models and calibration are unavailable.", color = Muted, lineHeight = 21.sp)
                                         }
-                                        Text("Capture provenance digest · not an identity signature", color = Cyan, fontSize = 16.sp)
                                         showcaseFingerprint?.let { Text("Measured digest: ${it.take(24)}…", color = Muted, fontSize = 12.sp) }
                                         showcaseEvidence.forEach { (position, measured) -> ShowcaseEvidenceCard(position, measured) }
                                         Text("Trained specialists, a Capybara Laya model, and calibration are unavailable. No identity decision or confidence is reported.", color = Muted, lineHeight = 21.sp)
@@ -412,8 +416,16 @@ class MainActivity : ComponentActivity() {
                         }
                         else -> {
                             Spacer(Modifier.height(30.dp))
-                            Text("Give the physical\nworld a memory.", fontFamily = FontFamily.Serif, fontSize = 37.sp, lineHeight = 44.sp)
-                            Text("Sound. Vibration. Physical evidence.", color = Muted, fontSize = 15.sp)
+                            AnimatedVisibility(
+                                visible = introVisible,
+                                enter = fadeIn(animationSpec = tween(700)) +
+                                    slideInVertically(animationSpec = tween(700)) { it / 8 }
+                            ) {
+                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Text("Give the physical\nworld a memory.", fontFamily = FontFamily.Serif, fontSize = 37.sp, lineHeight = 44.sp)
+                                    Text("Sound. Vibration. Physical evidence.", color = Muted, fontSize = 15.sp)
+                                }
+                            }
                             Spacer(Modifier.height(16.dp))
                             Button(onClick = { openShowcase("enroll") }, modifier = Modifier.fillMaxWidth().heightIn(min = 58.dp)) {
                                 Text("Enroll object", fontSize = 17.sp)
@@ -470,7 +482,7 @@ class MainActivity : ComponentActivity() {
     ) {
         if (busy) return
         val condition = if (mode == "enroll") "showcase_enrollment" else "showcase_scan"
-        val label = try { CaptureLabel(objectName, sessionId, condition, position, ProfileEngine.RIGID_CASE_ID) }
+        val label = try { CaptureLabel(objectName, sessionId, condition, position, ProfileEngine.SHOWCASE_OBJECT_ID) }
         catch (error: IllegalArgumentException) {
             problem = "Invalid capture details; return and try again."
             log(error.message ?: "Invalid showcase capture label")
@@ -604,6 +616,27 @@ private fun ShowcaseEvidenceCard(position: String, evidence: PhysicsEvidence) {
     }
 }
 
+
+@Composable
+private fun ObjectGuide(sideIndex: Int) {
+    Column(
+        Modifier.fillMaxWidth().background(Charcoal).padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text("TWO-SIDE OBJECT SCAN", color = Cyan, fontSize = 11.sp, letterSpacing = 1.sp)
+        Box(
+            Modifier.fillMaxWidth().height(86.dp).background(Obsidian),
+            contentAlignment = androidx.compose.ui.Alignment.Center
+        ) {
+            Text(if (sideIndex == 0) "PLACE PHONE ON SIDE 1" else "TURN TO SIDE 2", color = Sand, fontSize = 15.sp)
+        }
+        Text(
+            if (sideIndex == 0) "Use any stable box or object. Keep the phone fully supported during the real acoustic and haptic capture."
+            else "Scan the other contact surface without changing the object or measurement conditions.",
+            color = Sand, fontSize = 16.sp, lineHeight = 22.sp
+        )
+    }
+}
 
 @Composable private fun PositionGuide(position: String) {
     Column(Modifier.fillMaxWidth().background(Charcoal).padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {

@@ -167,3 +167,21 @@ phone-to-case integrity evaluation here and cannot replace the five physical
 specialists, ReferenceGuard, or human-labeled object/session-separated data.
 Decision: do not integrate Jev into the SDK/app; retain it only as a possible
 non-production research comparator if the product's offline constraint changes.
+
+## Generic showcase and training execution status (2026-10-09)
+
+Question: can the judge-facing flow accept arbitrary boxes/objects without
+silently claiming a universal integrity model?
+
+Measured implementation decision: keep `rigid_case` A–D as the controlled
+research protocol, and add a separate `showcase_object` acquisition profile
+with `SIDE_1` and `SIDE_2`. The Compose flow records real stereo audio requests
+and all exposed vibrator IDs on both sides, asks the user to approve/retry/
+reject each capture, and merges the two saved capture hashes into a provenance
+fingerprint. This fingerprint is not a physical identity signature.
+
+Training decision: local CPU training remains the only completed training path.
+The Kaggle CLI is installed and masked credentials are available, but no cloud
+job was launched because no authorized, labeled Capybara physical dataset
+exists. Public UCI/MOMENT results remain transfer baselines only; using Kaggle
+with unrelated public labels would not train a valid Capybara specialist.

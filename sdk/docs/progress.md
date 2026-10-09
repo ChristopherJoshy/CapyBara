@@ -119,6 +119,22 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   cache; rerunning with that cache available succeeded. No connected-device
   checks were run; preserve the installed app because connected instrumentation
   previously removed `dev.capybara.app` and may have cleared private data.
+2026-10-09 generic showcase flow:
+
+- Added a separate `showcase_object` profile with two sides so the judge-facing
+  app accepts any stable box or object without pretending the rigid-case A–D
+  protocol is universal.
+- Enrollment now asks for an object name, captures and reviews side 1, asks the
+  user to scan the other side, captures and reviews side 2, then merges the two
+  saved capture hashes into a provenance fingerprint and displays an animated
+  object-added result.
+- Scan uses the same two-side capture/review flow without a name prompt and
+  reports `INCONCLUSIVE` because comparison specialists and calibration remain
+  unavailable. The app requests stereo audio and all exposed vibrator IDs;
+  physical speaker/motor onset remains unmeasured.
+- Host SDK tests, lint, APK unit-test task and debug assembly passed after this
+  change. Connected UI validation remains pending because the prior connected
+  task removed the package and may clear private data.
 
 ## Next acceptance milestones
 

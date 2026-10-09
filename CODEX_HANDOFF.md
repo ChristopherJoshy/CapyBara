@@ -13,9 +13,9 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
 
 ## User instructions to preserve
 
-- Use licensed pretrained weights where they fit the real sensor modality and task. The user explicitly selected Laya for the final decision stage; preserve its pinned source/checkpoint lineage. MOMENT was tested and rejected for the UCI fan transfer. Do not use Kaggle as a fallback unless the user redirects the work.
-- Use the isolated `sdk/training/artifacts/venv` with its bundled Python 3.12.14; do not mix packages with global Python. No Kaggle job ran and no captures were uploaded. A prior attempt to upload a private Kaggle kernel source was rejected by the app reviewer because ownership of that external destination was not verified; the user then chose Laya. Do not retry that external upload.
-- Commit and push after each **verified coherent slice**, not on a timer. Stage and inspect only intended files; never push captures, downloaded data, weights, virtual environments or credentials. A push of commit `74b8d86` to `origin codex/v6-handoff` was rejected by the app reviewer because repository ownership for `ChristopherJoshy/CapyBara` was not verified. Nothing was pushed; do not retry without resolving the ownership check.
+- Use licensed pretrained weights where they fit the real sensor modality and task. The user explicitly selected Laya for the final decision stage; preserve its pinned source/checkpoint lineage. MOMENT was tested and rejected for the UCI fan transfer.
+- Use the isolated `sdk/training/artifacts/venv` with its bundled Python 3.12.14. Kaggle CLI read access is verified, but no cloud training job has run because no authorized, labeled Capybara physical dataset exists. Do not upload private captures or credentials.
+- Commit and push after each **verified coherent slice**, not on a timer. Stage and inspect only intended files; never push captures, downloaded data, weights, virtual environments or credentials. `gh auth status` is currently valid for `ChristopherJoshy`; push the verified branch checkpoint.
 
 ## Safety invariants
 
@@ -30,10 +30,21 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
 
 - Android SDK and Compose demo are present. The SDK uses real `AudioRecord`, `AudioTrack`, `SensorManager` and `VibratorManager` APIs, CPU DSP, cancellation cleanup, private atomic capture storage and Android Keystore-protected baselines.
 - The connected iQOO is I2501 / Android 16 API 36 / `arm64-v8a`, serial `10BFAT1UT2000XP`. Two vibrator IDs are exposed; the app requests the same finite waveform on both. This does not establish independent actuator axes, physical onset or speaker activation.
-- Showcase enrollment and scan guide four registered positions A–D. A complete enrollment stores an encrypted but uncalibrated research baseline; scan remains anonymous and `INCONCLUSIVE` because validated comparison models are unavailable.
-- Earlier device evidence includes 3 APK and 2 SDK tests on the awake device. This turn's latest APK suite and its cleanup incident are recorded in `README.md` and `sdk/docs/progress.md`; all such checks establish acquisition/UI/storage behavior only, not model behavior or integrity accuracy.
-- No user-selected rigid-case experiment captures or labels exist. The controlled A–D experiment and repetitions are specified in `sdk/docs/experiments.md`; human physical work remains a blocker.
-- Latest APK connected suite passed 3/3 tests; its UI assertions checked scan entry and position A only, not a complete A–D run or baseline save. The Gradle task removed `dev.capybara.app`; the demo APK was reinstalled and launched. Private app data may have been cleared. Avoid that task until its cleanup can be prevented or a verified backup exists.
+- The current showcase enrollment and scan guide two generic contact sides
+  (`SIDE_1`, `SIDE_2`). Enrollment names the object and saves two approved raw
+  captures plus a provenance fingerprint; scan is anonymous and remains
+  `INCONCLUSIVE` because validated comparison models are unavailable.
+- Earlier device evidence includes 3 APK and 2 SDK tests on the awake device.
+  The latest host build also compiles the updated showcase instrumentation.
+  These checks establish acquisition/UI/storage behavior only, not model
+  behavior or integrity accuracy.
+- No user-selected rigid-case experiment captures or labels exist. The
+  controlled A–D experiment and repetitions are specified in
+  `sdk/docs/experiments.md`; human physical work remains a blocker.
+- A safe ADB smoke test installed and launched the updated APK on
+  `10BFAT1UT2000XP`. The prior connected Gradle task removed
+  `dev.capybara.app`; avoid that task until cleanup can be prevented or a
+  verified backup exists.
 - All five specialists (EchoNet, VibraNet, PhysFusion, StateNet, SpatialNet), actual Capybara-Laya training, CPU export parity, calibration, TrustGate and full offline MATCH/CHANGED behavior remain incomplete.
 - The pinned Laya 0.4.1 base checkpoint loaded on host CPU; the official exporter created a graph plus 1,685,258,240 bytes of external FP32 weights. ONNX Runtime CPU matched eager CPU on one generic upstream email example. Its base confidence is uncalibrated; no graph or model is in the APK.
 
@@ -75,14 +86,24 @@ Reproduce the scratch baseline with:
 
 ## Immediate continuation order
 
-1. Keep the restored Capybara APK installed. Find a device-test path that preserves its installation and private data before rerunning connected tests; host builds, lint and unit checks remain available.
-2. Collect and label the real rigid-case experiment in `sdk/docs/experiments.md`: A–D enrollment, five unchanged repositioned repeats per position, removed-item repeats, restoration repeats, and invalid captures. This requires human physical manipulation and labeling.
-3. Only after real capture evidence exists, build and evaluate each modality-matched specialist with object/session/run-separated splits, then fine-tune and calibrate Laya on versioned specialist evidence.
-4. Qualify model size/quantization with held-out accuracy and calibration before implementing Android CPU tokenizer/runtime parity, TrustGate, phone memory/latency measurements and offline end-to-end evaluation.
-5. Resolve preservation-safe connected test execution before any future device suite. Do not rerun the connected Gradle task until its package/data cleanup is understood.
-6. Git history was empty (`main` unborn, `origin/main` absent) when this handoff
-   began. The first checkpoint is on feature branch `codex/v6-handoff`; continue
-   with local feature-branch commits after each verified coherent slice. Push is
-   currently blocked by the ownership review described above.
-   Review staged paths; keep `sdk/training/artifacts/`, captures, credentials and
-   generated files out of commits.
+1. Keep the restored Capybara APK installed. The updated generic two-side
+   showcase is installed and launched on the verified device; preserve app data
+   before any connected test.
+2. Collect and label the real rigid-case experiment in `sdk/docs/experiments.md`:
+   A–D enrollment, five unchanged repositioned repeats per position, removed-item
+   repeats, restoration repeats, and invalid captures. This requires human
+   physical manipulation and labeling.
+3. Only after real capture evidence exists, build and evaluate each
+   modality-matched specialist with object/session/run-separated splits. Use the
+   verified Kaggle CLI only for authorized data; local venv CPU training remains
+   the fallback.
+4. Fine-tune and calibrate Laya on versioned specialist evidence. Qualify model
+   size/quantization with held-out accuracy before Android CPU parity, TrustGate,
+   phone memory/latency measurements and offline end-to-end evaluation.
+5. Resolve preservation-safe connected test execution before any future device
+   suite. Do not rerun the connected Gradle task until its package/data cleanup is
+   understood.
+6. The first checkpoint is on feature branch `codex/v6-handoff`; continue with
+   local feature-branch commits after each verified coherent slice, push them to
+   the configured origin, and keep `sdk/training/artifacts/`, captures,
+   credentials and generated files out of commits.
