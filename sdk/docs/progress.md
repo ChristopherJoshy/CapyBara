@@ -206,6 +206,20 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   capture or saved-reference inspection/export was performed.
 - Commit `a6cf03d` was pushed to `codex/v6-handoff`.
 
+## Public object-audio license audit (2026-10-10)
+
+- Corrected `research.md`: ObjectFolder-Real's data license is unverified;
+  ObjectFolder 2.0's CC BY 4.0 statement is for a separate release.
+- The closest fill-state lead, FillImpact, is described in its paper as over
+  5,000 real-container recordings with fill labels, but no dataset URL or data
+  license is provided. SonicSense has relevant inventory-state work and a
+  contact-microphone modality, but its linked recordings have no separate data
+  license. The YCB-impact OSF record has `node_license: null`. RealImpact's
+  repository license covers code, not a documented data license.
+- No data was downloaded and no model was trained. None of these sources
+  satisfies both verified data rights and Capybara's active phone-probe task;
+  model training and physical decision validation remain blocked.
+
 ## Next acceptance milestones
 
 1. The user collects and labels real rigid-case A–D enrollment, unchanged

@@ -99,14 +99,36 @@ The tutorial establishes its input/task but not the weight asset's license here;
 verify that before reuse. Environmental-event pretraining is not evidence of
 active object-response or integrity recognition.
 
-The [Knocker data](https://nmsl.kaist.ac.kr/projects/knocker/) and YCB-impact
-archive were publicly reachable, but no dataset license was found in their
-download records. Do not train distributable weights from them unless the authors
-grant terms. The licensed [ObjectFolder-Real](https://www.objectfolder.org/objectfolder-real-download)
-contains controlled impact recordings and contact-force profiles, but its first
-10-object audio archive is about 36 GB and has no integrity-state labels.
-Public-data use is bounded by source labels, licensing, domain gap, and measured
-device validation; it cannot replace human-labeled Capybara captures.
+The [Knocker data](https://nmsl.kaist.ac.kr/projects/knocker/) and
+[YCB-impact OSF record](https://api.osf.io/v2/nodes/4tcp6/) are publicly
+reachable but provide no dataset license. YCB reports `node_license: null`.
+Do not use either dataset for training or distribution without explicit terms.
+
+The [ObjectFolder-Real download page](https://www.objectfolder.org/objectfolder-real-download)
+describes real-object impacts, force profiles and tactile captures, but states no
+data license. The separate [ObjectFolder 2.0 download page](https://www.objectfolder.org/objectfolder2-0-download)
+says ObjectFolder is CC BY 4.0; that does not establish terms for the Real archives.
+Correction: ObjectFolder-Real is not verified as licensed. Do not download or
+train on those recordings until their data terms are explicit.
+
+Closest physical-audio leads audited 2026-10-10; none is currently usable:
+- [FillImpact](https://arxiv.org/abs/2607.17773) is described as over 5,000
+  48 kHz impact recordings from 88 real containers with hollow, water, rice and
+  fill-level labels. The paper gives no dataset download URL or data license.
+  Its DJI Mic/physical-striker setup also differs from Capybara's phone probe.
+- [SonicSense](https://proceedings.mlr.press/v270/liu25h.html) studies container
+  inventory and object properties with contact microphones. Its
+  [Apache-2.0 code repository](https://github.com/generalroboticslab/SonicSense)
+  links the recordings separately on Google Drive but states no dataset license.
+- [YCB-impact](https://api.osf.io/v2/nodes/4tcp6/) has `node_license: null`.
+  [RealImpact](https://github.com/samuel-clarke/RealImpact) publishes a separate
+  MIT-licensed code repository and data download script, but no data license was
+  found. Both are controlled impact-audio datasets without integrity-state
+  labels and do not match the phone active-probe setup.
+
+No candidate was downloaded or used. Public-data use remains bounded by source
+labels, artifact-specific licensing, domain gap, and measured device validation;
+it cannot replace human-labeled Capybara captures.
 
 ## Pretrained transfer and Laya host evaluation (2026-10-09)
 

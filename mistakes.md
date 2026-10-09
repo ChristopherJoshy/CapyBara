@@ -82,3 +82,12 @@ The remote is `ChristopherJoshy/CapyBara`, but local `gh auth status` reports th
 configured token invalid, and `gh api user` could not reach GitHub. Do not infer
 authenticated repository ownership from a cached account name or retry a push
 without valid identity verification.
+
+## 2026-10-10: dataset rights do not inherit from code repositories
+
+Earlier research incorrectly described ObjectFolder-Real as licensed based on
+the separate ObjectFolder 2.0 CC BY 4.0 statement. The Real download page does
+not state data terms. RealImpact's MIT and SonicSense's Apache-2.0 licenses are
+for their code repositories; neither establishes rights for separately hosted
+recordings. The YCB-impact OSF record reports no node license. Check the actual
+data artifact's license before download, training, or redistribution.
