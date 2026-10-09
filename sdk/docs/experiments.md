@@ -1,9 +1,38 @@
 # Physical experiments and model acceptance
 
-Status, 9 October 2026: real device diagnostics may verify acquisition, but there
-is no labeled physical-integrity dataset. The user is currently unavailable to
-manipulate objects. Do not relabel phone diagnostics or schema-test fixtures as
-training data. Do not launch Kaggle training until the prerequisites below exist.
+Status, 10 October 2026: there is no labeled physical-integrity dataset. The
+user must manipulate and label physical objects before task-specific training
+can begin. Public-data audit and dataset decisions are in `research.md`. Do not
+relabel phone diagnostics or schema-test fixtures as training data, and do not
+launch a Kaggle job with unrelated labels.
+
+For an initial controlled run, use a rigid closable earbuds case with safe,
+removable earbuds only if it supports stable phone contact and safe contents
+changes. Use a firm table, four marked positions A–D, and the app's `rigid_case`
+research flow. Keep the lid closed and phone orientation, support, power state
+and audio route consistent. Capture one reference set at A–D, then five
+unchanged A–D passes, five changed A–D passes with the earbuds removed, and five
+restored A–D passes. Use a fresh `sessionId` for each complete set. Give each
+comparison pass a unique `runId`, reused for its four position-level annotation
+rows. Use the app's `with_earbuds` / `without_earbuds` labels only when those
+states are physically true; never relabel a generic object as an earbuds case.
+
+In Capture setup, keep the object ID stable and tap **New session** before each
+A–D set. Select the physically correct condition chip for every capture. Save a
+baseline only for the first reference set; comparison sets stay raw captures.
+The UI does not record `runId`, so keep each comparison set's unique ID in the
+operator log for later annotation.
+
+This single-object experiment tests acquisition and within-object separability
+only. It cannot support an accuracy claim or train a generalizable model. The
+minimum initial object-separated pilot is ten distinct physical cases: six
+training, two calibration, and two untouched test objects, with all captures,
+references and sessions of each object confined to one split. Each split needs
+`MATCH`, `CHANGED` and physically justified `INCONCLUSIVE` outcomes. This is a
+minimum pilot, not a statistically adequate accuracy sample. Raw recordings
+remain in the app-private capture store until explicitly copied to local
+`sdk/captures/`; they must not be uploaded to Kaggle without specific
+authorization.
 
 ## First controlled experiment
 
@@ -14,18 +43,22 @@ easier to register. Cardboard and flexible bags follow after controlled feasibil
 Place the container on a firm repeatable support, keep the phone fully supported,
 mark four reproducible positions A–D, and use ordinary safe sound/haptic levels.
 
-For each object/session:
+For one stable object ID:
 
-1. Give the object a stable pseudonymous ID and the acquisition session a new ID.
-   Record profile, contents, supporting surface, four marked positions and device
-   calibration/version. Separate physical run IDs for each contents manipulation.
-2. Capture enrollment at A–D. Record each raw capture and its actual excitation,
-   timing, routing, quality and sample-loss metadata. Do not silently replace it.
-3. Remeasure unchanged contents at A–D, lifting/repositioning between repeats.
-   Begin with five independent repeats per position to expose coupling variation.
-4. Remove one item, close the case, and repeat five times per position. Record the
-   exact intervention before measuring. Restore contents and repeat unchanged.
-5. Inspect actual distributions and interference before expanding the matrix.
+1. Record profile, contents, supporting surface, four marked positions and
+   device calibration/version.
+2. Capture the enrollment reference at A–D under `with_earbuds`, using one
+   `sessionId` for that complete set. Preserve every raw capture and its actual
+   excitation, timing, routing, quality and sample-loss metadata.
+3. For each of five independent unchanged passes, lift/reposition the case,
+   create a fresh `sessionId`, and capture all positions A–D.
+4. Remove the earbuds, close the case, and capture five changed A–D passes,
+   each with a fresh `sessionId`; record the exact intervention. Restore the
+   contents and capture five more unchanged A–D passes.
+5. Assign a distinct `runId` to each comparison pass. Use that same ID on its
+   four position-level annotation rows, each comparing against the matching
+   reference position. Never reuse a `runId` across distinct passes.
+6. Inspect actual distributions and interference before expanding the matrix.
    If within-state repositioning variation dominates changed-state separation,
    report that result and improve contact/excitation rather than boost confidence.
 

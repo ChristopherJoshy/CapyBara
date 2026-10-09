@@ -18,6 +18,9 @@ research.md, mistakes.md and scoped AGENTS.md before resuming work.
 - Real labeled measurements, object/session separated evaluation, provenance,
   export parity and measured device latency are required before claiming success.
 - Training data and credentials stay private. Never log authentication material.
+- The generic two-side showcase may store only complete registered captures as
+  an encrypted uncalibrated research reference; partial/rejected captures are
+  not enrolled objects, and provenance digests are not identity signatures.
 
 ## Organization and workflow
 

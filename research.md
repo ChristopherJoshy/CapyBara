@@ -69,13 +69,14 @@ transfer, or package-integrity performance. Weights remain ignored under
 `ea0a70c4f3f0b9ff1aa3f8c2bfb668d687e289a4a50c19d9ddd3393c894766c2`.
 
 The [KAIST rotating-machine dataset](https://data.mendeley.com/datasets/ztmf3m7h5x/6)
-is CC BY 4.0. It provides paired acoustic and vibration measurements with machine
-health labels; the record lists 45 MB of acoustic data and 2.48 GB of vibration
-data. The related [Data in Brief paper](https://doi.org/10.1016/j.dib.2023.109049)
-reports synchronized acquisition at 51.2 kHz for acoustic and 25.6 kHz for
-vibration, with normal, bearing-fault, misalignment and unbalance conditions.
-This is a possible PhysFusion pretraining source, not a phone/container integrity
-dataset.
+is CC BY 4.0, authored by Jung, Kim, Yun, Bae and Park (published 8 February
+2023). The linked [Data in Brief paper](https://pmc.ncbi.nlm.nih.gov/articles/PMC10036499/)
+reports four industrial piezoelectric accelerometers at 25.6 kHz and one nearby
+microphone at 51.2 kHz. Acoustic recordings cover five no-load machine states;
+the vibration files cover more fault/load conditions. These are machine-fault
+labels on an industrial testbed, not smartphone active-probe measurements or
+object/session-separated package-state labels. License permits reuse, but the
+task and sensor mismatch make it unsuitable for training V6 specialists.
 
 [ReaLISED](https://zenodo.org/records/6488321) contains 2,479 real indoor
 recordings at 44.1 kHz with event, action and material metadata. Its Zenodo
@@ -177,11 +178,42 @@ Measured implementation decision: keep `rigid_case` A–D as the controlled
 research protocol, and add a separate `showcase_object` acquisition profile
 with `SIDE_1` and `SIDE_2`. The Compose flow records real stereo audio requests
 and all exposed vibrator IDs on both sides, asks the user to approve/retry/
-reject each capture, and merges the two saved capture hashes into a provenance
-fingerprint. This fingerprint is not a physical identity signature.
+reject each capture, and persists an encrypted uncalibrated research reference
+only after both registered sides are complete. Its provenance digest is not a
+physical identity signature.
 
 Training decision: local CPU training remains the only completed training path.
 The Kaggle CLI is installed and masked credentials are available, but no cloud
 job was launched because no authorized, labeled Capybara physical dataset
 exists. Public UCI/MOMENT results remain transfer baselines only; using Kaggle
 with unrelated public labels would not train a valid Capybara specialist.
+
+## Licensed-data audit and training decision (2026-10-10)
+
+Question: can another public dataset support a Capybara specialist or Laya
+fine-tune without treating unrelated labels as object-integrity evidence?
+
+The [smartphone vibration changepoint dataset](https://github.com/witulska/vibration-changepoint-dataset)
+is explicitly CC BY 4.0 ([license](https://github.com/witulska/vibration-changepoint-dataset/blob/main/LICENSE)).
+Its nine recordings (one person, motorbike and car) have observer-declared
+variance-change intervals and phone inertial channels nominally sampled at up to
+100 Hz. It has no microphone, active excitation, object state, or repeated
+object-integrity condition; it is not a V6 training set.
+
+[ORION-AE](https://doi.org/10.7910/DVN/FBRDU0) is CC0 1.0 according to its
+[Harvard Dataverse record](https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/FBRDU0).
+It measures bolt-loosening states with attached acoustic-emission sensors and a
+laser vibrometer at 5 MHz under a 100 Hz shaker. The integrity-like labels are
+valuable structural-monitoring evidence, but the sensors and bandwidth are
+incompatible with the phone's microphone/IMU capture path.
+
+Kaggle CLI 2.2.4 authentication, account-owned kernel listing, quota, and kernel
+metadata syntax were checked on 2026-10-10. The exact Mendeley DOI search found
+no Kaggle dataset mirror. Quota reported 0/30 GPU-hours and 0/20 TPU-hours used;
+quota does not prove a GPU can be allocated, and no allocation was tested. No
+Kaggle kernel, remote job, or dataset upload was created.
+
+Decision: do not train or quantize a model from these mismatched labels. The
+existing UCI fan classifier remains a local transfer baseline only. Train the
+V6 specialists and fine-tune Laya only after real iQOO captures have profile
+labels, independent object/session/run splits, and specialist evidence.

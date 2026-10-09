@@ -9,11 +9,12 @@ Capybara is an offline Android physical-measurement SDK and demonstration app. I
 - Connected test device: vivo/I2501, Android 16 / API 36, `arm64-v8a`, serial `10BFAT1UT2000XP`.
 - Real `AudioRecord` microphone capture, stereo `AudioTrack` excitation request, IMU capture, finite haptic excitation, cancellation cleanup, private atomic capture storage and CPU DSP are implemented.
 - The device exposes two vibrator IDs. On API 31+, Capybara requests the same finite waveform on all exposed IDs through `CombinedVibration`; Android does not expose independent-axis semantics for them.
-- Encrypted immutable four-position research baselines use Android Keystore AES-GCM.
-- The SDK profile catalog supports the calibrated-by-evidence research workflow
-  `rigid_case` at A–D and a separate generic `showcase_object` acquisition
-  workflow at two approved sides. The generic flow accepts any stable box/object
-  as raw capture input; it does not imply cross-object model generalization.
+- Encrypted immutable research baselines are profile-scoped and use Android
+  Keystore AES-GCM: four positions for the controlled `rigid_case` protocol and
+  two sides for the generic `showcase_object` flow. Both remain uncalibrated.
+- The profile catalog separates `rigid_case` A–D research capture from the
+  `showcase_object` SIDE_1/SIDE_2 acquisition flow. The latter accepts any stable
+  box/object as raw input; this does not establish cross-object generalization.
 - `ProbeBrain` records a fixed characterization plan: stereo audio requests the
   same excitation on left and right outputs, and haptics are requested on every
   exposed vibrator ID when Android reports them. These are requests, not proof
@@ -34,12 +35,13 @@ unavailable/INCONCLUSIVE behavior; the app never substitutes a threshold
 classifier or fabricated result.
 
 The showcase accepts any stable box or object through two real contact-side
-captures: enroll asks for a name, captures side 1, asks the user to turn the
-phone, captures side 2, merges both capture hashes into a provenance
-fingerprint, and shows an object-added animation. Scan uses the same two-side
-guided flow with approve/retry/reject review. It remains `INCONCLUSIVE` until
-validated comparison models and calibration exist; a provenance fingerprint is
-not an identity signature.
+captures. Enrollment asks for a name, captures and reviews side 1, asks the user
+to turn the phone, then captures and reviews side 2. Only a complete approved
+pair creates an encrypted uncalibrated research reference and provenance digest;
+partial/rejected captures are not listed as enrolled objects. Scan uses the same
+two-side approve/retry/reject flow without a name and remains `INCONCLUSIVE`
+until validated comparison models and calibration exist. The digest is not an
+identity signature.
 
 ## Repository
 

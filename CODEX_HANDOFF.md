@@ -1,6 +1,6 @@
 # Codex handoff: Capybara V6
 
-**Transfer requested:** the user is moving the active goal from this assistant to Codex. This is a state snapshot, not a completion claim. Continue the full V6 goal until its definition of done is verified.
+**Continuation snapshot (2026-10-10):** this is a status record, not a completion claim. Continue the full V6 goal until every definition-of-done item has current evidence.
 
 ## Read first
 
@@ -14,8 +14,8 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
 ## User instructions to preserve
 
 - Use licensed pretrained weights where they fit the real sensor modality and task. The user explicitly selected Laya for the final decision stage; preserve its pinned source/checkpoint lineage. MOMENT was tested and rejected for the UCI fan transfer.
-- Use the isolated `sdk/training/artifacts/venv` with its bundled Python 3.12.14. Kaggle CLI read access is verified, but no cloud training job has run because no authorized, labeled Capybara physical dataset exists. Do not upload private captures or credentials.
-- Commit and push after each **verified coherent slice**, not on a timer. Stage and inspect only intended files; never push captures, downloaded data, weights, virtual environments or credentials. `gh auth status` is currently valid for `ChristopherJoshy`; push the verified branch checkpoint.
+- Kaggle CLI 2.2.4 authenticated successfully; quota reported 30 GPU-hours and 20 TPU-hours remaining but no accelerator allocation was tested. Searching the exact licensed Mendeley DOI found no Kaggle mirror. No cloud job was launched because the available public datasets do not match physical phone-to-object integrity labels. Do not upload private captures or credentials.
+- Commit and push each **verified coherent slice**. Stage only intended files; never push captures, downloaded data, weights, virtual environments or credentials. GitHub authentication is valid and the current branch is `codex/v6-handoff`.
 
 ## Safety invariants
 
@@ -30,22 +30,25 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
 
 - Android SDK and Compose demo are present. The SDK uses real `AudioRecord`, `AudioTrack`, `SensorManager` and `VibratorManager` APIs, CPU DSP, cancellation cleanup, private atomic capture storage and Android Keystore-protected baselines.
 - The connected iQOO is I2501 / Android 16 API 36 / `arm64-v8a`, serial `10BFAT1UT2000XP`. Two vibrator IDs are exposed; the app requests the same finite waveform on both. This does not establish independent actuator axes, physical onset or speaker activation.
-- The current showcase enrollment and scan guide two generic contact sides
-  (`SIDE_1`, `SIDE_2`). Enrollment names the object and saves two approved raw
-  captures plus a provenance fingerprint; scan is anonymous and remains
-  `INCONCLUSIVE` because validated comparison models are unavailable.
-- Earlier device evidence includes 3 APK and 2 SDK tests on the awake device.
-  The latest host build also compiles the updated showcase instrumentation.
-  These checks establish acquisition/UI/storage behavior only, not model
-  behavior or integrity accuracy.
-- No user-selected rigid-case experiment captures or labels exist. The
-  controlled A–D experiment and repetitions are specified in
-  `sdk/docs/experiments.md`; human physical work remains a blocker.
-- A safe ADB smoke test installed and launched the updated APK on
-  `10BFAT1UT2000XP`. The prior connected Gradle task removed
-  `dev.capybara.app`; avoid that task until cleanup can be prevented or a
-  verified backup exists.
-- All five specialists (EchoNet, VibraNet, PhysFusion, StateNet, SpatialNet), actual Capybara-Laya training, CPU export parity, calibration, TrustGate and full offline MATCH/CHANGED behavior remain incomplete.
+- The current showcase uses two generic contact sides (`SIDE_1`, `SIDE_2`).
+  Enrollment names the object and saves the approved raw captures plus an
+  Android Keystore AES-GCM encrypted `RESEARCH_BASELINE_UNCALIBRATED` reference
+  and provenance digest only after both registered sides are complete. Partial
+  or rejected captures do not appear in the enrolled-object list. Scan is
+  anonymous and stays `INCONCLUSIVE`.
+- The latest host build compiled the new two-side storage regression and both
+  showcase instrumentation APKs. SDK/APK host unit tests and both lint tasks,
+  APK assembly, and instrumentation APK compilation passed. The storage
+  instrumentation was not executed because the historical connected task
+  removed the app package and may have cleared private data.
+- ADB install/launch on the verified serial resumed `dev.capybara.app`. A
+  scoped read-only app-data probe found no `no_backup/capybara` capture
+  directory. No current physical recordings or labels exist.
+- Real-device physical onset of audio/haptics, completed capture/review,
+  offline verification and UI screenshot inspection remain unverified.
+- All five specialists (EchoNet, VibraNet, PhysFusion, StateNet, SpatialNet),
+  task-specific Capybara-Laya training, Android CPU parity, calibration,
+  TrustGate and full offline MATCH/CHANGED behavior remain incomplete.
 - The pinned Laya 0.4.1 base checkpoint loaded on host CPU; the official exporter created a graph plus 1,685,258,240 bytes of external FP32 weights. ONNX Runtime CPU matched eager CPU on one generic upstream email example. Its base confidence is uncalibrated; no graph or model is in the APK.
 
 ## Public data and trained baseline
@@ -79,31 +82,26 @@ Reproduce the scratch baseline with:
 - [MOMENT-1-small](https://huggingface.co/AutonLab/MOMENT-1-small) is MIT-licensed and pinned to revision `411e288267f82cce86296dbe4d6c8bc533cc162f`; checkpoint SHA256 `785e6c6f57ffa7cac7e2a1fff6369618d49f2f441563ddea76c866231e5aa877`. Its frozen UCI fan probe scored 55.56% accuracy and 52.97% macro-F1, below the scratch baseline's 67.63% / 65.52% on the same 414-window speed-held-out split. It is rejected for this transfer and is not a Capybara model.
 - Laya source commit `1adc59f7e371deb601fcfa18a14e25db238addcc` and official English checkpoint revision `7b928d828b7b0e022f929d9bd2e44165aa270148` are recorded in `sdk/training/README.md`. The base tensor hash is `891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c`. Host eager/ONNX output matched on one generic example; the checkpoint has an invalid base temperature, and the 1.69 GB FP32 ONNX external weights are not app-deployable. No Capybara fine-tune or physical evaluation exists.
 - [YAMNet](https://www.tensorflow.org/hub/tutorials/yamnet) is a pretrained MobileNetV1 audio-event classifier trained for 521 AudioSet labels, with 16 kHz mono input. Its weight-asset license was not verified in the sources read. It is environmental-audio pretraining, not active phone/object response. Do not use until rights and domain transfer are checked.
-- [KAIST rotating-machine data](https://data.mendeley.com/datasets/ztmf3m7h5x/6), CC BY 4.0, contains synchronized industrial acoustic/vibration signals and normal/bearing-fault/misalignment/unbalance labels. The record lists 45 MB acoustic and 2.48 GB vibration files; the study reports 51.2 kHz audio and 25.6 kHz vibration. Potential licensed PhysFusion pretraining, but not phone/container integrity and not downloaded.
-- [ReaLISED](https://zenodo.org/records/6488321) has 2,479 real indoor event recordings at 44.1 kHz with event/action/material metadata, but its Zenodo license field is blank. Do not use it for weights intended for redistribution without clarified rights; it also lacks controlled excitation, paired IMU and reference/change labels.
-- [ObjectFolder-Real](https://www.objectfolder.org/objectfolder-real-download) is CC BY 4.0 and has impact audio plus force profiles, but the first 10-object audio archive is about 36 GB and has no integrity-state labels.
-- YCB-impact is publicly reachable but no dataset license was found. MIMII/DCASE machine-anomaly corpora located in research carry CC BY-NC-SA terms and are unsuitable for unrestricted commercial distribution. Do not treat public reachability as a data license.
+- [Vibration measurements with observer-declared variance change points](https://github.com/witulska/vibration-changepoint-dataset) is CC BY 4.0 and contains nine smartphone inertial recordings (one person, motorbike and car), up to 100 Hz, with observer-declared variance shifts. It lacks active excitation, audio and object-integrity labels.
+- [ORION-AE](https://doi.org/10.7910/DVN/FBRDU0) is CC0 1.0 and labels bolt-loosening levels using bonded 5 MHz acoustic-emission sensors and a laser vibrometer. This structural-health dataset is incompatible with phone microphone/IMU input.
+- The licensed KAIST data and these adjacent datasets were not downloaded or used for task-model training; using their unrelated labels would not create Capybara specialists.
 
 ## Immediate continuation order
 
-1. Keep the restored Capybara APK installed. The updated generic two-side
-   showcase is installed and launched on the verified device; preserve app data
-   before any connected test.
-2. Collect and label the real rigid-case experiment in `sdk/docs/experiments.md`:
-   A–D enrollment, five unchanged repositioned repeats per position, removed-item
-   repeats, restoration repeats, and invalid captures. This requires human
-   physical manipulation and labeling.
-3. Only after real capture evidence exists, build and evaluate each
-   modality-matched specialist with object/session/run-separated splits. Use the
-   verified Kaggle CLI only for authorized data; local venv CPU training remains
-   the fallback.
-4. Fine-tune and calibrate Laya on versioned specialist evidence. Qualify model
-   size/quantization with held-out accuracy before Android CPU parity, TrustGate,
-   phone memory/latency measurements and offline end-to-end evaluation.
-5. Resolve preservation-safe connected test execution before any future device
-   suite. Do not rerun the connected Gradle task until its package/data cleanup is
-   understood.
-6. The first checkpoint is on feature branch `codex/v6-handoff`; continue with
-   local feature-branch commits after each verified coherent slice, push them to
-   the configured origin, and keep `sdk/training/artifacts/`, captures,
-   credentials and generated files out of commits.
+1. Keep the rebuilt Capybara APK installed and preserve its private data.
+2. Request the first controlled earbuds-case experiment from
+   `sdk/docs/experiments.md`. Collect five independent repeats per position and
+   physical state; a single object is feasibility evidence only.
+3. Obtain multiple independent object IDs, sessions, run labels and controlled
+   physical states before training. Keep each object's captures and references
+   within one train/calibration/test split.
+4. Train EchoNet/VibraNet/PhysFusion/StateNet/SpatialNet from measured iQOO data
+   only after separability and held-out evaluation are demonstrated; then
+   fine-tune Laya on their versioned evidence.
+5. Qualify quantization with held-out decision/calibration evidence before
+   Android CPU parity, memory/latency measurements, TrustGate and offline
+   end-to-end validation.
+6. Resolve preservation-safe connected test execution before any connected
+   Gradle suite; keep user app data intact.
+7. Continue on `codex/v6-handoff`; commit and push each verified coherent slice.
+   Keep captures, training artifacts, credentials and generated files out of Git.

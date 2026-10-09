@@ -199,6 +199,32 @@ Pushing uploads and runs a notebook and consumes quota. No job folder or private
 resource was created here because there is no valid physical training set yet.
 Do not run the official notebook's optional Hugging Face publishing cells.
 
+## Public-data audit and current Kaggle state (2026-10-10)
+
+Kaggle CLI 2.2.4 authenticated successfully. The read-only quota check reported
+0/30 GPU-hours and 0/20 TPU-hours used; this is quota, not proof that an
+accelerator can be allocated. Searching the exact Mendeley DOI found no Kaggle
+mirror. No kernel, training job, or dataset upload was created.
+
+The public-data review found no dataset suitable for V6 specialist/Laya labels:
+
+- The CC BY 4.0 [KAIST rotating-machine dataset](https://data.mendeley.com/datasets/ztmf3m7h5x/6)
+  pairs industrial microphone and piezoelectric accelerometer data, but machine
+  fault labels do not describe phone-to-object integrity.
+- The CC BY 4.0
+  [smartphone variance-changepoint dataset](https://github.com/witulska/vibration-changepoint-dataset)
+  has nine inertial recordings and observer-marked variance breaks, not active
+  probes, microphone data, or object-state labels.
+- The CC0 1.0 [ORION-AE bolt-loosening dataset](https://doi.org/10.7910/DVN/FBRDU0)
+  uses attached 5 MHz acoustic-emission sensors and a laser vibrometer, not a
+  phone microphone/IMU.
+
+These sources may inform literature review but are not promoted as V6 models or
+training evidence. Do not train task models from a dataset until its license,
+labels, sensor/task fit, and evaluation split are approved. The V6 decision
+pipeline additionally requires the actual iQOO physical-label prerequisite in
+`sdk/docs/experiments.md`.
+
 Primary references: [Laya fine-tuning source](https://github.com/NandhaKishorM/laya/blob/1adc59f7e371deb601fcfa18a14e25db238addcc/laya/train.py),
 [official Kaggle notebook](https://github.com/NandhaKishorM/laya/blob/1adc59f7e371deb601fcfa18a14e25db238addcc/notebooks/laya_finetune_typed_decisions_2xT4_kaggle.ipynb),
 [ONNX export](https://github.com/NandhaKishorM/laya/blob/1adc59f7e371deb601fcfa18a14e25db238addcc/scripts/export_onnx.py),

@@ -136,6 +136,33 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   change. Connected UI validation remains pending because the prior connected
   task removed the package and may clear private data.
 
+2026-10-10 generic baseline persistence and public-data audit:
+
+- `SignatureVault` now validates the registered position count for each profile:
+  four A–D captures for `rigid_case`, two sides for `showcase_object`. Both are
+  AES-GCM encrypted `RESEARCH_BASELINE_UNCALIBRATED` references.
+- The showcase home list now derives only from saved references. Incomplete or
+  rejected raw captures remain private research data and cannot appear as
+  enrolled objects. The app shows “Object added” only after encrypted reference
+  creation succeeds; failure is explicit.
+- Added an Android storage regression test for a two-side reference, its stored
+  two captures/status, and rejection of incomplete or duplicate-side input.
+  SDK/APK host unit tests, both lint tasks, APK assembly, and both
+  instrumentation APK compile tasks passed. The storage instrumentation was
+  compiled but not run because the historical connected task removed the app
+  package and may clear its data.
+- Installed and launched the rebuilt app on `10BFAT1UT2000XP`; the resumed
+  activity was observed. A read-only `run-as dev.capybara.app` check found no
+  capture directory; no physical capture or user data was present for training.
+- Audited the licensed KAIST paired industrial dataset, CC BY 4.0 smartphone
+  variance-change data, and CC0 ORION-AE bolt-loosening data. Their labels or
+  sensors do not match phone-to-box integrity. Kaggle CLI 2.2.4 auth worked;
+  quota showed 0/30 GPU and 0/20 TPU hours used. The exact public-data DOI
+  search found no Kaggle mirror. No remote job or public-data model was launched.
+- Code commit `3c57a15` was pushed to `codex/v6-handoff`. Full V6 training,
+  calibration, and physical evaluation remain blocked on actual labeled
+  iQOO captures and multiple independent objects.
+
 ## Next acceptance milestones
 
 1. The user collects and labels real rigid-case A–D enrollment, unchanged

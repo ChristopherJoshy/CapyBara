@@ -18,7 +18,8 @@ logs, scientific details and capture configuration in a hamburger-only sidebar.
 Keep unavailable decisions disabled and accurately described in the sidebar.
 
 The judge-facing showcase accepts any stable box/object through the
-`showcase_object` two-side capture flow: name (enrollment only), real side-1
-capture, turn prompt, real side-2 capture, approve/retry/reject, then a
-provenance fingerprint. This must not be presented as calibrated identity
-recognition while specialist weights and calibration are unavailable.
+`showcase_object` two-side flow: name (enrollment only), real side-1 capture,
+turn prompt, real side-2 capture, approve/retry/reject, then encrypted
+uncalibrated research reference plus provenance digest. Only completed
+references appear as enrolled; partial/rejected runs do not. Never present the
+digest as calibrated identity recognition.
