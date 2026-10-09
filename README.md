@@ -57,6 +57,12 @@ identity signature.
 cmd.exe /c gradlew.bat testDebugUnitTest assembleDebug
 ```
 
+## Latest verification (2026-10-10)
+
+`cmd.exe /c gradlew.bat :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug`
+completed successfully. `:apk:testDebugUnitTest` was `NO-SOURCE`, so this checked
+APK compilation and lint, not the on-device enrollment or sensor-capture path.
+
 Install only the Capybara package on the verified device:
 
 ```powershell

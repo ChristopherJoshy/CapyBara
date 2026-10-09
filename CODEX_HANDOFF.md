@@ -41,6 +41,10 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
   APK assembly, and instrumentation APK compilation passed. The storage
   instrumentation was not executed because the historical connected task
   removed the app package and may have cleared private data.
+- Follow-up commit `9e6d26e` replaced the misleading enrollment prompt
+  “Create a physical fingerprint” with “Create a research reference”.
+  `:apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug` passed;
+  the unit-test task was `NO-SOURCE`. No device enrollment/capture was run.
 - ADB install/launch on the verified serial resumed `dev.capybara.app` and
   rendered its home UI. A scoped read-only app-data probe found no
   `no_backup/capybara` capture directory, but the home list displayed a saved

@@ -166,6 +166,15 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   calibration, and physical evaluation remain blocked on actual labeled
   iQOO captures and multiple independent objects.
 
+2026-10-10 enrollment terminology correction:
+
+- Replaced the enrollment prompt “Create a physical fingerprint” with “Create a
+  research reference”; the stored digest is provenance, not identity.
+- `cmd.exe /c gradlew.bat :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug`
+  completed successfully. `:apk:testDebugUnitTest` was `NO-SOURCE`; APK compile
+  and lint passed, but no device enrollment/capture flow was run.
+- Commit `9e6d26e` was pushed to `codex/v6-handoff`.
+
 ## Next acceptance milestones
 
 1. The user collects and labels real rigid-case A–D enrollment, unchanged
