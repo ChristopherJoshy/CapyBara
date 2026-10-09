@@ -36,15 +36,18 @@ includes sensor bias; neither number establishes contact quality.
 The FFT is a radix-2 CPU implementation. Segments use a periodic Hann window,
 per-segment mean subtraction and 50% overlap. Segment length is the largest power
 of two no greater than 1024 or the recording length. Fewer than eight samples
-cannot produce spectral evidence. Incomplete trailing windows are omitted and
-reported. Frequency resolution is `sampleRate/segmentLength`; zero padding does
-not create additional physical resolution.
+cannot produce spectral evidence. One incomplete trailing window is included
+only when samples extend beyond the last full window: it is zero-padded for the
+FFT, mean-subtracted over observed samples, scaled by observed Hann energy, and
+weighted by its observed fraction. This approximate edge policy is reported;
+frequency resolution is `sampleRate/segmentLength`, and zero padding does not
+create additional physical resolution.
 
-For each segment, the integrated contribution of bin k is
-`c[k]*abs(FFT(window*(x-mean)))²/(N*sum(window²))`, where c is 1 at DC/Nyquist
-and 2 elsewhere. Averaging segments gives Welch band power, equivalent to PSD
-integration with bin width `sampleRate/N`. This normalization preserves expected
-sinusoidal power rather than comparing unscaled FFT magnitudes.
+For an N-point segment with s observed samples, the integrated contribution of
+bin k is `alpha*c[k]*abs(FFT(window*(x-mean)))²/(N*sum(window[0:s]²))`, where c
+is 1 at DC/Nyquist and 2 elsewhere; alpha is 1 for full windows and s/N for the
+trailing window. Full windows use Welch normalization; the approximate partial
+window policy is not calibrated boundary handling.
 [Welch method and scaling](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html).
 
 These bands describe the complete recording, including silence and haptic stages.

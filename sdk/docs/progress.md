@@ -175,6 +175,22 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   and lint passed, but no device enrollment/capture flow was run.
 - Commit `9e6d26e` was pushed to `codex/v6-handoff`.
 
+2026-10-10 trailing-spectrum DSP correction:
+
+- A synthetic regression first failed when a nonzero PCM sample at the final
+  index contributed zero band energy. The engine now includes one zero-padded
+  tail window only when it contains samples beyond complete windows, normalizes
+  using observed Hann energy, and weights that window by its observed fraction.
+- Focused `PhysicsEngineTest.unrepresentedTrailingSampleContributesToSpectrum`
+  passed. Full host/lint/APK build:
+  ```powershell
+  cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug
+  ```
+  passed; `:apk:testDebugUnitTest` was `NO-SOURCE`.
+- This is a synthetic DSP boundary check, not physical transfer-response
+  calibration or integrity evidence. Commit `a476743` was pushed to
+  `codex/v6-handoff`.
+
 ## Next acceptance milestones
 
 1. The user collects and labels real rigid-case A–D enrollment, unchanged

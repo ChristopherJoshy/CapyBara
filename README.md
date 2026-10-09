@@ -59,9 +59,12 @@ cmd.exe /c gradlew.bat testDebugUnitTest assembleDebug
 
 ## Latest verification (2026-10-10)
 
-`cmd.exe /c gradlew.bat :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug`
-completed successfully. `:apk:testDebugUnitTest` was `NO-SOURCE`, so this checked
-APK compilation and lint, not the on-device enrollment or sensor-capture path.
+```powershell
+cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug
+```
+completed successfully. `:apk:testDebugUnitTest` was `NO-SOURCE`. This includes
+synthetic DSP tests and APK compilation/lint; it is not physical-response or
+integrity validation.
 
 Install only the Capybara package on the verified device:
 

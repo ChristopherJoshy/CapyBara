@@ -45,6 +45,10 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
   “Create a physical fingerprint” with “Create a research reference”.
   `:apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug` passed;
   the unit-test task was `NO-SOURCE`. No device enrollment/capture was run.
+- `a476743` includes the final unrepresented PCM samples in coarse spectral
+  evidence through one reported, zero-padded tail window; a synthetic last-sample
+  regression and full host/lint/assembly checks passed. This diagnostic remains
+  uncalibrated and is not integrity evidence.
 - ADB install/launch on the verified serial resumed `dev.capybara.app` and
   rendered its home UI. A scoped read-only app-data probe found no
   `no_backup/capybara` capture directory, but the home list displayed a saved
