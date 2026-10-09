@@ -42,7 +42,7 @@ is available.
 | Evidence Engine | No canonical specialist-evidence producer. | Primitive PhysicsEngine output is insufficient for final Laya input. Each feature needs source captures, model versions, and calibration provenance. |
 | Capybara-Laya | Pinned official Laya base loads on host CPU and its generic example passed eager/ONNX CPU parity. | No physical training records, specialist outputs, or fine-tune exist. The 1.69 GB FP32 export and uncalibrated base confidence are not Android deployment candidates. |
 | TrustGate | Not implemented. | Missing-model, invalid-contact, OOD, and calibrated-risk acceptance logic has not been established. |
-| SignatureVault and app | Keystore-encrypted, immutable uncalibrated baselines support complete registered profiles; the app lists only saved references and keeps scan `INCONCLUSIVE`. | No embedding comparison or validated MATCH/CHANGED model; no user physical baseline exists. |
+| SignatureVault and app | Keystore-encrypted, immutable uncalibrated baselines support complete registered profiles; the app lists only saved references and keeps scan `INCONCLUSIVE`. | No embedding comparison or validated MATCH/CHANGED model; no reference is accepted as verified physical training/evaluation data. |
 
 This is the current implementation boundary, not a reduced replacement for the
 required V6 architecture. No stage may turn missing evidence into a positive
