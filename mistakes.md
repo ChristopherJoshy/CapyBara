@@ -67,3 +67,18 @@ user's Gradle cache. The same checked-in wrapper and task set succeeded once
 the requested cache access was available. This was a host sandbox boundary, not
 a Gradle or source failure. Keep using the checked-in wrapper and record the
 actual task result; do not modify wrapper files to work around the cache.
+
+## 2026-10-09: verify the app's actual private capture root
+
+The first read-only device lookup checked `files/capybara/captures` and found no
+directory. `CaptureStore` uses `Context.noBackupFilesDir`, so the correct path is
+`no_backup/capybara/captures`; that path also does not exist on the installed
+Capybara package. No files were changed. Verify the storage API before treating
+an absent path as evidence that no captures exist.
+
+## 2026-10-09: a configured GitHub account is not proof of push access
+
+The remote is `ChristopherJoshy/CapyBara`, but local `gh auth status` reports the
+configured token invalid, and `gh api user` could not reach GitHub. Do not infer
+authenticated repository ownership from a cached account name or retry a push
+without valid identity verification.

@@ -72,6 +72,28 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   No connected tests were run because the earlier connected task removed the
   app package and may have cleared private data.
 
+2026-10-09 fixed probe planning slice:
+
+- Added `ProbeBrain` as a fixed, profile-checked policy. It always requests the
+  acoustic chirp for `rigid_case` and requests haptics only when Android reports
+  a vibrator. The selected plan and its fixed-selection basis are stored with
+  capture metadata; this is not signal-adaptive planning.
+- All 2 `ProbeBrainTest` and 3 `ProfileEngineTest` tests pass in the latest SDK
+  unit-test results; full host SDK/APK unit, lint and APK assembly command
+  completed successfully. No device suite was run.
+- Rechecked training inputs: neither `sdk/captures/` nor a prepared
+  `sdk/training/artifacts/dataset-v1/` exists. No eligible physical records are
+  available, so no Laya fine-tune was launched. The public UCI fan labels remain
+  unrelated to the physical integrity task.
+- A read-only check of `dev.capybara.app` on serial `10BFAT1UT2000XP` confirmed
+  the package is installed but `no_backup/capybara/captures` does not exist.
+- Push remains blocked: the configured GitHub account name matches the remote
+  owner, but `gh auth status` reports its token is invalid and GitHub API access
+  failed. No push was attempted without verifiable authentication.
+- `sdk/docs/architecture.md` now maps each required architecture stage to its
+  implementation state and specific evidence/deployment gate. The full V6
+  definition of done remains unmet.
+
 2026-10-09 pretrained-model continuation (supersedes earlier environment notes):
 
 - The isolated `sdk/training/artifacts/venv` now runs bundled Python 3.12.14,

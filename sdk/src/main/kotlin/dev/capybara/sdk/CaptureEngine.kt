@@ -62,6 +62,7 @@ internal class CaptureEngine(private val context: Context) {
         val sensorManager = context.getSystemService(SensorManager::class.java)
         val audioManager = context.getSystemService(AudioManager::class.java)
         val haptic = vibrator(context)
+        val probePlan = ProbeBrain.select(label.profile, haptic.hasVibrator())
         val hapticManager = if (Build.VERSION.SDK_INT >= 31) context.getSystemService(VibratorManager::class.java) else null
         val hapticIds = if (Build.VERSION.SDK_INT >= 31) hapticManager?.vibratorIds?.toList().orEmpty() else emptyList()
         val sensorThread = HandlerThread("CapybaraCapture").apply { start() }
@@ -233,6 +234,8 @@ internal class CaptureEngine(private val context: Context) {
             metadata["audioOutputTimebase"] = "MONOTONIC"
             metadata["imuTimebase"] = "BOOTTIME"
             metadata["capturePurpose"] = "raw_measurement_only"
+            metadata["probePlan"] = probePlan.description
+            metadata["probePlanSelection"] = "fixed_profile_and_hardware_capabilities"
             metadata["contactQuality"] = "unavailable_without_calibration"
             metadata["acousticExcitation"] = "linear_chirp_300_8000Hz_1s_20ms_fades_digital_amplitude_0.12"
             metadata["acousticSpl"] = "unmeasured"
@@ -266,7 +269,7 @@ internal class CaptureEngine(private val context: Context) {
                 observeRoute("output", player)
                 metadata["playbackHeadFrames"] = player.playbackHeadPosition.toString()
                 delay(700)
-                if (haptic.hasVibrator()) {
+                if (probePlan.requestHaptics) {
                     progress("Requesting finite haptic pulses")
                     val timing = longArrayOf(0, 80, 120, 80, 120, 120)
                     val amplitude = if (haptic.hasAmplitudeControl()) intArrayOf(0, 64, 0, 96, 0, 128) else intArrayOf(0, -1, 0, -1, 0, -1)

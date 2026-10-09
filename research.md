@@ -147,3 +147,23 @@ weights, phone parity/resource measurements or integrity metrics.
 The UCI evaluation implementation is `sdk/training/evaluate_moment_uci.py`; its
 small contract tests are `sdk/training/test_evaluate_moment_uci.py`. The reports,
 weights, checkpoints and captures remain ignored under training artifacts.
+
+## Jev substitution check (2026-10-09)
+
+The user asked whether TypeSafe Jev could replace Laya as the final decision
+model. TypeSafe's [API reference](https://docs.typesafe.ai/api) documents a
+hosted `POST https://api.typesafe.ai/v1/systemone` endpoint authenticated by a
+bearer API key. Its [model page](https://docs.typesafe.ai/models) says Jev accepts
+text-only state, does not accept audio, and is not fine-tuned per customer; the
+same model weights serve every account. The [first-party announcement](https://typesafe.ai/blog/introducing-system-one-models-and-jev)
+positions Jev as a structured-decision model.
+
+The official material reviewed documents API access; it does not provide a
+downloadable Jev checkpoint or an offline runtime. Even if derived capture
+features were serialized into text/JSON, inference would require network access
+and send derived physical evidence to a hosted service. This conflicts with the
+Capybara offline/no-cloud runtime invariant. Jev also has no demonstrated
+phone-to-case integrity evaluation here and cannot replace the five physical
+specialists, ReferenceGuard, or human-labeled object/session-separated data.
+Decision: do not integrate Jev into the SDK/app; retain it only as a possible
+non-production research comparator if the product's offline constraint changes.
