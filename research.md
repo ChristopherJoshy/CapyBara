@@ -77,10 +77,11 @@ vibration, with normal, bearing-fault, misalignment and unbalance conditions.
 This is a possible PhysFusion pretraining source, not a phone/container integrity
 dataset.
 
-[ReaLISED](https://zenodo.org/records/6488321) is CC BY 4.0 and contains 2,479
-real indoor recordings at 44.1 kHz with event, action and material metadata.
-It can support generic acoustic-event pretraining, but has no controlled probe,
-paired IMU, or reference/change labels.
+[ReaLISED](https://zenodo.org/records/6488321) contains 2,479 real indoor
+recordings at 44.1 kHz with event, action and material metadata. Its Zenodo
+record currently leaves the license field blank, so it is excluded from
+training intended for redistribution until reuse rights are clarified. In any
+case it has no controlled probe, paired IMU, or reference/change labels.
 
 The public [MOMENT-1-small checkpoint](https://huggingface.co/AutonLab/MOMENT-1-small)
 is MIT-licensed and exposes pretrained time-series representations and a
@@ -106,21 +107,43 @@ contains controlled impact recordings and contact-force profiles, but its first
 Public-data use is bounded by source labels, licensing, domain gap, and measured
 device validation; it cannot replace human-labeled Capybara captures.
 
-## MOMENT evaluation prerequisites (2026-10-09)
+## Pretrained transfer and Laya host evaluation (2026-10-09)
+
+The isolated training environment now runs bundled Python 3.12.14 with
+PyTorch 2.14.1+cpu, NumPy 2.2.6, Transformers 4.57.1, `momentfm` 0.1.5, Laya
+0.4.1, ONNX 1.23.2 and ONNX Runtime 1.31.0. CUDA is unavailable. These are
+observed package versions, not a complete dependency lock.
 
 The [official MOMENT model card](https://huggingface.co/AutonLab/MOMENT-1-small)
-lists the checkpoint as MIT-licensed. Its pinned model revision, weight hash and
-size are recorded above. The [official MOMENT repository](https://github.com/moment-timeseries-foundation-model/moment)
-documents frozen representation and classification tasks through
-`MOMENTPipeline`; this makes a frozen-encoder comparison on the existing UCI
-speed-group split a reasonable bounded transfer experiment. It cannot create
-Capybara integrity labels from fan-configuration labels.
+and [official repository](https://github.com/moment-timeseries-foundation-model/moment)
+support a frozen embedding comparison. On 2,346 UCI fan windows, a frozen
+MOMENT-1-small encoder plus train-only normalized linear probe, with fan speeds
+40/70/100 held out exactly as the scratch baseline, scored 55.56% accuracy,
+52.97% macro-F1 and 0.9220 cross-entropy on 414 test windows. The scratch CNN
+scored 67.63%, 65.52% and 0.8002 on the same test split. MOMENT did not transfer
+well in this setup; it is not promoted. Both datasets are one fan's
+speed-configuration windows, not independent objects or Capybara evidence.
 
-The evaluation did not run: the ignored Python 3.13 venv exists, including its
-PyTorch files, but Windows cannot start its interpreter. Its config points to a
-Microsoft Store Python base; only the separate bundled Python 3.12.14 launcher
-was confirmed working, and it was not used for ML. The MOMENT checkpoint is not
-cached. This is an environment blocker, not evidence for or against model
-transfer. Restore the intended venv runtime, pin the `momentfm` source revision,
-then measure the frozen encoder on the same split before considering any student
-or Android deployment.
+The user selected Laya for the final decision stage. The Apache-2.0 source is
+pinned to commit `1adc59f7e371deb601fcfa18a14e25db238addcc` (0.4.1). The official
+English base checkpoint is downloaded at revision
+`7b928d828b7b0e022f929d9bd2e44165aa270148`; `model.safetensors` is 842,609,210
+bytes and SHA256
+`891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c`.
+[`sdk/docs/laya-integration.md`](sdk/docs/laya-integration.md) records its
+input/output contract and limits. The loaded Torch model counted 421,293,827
+parameters, three fewer than the upstream README's 421,293,830; this discrepancy
+is unresolved.
+
+The pinned upstream exporter generated a 3,306,003-byte ONNX graph and an
+external FP32 weight file of 1,685,258,240 bytes. A host ONNX Runtime CPU session
+ran the same generic upstream email example as eager CPU and produced the same
+`0.879` output. This validates one generic host export/runtime path only. Laya
+warned that a base temperature `0.1005828` was clamped to `0.5`; confidence is
+uncalibrated. The 1.69 GB FP32 export is not packaged or used by Android, and
+there are no physical labels, five trained specialists, trained Capybara-Laya
+weights, phone parity/resource measurements or integrity metrics.
+
+The UCI evaluation implementation is `sdk/training/evaluate_moment_uci.py`; its
+small contract tests are `sdk/training/test_evaluate_moment_uci.py`. The reports,
+weights, checkpoints and captures remain ignored under training artifacts.

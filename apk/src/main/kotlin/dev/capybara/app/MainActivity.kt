@@ -190,7 +190,7 @@ class MainActivity : ComponentActivity() {
                             Text("${capabilities.model} · API ${capabilities.apiLevel}", color = Cyan)
                             Text("Microphone: ${if (microphoneGranted) "permission granted" else "permission needed"}\nCaptures: $savedCount\nBaselines: ${baselines.size}\nCurrent operation: $stage", color = Muted)
                             Text("Intelligence", color = Copper, fontSize = 18.sp)
-                            Text("EchoNet, VibraNet, PhysFusion, StateNet, SpatialNet and Laya: checkpoints unavailable.\nCalibration: pending.\nVerification: unavailable.", color = Muted, lineHeight = 21.sp)
+                            Text("EchoNet, VibraNet, PhysFusion, StateNet and SpatialNet: checkpoints unavailable.\nCapybara Laya: not trained or installed.\nCalibration: pending.\nVerification: unavailable.", color = Muted, lineHeight = 21.sp)
                             TextButton(onClick = { scientificDetails = !scientificDetails }) { Text(if (scientificDetails) "Hide technical details" else "Technical details") }
                             if (scientificDetails) {
                                 Text(capabilities.audio, color = Muted, fontSize = 12.sp)
@@ -398,7 +398,7 @@ class MainActivity : ComponentActivity() {
                                         Text("Capture provenance digest · not an identity signature", color = Cyan, fontSize = 16.sp)
                                         showcaseFingerprint?.let { Text("Measured digest: ${it.take(24)}…", color = Muted, fontSize = 12.sp) }
                                         showcaseEvidence.forEach { (position, measured) -> ShowcaseEvidenceCard(position, measured) }
-                                        Text("Trained specialists, Laya, and calibration are unavailable. No identity decision or confidence is reported.", color = Muted, lineHeight = 21.sp)
+                                        Text("Trained specialists, a Capybara Laya model, and calibration are unavailable. No identity decision or confidence is reported.", color = Muted, lineHeight = 21.sp)
                                         Button(onClick = {
                                             showcaseMode = null
                                             showcaseStep = "name"

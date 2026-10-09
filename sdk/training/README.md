@@ -7,35 +7,26 @@ temporary fixtures only; they are never training or evaluation evidence.
 
 ## Verified environment, 9 October 2026
 
-- Kaggle CLI **2.2.4** is installed in the Python 3.13 Store site-packages.
-- The WindowsApps `python.exe` launcher fails in this environment. Codex's bundled
-  Python **3.12.14** works. Importing the installed Kaggle site-packages through it
-  works for the verified CLI and read-only API calls; this is not a verified ML
-  environment and must not be used to mix binary ML packages across Python versions.
-- Credential presence was checked with the Kaggle skill's checker, with token
-  output fully redacted and credential-permission mutation disabled.
-- Live authentication succeeded as **chrisopherjoshy**, exactly this spelling.
-- Quota: GPU **0.00 / 30.00 hours used**, TPU **0.00 / 20.00 hours used**. API refresh
-  value was `2026-10-10T00:00:00`; it supplied no timezone, so none is inferred.
-- Installed `kernels push --help` supports `--accelerator`; it does **not** show
-  the newer documentation's `--no-run`. Use installed help to verify commands.
-- No GPU was allocated, no training was launched, and no recordings were uploaded.
-- Bundled Python has NumPy but no PyTorch, ONNX, ONNX Runtime, Transformers,
-  Tokenizers, Safetensors, or Laya. ML execution is unverified.
+The isolated `artifacts/venv` now launches with bundled Python **3.12.14** and
+contains PyTorch **2.14.1+cpu**, NumPy **2.2.6**, Transformers **4.57.1**,
+MOMENT **0.1.5**, Laya **0.4.1** from the exact source commit below, ONNX **1.23.2**,
+and ONNX Runtime **1.31.0**. `torch.cuda.is_available()` is false. These versions
+are observed, not a locked dependency set; repeatability across a fresh install
+is not yet established.
 
-Recheck on 9 October 2026: `artifacts/venv/Scripts/python.exe` is present but
-Windows cannot start it. Its `pyvenv.cfg` points to the Microsoft Store Python
-3.13.14 base; the bundled Python 3.12.14 launches, but must not be used to mix
-the venv's binary ML packages. MOMENT weights are not cached and no pretrained
-evaluation has run. Restore a working Python 3.13 runtime for this venv before
-installing the pinned MOMENT tooling or interpreting any model results.
+The frozen MOMENT-1-small comparison on the existing UCI fan speed-group split
+completed on CPU. It scored 55.56% accuracy, 52.97% macro-F1 and 0.9220
+cross-entropy on 414 held-out windows, below the scratch UCI baseline's 67.63%,
+65.52% and 0.8002. This rejects this transfer setup for the fan task; neither
+result is Capybara integrity evidence.
 
-This read-only check prints only the account name and quota, never credentials:
-
-```powershell
-$trainingPython = 'C:\Users\Chris\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
-& $trainingPython -c 'import sys; sys.path.insert(0,r"C:\Users\Chris\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages"); import kaggle; kaggle.api.authenticate(); print(kaggle.api.get_config_value("username")); kaggle.api.quota_view_cli()'
-```
+The official English Laya base checkpoint is cached at its pinned revision and
+verified weight SHA256 below. A generic upstream email example ran with eager
+CPU and exported ONNX CPU backends and returned the same result. The checkpoint
+warns that one shipped temperature is invalid and clamped; its confidence is
+uncalibrated. Its FP32 ONNX weights occupy 1,685,258,240 bytes before app/runtime
+overhead. It is not a Capybara model, is not packaged in Android, and is never
+used for physical decisions.
 
 ## Capture and annotation contract
 
@@ -103,15 +94,16 @@ The ignored local checkout is `sdk/training/upstream/laya`. Recreate it with:
 ```powershell
 git clone https://github.com/NandhaKishorM/laya sdk/training/upstream/laya
 git -C sdk/training/upstream/laya checkout --detach 1adc59f7e371deb601fcfa18a14e25db238addcc
-python -m venv sdk/training/artifacts/venv
+$trainingPython = 'C:\Users\Chris\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
+& $trainingPython -m venv sdk/training/artifacts/venv
 & sdk/training/artifacts/venv/Scripts/python.exe -m pip install -r sdk/training/requirements.txt
 ```
 
-Use a functioning installed Python 3.11+ for this environment. The scripts require
-the pip installation's direct-url commit to match the pin. The upstream requirements
+Use the isolated environment's Python executable. The scripts require the pip
+installation's direct-url commit to match the pin. The upstream requirements
 allow several dependency versions; every real run records resolved versions in
-`training-report.json`. A tested ML dependency lock still requires the first real
-job; this preparation has not established bitwise reproducibility.
+`training-report.json`. A tested ML dependency lock still requires a real training
+run; this preparation has not established bitwise reproducibility.
 
 Download the genuine English checkpoint once, at its verified revision:
 
@@ -125,8 +117,20 @@ These are future commands. Do not run training until actual labeled specialist
 evidence and calibration exist. CPU training is supported with `--device cpu`;
 Android inference and export parity always use CPU. Base weights must match
 SHA256 `891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c`.
-The base tensor file is 842,609,210 bytes with 421,293,830 parameters. FP32 runtime
-weight storage alone is about 1.68 GB; graph overhead and activations add memory.
+The base tensor file is 842,609,210 bytes with SHA256
+`891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c`. The
+loaded Torch model reports 421,293,827 parameters; the upstream README says
+421,293,830, a three-parameter discrepancy that is not resolved. The upstream
+exporter produced an ONNX graph (SHA256
+`6fc87cf398222e3726549040a03099bb75bc57067769a1cb657c942e80a4e46c`) plus
+**1,685,258,240 bytes** of external FP32 weights (SHA256
+`c1c08150e12327b306ed5389a9e5768c69ee068ed591362911fa67da3b6ee387`). ONNX
+Runtime loaded both on the host using only `CPUExecutionProvider`.
+On the official generic email example, eager and ONNX returned identical `0.879`
+for the same `noul` output. This is export/runtime plumbing only: the base model
+warned that a temperature was clamped from `0.1005828` to `0.5`, so confidence is
+uncalibrated. No phone/AAR, tokenizer port, Android parity, memory or latency
+check has passed, and this graph is not an Android package candidate.
 
 Training uses upstream load/train/calibration/save/evaluation APIs and RLCD,
 sequential options, shuffled choice presentation, four epochs, and seed 20261009.
@@ -170,18 +174,13 @@ not independent physical objects. The model SHA256 and full confusion matrix are
 in the ignored `training-report.json`; the weights SHA256 is
 `ea0a70c4f3f0b9ff1aa3f8c2bfb668d687e289a4a50c19d9ddd3393c894766c2`.
 
-This result is a scratch baseline only. The user requires licensed pretrained
-models wherever possible. Evaluate the pinned MIT MOMENT-1-small checkpoint
-(`411e288267f82cce86296dbe4d6c8bc533cc162f`) on the same group split; its
-151,615,328-byte checkpoint and 37,901,512 parameters are likely too large for
-Android. Compare a frozen/finetuned encoder and, only if warranted, a distilled
-student. Do not promote it without held-out evaluation and offline CPU/device
-parity. No V6 specialist or integrity model is currently trained or integrated.
-
-The training process emitted PyTorch's optional NumPy initialization warning
-because this venv does not currently install NumPy; the script does not use NumPy,
-and the run completed with the report above. Add NumPy only if a later
-pretraining dependency requires it.
+This result is a scratch baseline only. The pinned MIT MOMENT-1-small encoder was
+also evaluated on this same split; its frozen embedding probe scored 55.56%
+accuracy and 52.97% macro-F1, below the scratch model. Keep that candidate
+rejected for this fan transfer and do not relabel it as VibraNet. The Laya base
+checkpoint is the selected decision-model lineage, but it still needs real
+specialist evidence, human labels, leakage-safe calibration/test splits, and an
+actual fine-tune before it can support Capybara decisions.
 
 ## Kaggle execution, when real data is ready
 

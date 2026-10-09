@@ -1,9 +1,11 @@
 # Laya integration: verified source, deployment still blocked
 
-Investigated on 9 October 2026. Laya is mandatory and no substitute classifier is
-implemented. No trained Capybara-Laya checkpoint, ONNX graph, calibrated physical
-dataset, or Android Laya benchmark exists yet. The app must report this explicitly
-and return INCONCLUSIVE when the required intelligence is unavailable.
+Investigated on 9 October 2026. Laya is the selected final decision-model lineage;
+no substitute classifier is implemented. The official base checkpoint and a host
+ONNX export now exist in ignored training artifacts, but no trained Capybara-Laya
+checkpoint, calibrated physical dataset, Android Laya benchmark, or deployable
+Capybara decision exists. The app must report this explicitly and return
+INCONCLUSIVE when the required intelligence is unavailable.
 
 ## Architecture and checkpoint
 
@@ -16,8 +18,10 @@ in one forward pass; it does not generate free-form text. A fixed three-choice
 integrity question fits this interface.
 
 The English official checkpoint uses ModernBERT-large, 28 encoder layers,
-hidden size 1024, 16 attention heads and vocabulary size 50,368. Its total tensor
-count is **421,293,830 parameters** including Laya's added heads. The actual
+hidden size 1024, 16 attention heads and vocabulary size 50,368. The pinned
+upstream README reports **421,293,830 parameters** including Laya's added heads;
+the loaded model's parameter iterator counts **421,293,827**, a three-parameter
+discrepancy that has not been resolved. The actual
 checkpoint config limits the combined question/evidence sequence to 512 tokens
 and the question/options head to 192; the backbone's 8,192 position capacity is
 not the deployed Laya input budget. The canonical evidence serializer must report
@@ -28,8 +32,9 @@ contains `model.safetensors` (842,609,210 bytes; mostly FP16),
 `rl_agent_config.json`, `encoder/config.json`, `tokenizer/tokenizer.json` and
 `tokenizer/tokenizer_config.json`. Its model SHA256 is
 `891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c`.
-These values were retrieved from official API/config metadata, not inferred from
-a filename. We have not downloaded or executed the weights.
+These values were retrieved from official API/config metadata and locally hashed,
+not inferred from a filename. The base weights loaded and ran on host CPU; that
+is not a Capybara evaluation.
 [Official checkpoint](https://huggingface.co/convaiinnovations/laya/tree/7b928d828b7b0e022f929d9bd2e44165aa270148),
 [configuration](https://huggingface.co/convaiinnovations/laya/blob/7b928d828b7b0e022f929d9bd2e44165aa270148/rl_agent_config.json).
 
@@ -86,12 +91,16 @@ manifest, and model licenses locally. No Hugging Face download or model router
 fetch may occur during a phone scan.
 [ONNX Runtime mobile guidance](https://onnxruntime.ai/docs/tutorials/mobile/).
 
-FP32 storage for 421M parameters is roughly 1.68 GB before activations, allocator
-overhead and graph duplication. Smartphone memory and a 500 ms Laya target are
-unverified. Dynamic INT8 is not automatically safe: upstream's exporter reports
-substantial held-out decision drift, especially per-channel quantization. Keep
-FP32 as the parity baseline and only deploy a quantized graph after a task-specific
-held-out accuracy/calibration study. No size/latency promise is made here.
+The pinned upstream exporter completed after enabling UTF-8 output on Windows.
+It produced a 3,306,003-byte ONNX graph and a 1,685,258,240-byte external FP32
+weight file. ONNX Runtime loaded it on CPU; on the official generic email example,
+the eager and ONNX APIs returned the same `0.879` result. The example exercises
+export plumbing only, and its base temperature is invalid/clamped. No Android
+tokenizer/operator parity, phone memory, or latency has been measured. The 1.69 GB
+external weight file makes this FP32 export unsuitable for current APK packaging.
+Dynamic INT8 is not automatically safe: upstream's exporter reports substantial
+held-out decision drift, especially per-channel quantization. Only assess a
+quantized graph after task-specific held-out accuracy/calibration evidence exists.
 
 ## Evidence, calibration and TrustGate
 
@@ -127,9 +136,9 @@ redistribution. No third-party model is committed to this repository.
 [ModernBERT model card](https://huggingface.co/answerdotai/ModernBERT-large#license),
 [ONNX Runtime license](https://github.com/microsoft/onnxruntime/blob/main/LICENSE).
 
-Verified locally: pinned source checkout, live read-only Kaggle authentication/
-quota, ten data-safety tests, Python syntax. Still required: real object data,
-specialist training, Laya fine-tuning, resolved ML dependency lock, actual export,
-host CPU numerical/probability parity, Android tokenizer/operator parity, memory,
-CPU latency and held-out full-system offline evaluation. No neural target is
-claimed achieved.
+Verified locally: pinned source and base checkpoint, weight hash, CPU eager load,
+successful ONNX export, CPU ONNX Runtime load and one generic host output-parity
+example, ten data-safety tests, and Python syntax. Still required: real object
+data, specialist training, Laya fine-tuning, resolved ML dependency lock, Android
+tokenizer/operator parity, phone memory and CPU latency, calibration, TrustGate,
+and held-out full-system offline evaluation. No neural target is claimed achieved.

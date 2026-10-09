@@ -40,10 +40,30 @@ reinstalled and launched; no unrelated package was touched. Do not rerun the
 connected task until its cleanup behavior can be avoided or a verified backup
 exists. Host compile, lint and unit checks remain safe.
 
-## 2026-10-09: pretrained evaluation venv cannot start
+## 2026-10-09: isolated ML runtime and Windows ONNX output
 
-The ignored training venv's Python executable is present but fails to create a
-process because its config points to a Microsoft Store Python 3.13 base. The
-bundled Python 3.12.14 works, but using it with the venv's compiled PyTorch
-packages would mix runtimes. Do not install ML packages globally or claim MOMENT
-results until a compatible venv interpreter is restored.
+The original ignored venv pointed to a Microsoft Store Python 3.13 base that
+could not start. Recreating the isolated environment with the bundled Python
+3.12.14 restored CPU ML execution; the old environment is preserved separately
+as `venv-python313-unlaunchable`. Do not repair this by mixing compiled packages
+with a different global interpreter.
+
+The pinned Laya exporter initially failed only when its Windows cp1252 console
+could not encode a Unicode checkmark. Setting `PYTHONUTF8=1` and
+`PYTHONIOENCODING=utf-8` let the unchanged upstream export finish. ONNX Runtime
+then loaded the graph and its 1.69 GB external weight file on CPU and matched the
+eager result on one generic example. ONNX's Python checker still fails to
+canonicalize that external-data path on this host (`Access is denied`) even
+though Python can stat/read it and ONNX Runtime can execute it; keep the checker
+limitation explicit instead of treating its error as a successful validation.
+The base checkpoint's clamped temperature also means its confidence is not
+calibrated.
+
+## 2026-10-09: sandbox denied the Gradle wrapper cache lock
+
+The first host wrapper attempt stopped before Gradle started because the
+restricted process could not open the standard distribution lock under the
+user's Gradle cache. The same checked-in wrapper and task set succeeded once
+the requested cache access was available. This was a host sandbox boundary, not
+a Gradle or source failure. Keep using the checked-in wrapper and record the
+actual task result; do not modify wrapper files to work around the cache.

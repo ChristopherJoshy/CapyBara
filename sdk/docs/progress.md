@@ -57,20 +57,50 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 - No user physical-case captures, trained Capybara specialists, calibrated
   decisions or held-out physical evaluation exist.
 
+2026-10-09 pretrained-model continuation (supersedes earlier environment notes):
+
+- The isolated `sdk/training/artifacts/venv` now runs bundled Python 3.12.14,
+  Torch 2.14.1+cpu, NumPy 2.2.6, Transformers 4.57.1, MOMENT 0.1.5, Laya 0.4.1,
+  ONNX 1.23.2 and ONNX Runtime 1.31.0. CUDA is unavailable. This is an observed
+  environment, not a complete dependency lock.
+- Frozen MOMENT-1-small embeddings plus a linear probe reached 55.56% accuracy,
+  52.97% macro-F1 and 0.9220 cross-entropy on 414 UCI fan windows held out by
+  speed. It underperformed the scratch CNN on the same split (67.63%, 65.52%,
+  0.8002) and is rejected for this transfer. Neither result is Capybara evidence.
+- The user's selected Laya path is prepared: pinned 0.4.1 source and official
+  English base checkpoint loaded on CPU; weight SHA256 is recorded in
+  `sdk/training/README.md`. Upstream ONNX export succeeded and ONNX Runtime CPU
+  matched eager CPU on one generic email example. The external FP32 weights are
+  1,685,258,240 bytes. Base temperature clamping makes confidence uncalibrated;
+  this is not a physical integrity model and was not integrated into Android.
+- No case captures or annotations exist. All five physical specialists,
+  fine-tuned Capybara-Laya, calibration, TrustGate, Android parity, measured
+  phone resource use and held-out physical evaluation remain incomplete.
+- `cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug
+  :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug` passed on the host.
+  The first restricted run could not open Gradle's wrapper lock under the user
+  cache; rerunning with that cache available succeeded. No connected-device
+  checks were run; preserve the installed app because connected instrumentation
+  previously removed `dev.capybara.app` and may have cleared private data.
+
 ## Next acceptance milestones
 
-1. Preserve the restored app and its private data while finding a safe connected
-   test path; host build, lint and unit validation already pass.
-2. Restore a working Python 3.13 base for the ignored training venv and evaluate
-   licensed MOMENT transfer on the existing held-out UCI speed groups.
-3. Collect real rigid-case A–D enrollment, unchanged repeats, removed-item
-   changes and restored repeats. User physical manipulation is required.
-4. Train EchoNet, VibraNet, PhysFusion, StateNet, SpatialNet and actual Laya only
-   from modality-matched, labeled evidence with leakage-safe splits.
-5. Validate CPU export parity, calibration, TrustGate and offline end-to-end
-   results on held-out physical sessions and the iQOO.
+1. The user collects and labels real rigid-case A–D enrollment, unchanged
+   repositioned repeats, removed-item changes, restored repeats and invalid
+   captures using `sdk/docs/experiments.md`. These physical labels cannot be
+   supplied by code or public fan data.
+2. Develop and evaluate EchoNet, VibraNet, PhysFusion, StateNet and SpatialNet
+   only from modality-matched real evidence with object/session/run-separated
+   splits. Continue only if repeated-state separability supports the task.
+3. Fine-tune the pinned Laya lineage on actual versioned specialist evidence,
+   calibrate on separate cases, and evaluate untouched physical test objects.
+4. Reduce or qualify the 1.69 GB FP32 export only with held-out accuracy and
+   calibration evidence; then implement Android CPU tokenizer/runtime parity,
+   TrustGate, memory/latency measurement and offline full-system checks.
+5. Resolve preservation-safe connected test execution before any future device
+   suite; host build/lint/unit checks remain available.
 
 No task-specific specialist weights, labeled physical-integrity corpus,
-calibration, or integrity accuracy currently exists. The ignored UCI baseline
-does not satisfy any V6 model milestone. Do not replace missing intelligence with
-an unvalidated threshold classifier.
+calibration, or integrity accuracy currently exists. Keep unavailable decisions
+as `INCONCLUSIVE`; do not substitute the UCI classifier, raw base Laya output or
+an unvalidated threshold.
