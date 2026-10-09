@@ -5,7 +5,7 @@ data class CaptureLabel(
     val sessionId: String,
     val condition: String,
     val position: String,
-    val profile: String = "rigid_case",
+    val profile: String = ProfileEngine.RIGID_CASE_ID,
 ) {
     init {
         require(listOf(objectId, sessionId, condition, position, profile).all {

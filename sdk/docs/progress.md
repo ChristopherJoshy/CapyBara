@@ -57,6 +57,21 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 - No user physical-case captures, trained Capybara specialists, calibrated
   decisions or held-out physical evaluation exist.
 
+2026-10-09 profile API slice:
+
+- Added the SDK's typed profile catalog for the one physically specified
+  `rigid_case` workflow and positions A–D. Physical captures reject unsupported
+  profiles and positions before opening hardware; the Compose flow and
+  encrypted-baseline validator now read the same catalog.
+- The profile is an acquisition contract only. No calibration, model readiness
+  or integrity result is inferred from it.
+- All 3 `ProfileEngineTest` JVM contract tests passed. The checked-in command
+  `cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug
+  :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug` passed, including
+  both module lint tasks and APK assembly. APK unit tests have no source set.
+  No connected tests were run because the earlier connected task removed the
+  app package and may have cleared private data.
+
 2026-10-09 pretrained-model continuation (supersedes earlier environment notes):
 
 - The isolated `sdk/training/artifacts/venv` now runs bundled Python 3.12.14,

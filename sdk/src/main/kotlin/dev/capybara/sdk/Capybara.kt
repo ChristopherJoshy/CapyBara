@@ -12,10 +12,15 @@ class Capybara(context: Context) {
 
     fun getCapabilities(): DeviceCapabilities = capabilities(context)
 
+    fun getSupportedProfiles(): List<IntegrityProfile> = ProfileEngine.supportedProfiles()
+
+    fun getProfile(profileId: String): IntegrityProfile = ProfileEngine.get(profileId)
+
     fun analyzePhysics(scan: Scan): PhysicsEvidence = PhysicsEngine.analyze(scan)
 
     /** Progress callbacks run on the capture dispatcher; cancellation releases all hardware. */
     suspend fun capture(label: CaptureLabel, onProgress: (String) -> Unit = {}): Scan {
+        ProfileEngine.validateCapture(label)
         check(captureLock.tryLock()) { "A Capybara capture is already active." }
         try {
             return withContext(Dispatchers.IO) { CaptureEngine(context).capture(label, onProgress) }

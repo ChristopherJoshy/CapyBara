@@ -123,7 +123,8 @@ class MainActivity : ComponentActivity() {
         var showcasePositionIndex by remember { mutableIntStateOf(0) }
         var showcaseReferenceSaved by remember { mutableStateOf(false) }
         var showcaseEvidence by remember { mutableStateOf<List<Pair<String, PhysicsEvidence>>>(emptyList()) }
-        val positions = listOf("A", "B", "C", "D")
+        val profile = remember { sdk.getProfile(ProfileEngine.RIGID_CASE_ID) }
+        val positions = profile.positions
         val showcasePosition = positions[showcasePositionIndex]
         val availableNames = baselines.map { it.objectId }.distinct()
         val drawer = rememberDrawerState(DrawerValue.Closed)
@@ -439,7 +440,7 @@ class MainActivity : ComponentActivity() {
 
     private fun startCapture(objectId: String, sessionId: String, condition: String, position: String) {
         if (busy) return
-        val label = try { CaptureLabel(objectId.trim(), sessionId.trim(), condition, position) }
+        val label = try { CaptureLabel(objectId.trim(), sessionId.trim(), condition, position, ProfileEngine.RIGID_CASE_ID) }
         catch (error: IllegalArgumentException) { problem = "Check the object and session IDs in the menu."; log(error.message ?: "Invalid label"); return }
         captureJob = lifecycleScope.launch {
             busy = true; problem = null
@@ -469,7 +470,7 @@ class MainActivity : ComponentActivity() {
     ) {
         if (busy) return
         val condition = if (mode == "enroll") "showcase_enrollment" else "showcase_scan"
-        val label = try { CaptureLabel(objectName, sessionId, condition, position) }
+        val label = try { CaptureLabel(objectName, sessionId, condition, position, ProfileEngine.RIGID_CASE_ID) }
         catch (error: IllegalArgumentException) {
             problem = "Invalid capture details; return and try again."
             log(error.message ?: "Invalid showcase capture label")

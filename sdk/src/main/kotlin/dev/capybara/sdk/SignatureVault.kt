@@ -32,12 +32,17 @@ class SignatureVault(context: Context) {
             }
         }
         val labels = captures.map { it.getJSONObject("label") }
-        require(labels.map { it.getString("position") }.toSet() == setOf("A", "B", "C", "D")) { "Each registered position must occur once." }
-        for (key in listOf("objectId", "sessionId", "condition", "profile")) {
+        val profileId = labels.first().getString("profile")
+        val profile = ProfileEngine.get(profileId)
+        require(labels.map { it.getString("position") }.toSet() == profile.positions.toSet()) {
+            "Each registered position for ${profile.id} must occur once."
+        }
+        for (key in listOf("objectId", "sessionId", "condition")) {
             require(labels.map { it.getString(key) }.distinct().size == 1) { "Baseline $key differs between positions." }
         }
+        require(labels.all { it.getString("profile") == profile.id }) { "Baseline profile differs between positions." }
         require(captures.map { it.getString("captureId") }.distinct().size == 4) { "A capture cannot be reused at another position." }
-        val reference = ResearchBaseline(UUID.randomUUID().toString(), labels[0].getString("objectId"), labels[0].getString("profile"), System.currentTimeMillis())
+        val reference = ResearchBaseline(UUID.randomUUID().toString(), labels[0].getString("objectId"), profile.id, System.currentTimeMillis())
         val json = JSONObject().put("schemaVersion", 1).put("id", reference.id).put("objectId", reference.objectId)
             .put("profile", reference.profile).put("createdAtMillis", reference.createdAtMillis)
             .put("modelVersion", JSONObject.NULL).put("calibrationVersion", JSONObject.NULL)
