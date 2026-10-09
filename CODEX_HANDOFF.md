@@ -41,11 +41,14 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
   APK assembly, and instrumentation APK compilation passed. The storage
   instrumentation was not executed because the historical connected task
   removed the app package and may have cleared private data.
-- ADB install/launch on the verified serial resumed `dev.capybara.app`. A
-  scoped read-only app-data probe found no `no_backup/capybara` capture
-  directory. No current physical recordings or labels exist.
-- Real-device physical onset of audio/haptics, completed capture/review,
-  offline verification and UI screenshot inspection remain unverified.
+- ADB install/launch on the verified serial resumed `dev.capybara.app` and
+  rendered its home UI. A scoped read-only app-data probe found no
+  `no_backup/capybara` capture directory, but the home list displayed a saved
+  research reference. Its underlying captures, labels and provenance were not
+  inspected or verified; do not use or export it without user approval.
+- The home screen was visually inspected; two-side interaction and completed
+  capture/review were not exercised. Physical onset of audio/haptics and offline
+  verification remain unverified.
 - All five specialists (EchoNet, VibraNet, PhysFusion, StateNet, SpatialNet),
   task-specific Capybara-Laya training, Android CPU parity, calibration,
   TrustGate and full offline MATCH/CHANGED behavior remain incomplete.

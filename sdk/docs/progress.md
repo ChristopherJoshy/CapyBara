@@ -151,9 +151,12 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   instrumentation APK compile tasks passed. The storage instrumentation was
   compiled but not run because the historical connected task removed the app
   package and may clear its data.
-- Installed and launched the rebuilt app on `10BFAT1UT2000XP`; the resumed
-  activity was observed. A read-only `run-as dev.capybara.app` check found no
-  capture directory; no physical capture or user data was present for training.
+- Installed and launched the rebuilt app on `10BFAT1UT2000XP`; the home UI
+  rendered. A read-only `run-as dev.capybara.app` check found no
+  `no_backup/capybara` capture directory. The home list displayed a saved
+  research reference, but its underlying captures, labels and provenance were
+  not inspected or verified. Preserve it; it is not accepted as training
+  evidence, and no data was copied or exported.
 - Audited the licensed KAIST paired industrial dataset, CC BY 4.0 smartphone
   variance-change data, and CC0 ORION-AE bolt-loosening data. Their labels or
   sensors do not match phone-to-box integrity. Kaggle CLI 2.2.4 auth worked;
