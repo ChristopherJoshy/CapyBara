@@ -126,6 +126,17 @@ Closest physical-audio leads audited 2026-10-10; none is currently usable:
   found. Both are controlled impact-audio datasets without integrity-state
   labels and do not match the phone active-probe setup.
 
+- [VibeCheck](https://arxiv.org/abs/2504.15535) is a closer active-sensing
+  precedent: it transmits a 20 Hz–20 kHz sweep through a gripped object using a
+  piezo emitter and receives it with a contact microphone; its tasks include
+  object, internal-pose and contact-state inference with session-separated
+  test sets. The transducers are mechanically coupled to the object, unlike
+  Capybara's phone air-speaker/microphone path. The paper and
+  [project page](https://roamlab.github.io/vibecheck/) provide no dataset
+  download. The [code repository](https://github.com/roamlab/acoustic-sensing-public)
+  has no dataset license; its Apache-2.0 file is nested under
+  `src/keyboard_control`. Do not reuse its data or model assets.
+
 No candidate was downloaded or used. Public-data use remains bounded by source
 labels, artifact-specific licensing, domain gap, and measured device validation;
 it cannot replace human-labeled Capybara captures.

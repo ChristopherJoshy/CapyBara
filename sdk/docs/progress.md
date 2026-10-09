@@ -216,6 +216,11 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   contact-microphone modality, but its linked recordings have no separate data
   license. The YCB-impact OSF record has `node_license: null`. RealImpact's
   repository license covers code, not a documented data license.
+- VibeCheck provides an active-acoustic method precedent (piezo speaker and
+  contact microphone coupled through an object), but its hardware differs from
+  the phone's air-coupled speaker/microphone path. Paper/project sources do not
+  release a dataset, and its code repository does not provide dataset terms;
+  no data or model assets were reused.
 - No data was downloaded and no model was trained. None of these sources
   satisfies both verified data rights and Capybara's active phone-probe task;
   model training and physical decision validation remain blocked.
