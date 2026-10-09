@@ -191,6 +191,21 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   calibration or integrity evidence. Commit `a476743` was pushed to
   `codex/v6-handoff`.
 
+2026-10-10 showcase UX and motion update:
+
+- Renamed the home action to `Scan`. Added a small startup logo scale, a pulse
+  visible only while a real SDK capture/analysis operation is busy, and an
+  animated result mark: check only after the encrypted research baseline saves;
+  `?` for the existing `INCONCLUSIVE` scan; dash when the reference is not saved.
+  The capture digest is explicitly labeled provenance, not a physical identity
+  fingerprint.
+- `cmd.exe /c gradlew.bat :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebugAndroidTest :apk:assembleDebug`
+  passed. APK unit tests were `NO-SOURCE`; instrumentation compiled, not run.
+- Installed with `adb -s 10BFAT1UT2000XP install -r ...`, launched the actual
+  app, and visually verified the home and scan-placement screens. No physical
+  capture or saved-reference inspection/export was performed.
+- Commit `a6cf03d` was pushed to `codex/v6-handoff`.
+
 ## Next acceptance milestones
 
 1. The user collects and labels real rigid-case A–D enrollment, unchanged

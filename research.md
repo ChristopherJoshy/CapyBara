@@ -217,3 +217,25 @@ Decision: do not train or quantize a model from these mismatched labels. The
 existing UCI fan classifier remains a local transfer baseline only. Train the
 V6 specialists and fine-tune Laya only after real iQOO captures have profile
 labels, independent object/session/run splits, and specialist evidence.
+
+## Compose motion and truthfulness (official Android sources, observed 2026-10-10)
+
+Question: which Compose motion APIs can polish the showcase without implying
+progress or a successful physical-integrity decision?
+
+Sources: [Value-based animations](https://developer.android.com/develop/ui/compose/animation/value-based),
+Android Developers, undated (observed 2026-10-10); [Compose Animation release
+notes](https://developer.android.com/jetpack/androidx/releases/compose-animation),
+version 1.2.0 (27 July 2022). The official guide documents state-driven
+`animateFloatAsState` and repeating transitions; the release notes state that
+Compose animation honors the Android Animator duration-scale setting.
+`androidx.compose.animation:animation` resolved to 1.12.1 under BOM 2026.09.00
+in the app's `debugRuntimeClasspath`.
+
+Decision: keep startup and result transitions finite; show a non-waveform pulse
+only while the real SDK operation is busy, alongside the reported capture stage.
+The success check appears only after reference persistence; a scan with missing
+trained/calibrated comparison remains `INCONCLUSIVE`, with no match/not-found
+animation. The UI installed and rendered on iQOO; this pass did not exercise a
+physical capture, so the active pulse and result animation were not observed on
+hardware.

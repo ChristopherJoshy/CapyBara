@@ -24,9 +24,24 @@ operations. Raw captures stay private.
 Microphone permission is requested only when needed. Cancelling or leaving the
 activity cancels acquisition and releases hardware. No INTERNET permission exists.
 Buttons have normal accessible touch targets. Waveforms have a semantic label.
-Scrolling/insets support large text and real device cutouts. Enrollment and
-verification are visibly disabled while trained models/calibration are missing.
+Scrolling/insets support large text and real device cutouts. Research enrollment
+and scan capture remain available; absent validated models/calibration, the app
+withholds MATCH/CHANGED and reports `INCONCLUSIVE`.
 
 Required future flows: full validated enrollment/reference management, four-point
 verification, actual model stages, TrustGate result and calibrated evidence. Do
 not turn the data collector into a scripted demonstration of those features.
+
+## Motion and outcome semantics
+
+The home mascot scales in with the mission text. A small non-waveform pulse is
+shown only while the SDK reports a showcase capture/analysis operation as busy,
+alongside its real stage text. The result mark animates after work completes:
+check only after the encrypted research reference is saved, `?` for an
+`INCONCLUSIVE` scan, and a dash when enrollment did not persist. There is no
+match/not-found animation until validated decision models and calibration exist.
+The hash is a capture-provenance digest, never a physical identity fingerprint.
+Motion uses Compose value-based animations
+([official guide](https://developer.android.com/develop/ui/compose/animation/value-based))
+and respects the resolved Compose Animation 1.12.1 Animator duration-scale
+support ([release notes](https://developer.android.com/jetpack/androidx/releases/compose-animation)).

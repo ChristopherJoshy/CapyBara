@@ -54,9 +54,14 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
   `no_backup/capybara` capture directory, but the home list displayed a saved
   research reference. Its underlying captures, labels and provenance were not
   inspected or verified; do not use or export it without user approval.
-- The home screen was visually inspected; two-side interaction and completed
-  capture/review were not exercised. Physical onset of audio/haptics and offline
+- The installed home and side-1 placement screens were visually inspected; no
+  physical capture/review was run. Physical actuator onset, offline scan and
   verification remain unverified.
+- `a6cf03d` renames the home action to `Scan`, adds startup/capture/result motion,
+  and calls the capture-set hash a provenance digest. The active pulse is gated
+  by real SDK busy state; the success check requires encrypted reference save,
+  while scans still show `INCONCLUSIVE`. APK unit task was `NO-SOURCE`;
+  instrumentation compiled but was not executed. Device install/render passed.
 - All five specialists (EchoNet, VibraNet, PhysFusion, StateNet, SpatialNet),
   task-specific Capybara-Laya training, Android CPU parity, calibration,
   TrustGate and full offline MATCH/CHANGED behavior remain incomplete.

@@ -59,12 +59,23 @@ cmd.exe /c gradlew.bat testDebugUnitTest assembleDebug
 
 ## Latest verification (2026-10-10)
 
+Full SDK/DSP host verification passed:
+
 ```powershell
 cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug
 ```
-completed successfully. `:apk:testDebugUnitTest` was `NO-SOURCE`. This includes
-synthetic DSP tests and APK compilation/lint; it is not physical-response or
-integrity validation.
+
+Showcase UI verification also passed:
+
+```powershell
+cmd.exe /c gradlew.bat :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebugAndroidTest :apk:assembleDebug
+```
+
+The APK unit-test task is `NO-SOURCE`; Android instrumentation was compiled but
+not executed. The updated APK installed with `adb install -r` and rendered the
+home and side-1 scan-placement screens on `10BFAT1UT2000XP`. No physical
+capture or integrity decision was performed; these checks do not validate
+physical response or accuracy.
 
 Install only the Capybara package on the verified device:
 
