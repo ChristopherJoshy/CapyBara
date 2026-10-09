@@ -90,6 +90,13 @@ class PhysicsEngineTest {
         assertTrue(evidence.limitations.any { "cross-clock timing unstable" in it })
     }
 
+    @Test fun unrepresentedTrailingSampleContributesToSpectrum() {
+        val pcm = ShortArray(1537)
+        pcm[1536] = 8192
+        val evidence = PhysicsEngine.analyze(scan(pcm))
+        assertTrue(evidence.acousticBandEnergy.sum() > 0.0)
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun invalidAudioRateIsRejected() { PhysicsEngine.analyze(scan(ShortArray(8)).copy(sampleRate = 0)) }
 }

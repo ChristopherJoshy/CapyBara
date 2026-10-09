@@ -109,27 +109,44 @@ object PhysicsEngine {
         val n = Integer.highestOneBit(pcm.size.coerceAtMost(1024))
         if (n < 8) { issues += "Too few audio samples for spectral evidence"; return emptyList() }
         val window = DoubleArray(n) { 0.5 - 0.5 * cos(2 * PI * it / n) }
-        val scale = n * window.sumOf { it * it }
         val bands = DoubleArray(8)
         val real = DoubleArray(n)
         val imag = DoubleArray(n)
         val twiddleReal = DoubleArray(n / 2) { cos(-2 * PI * it / n) }
         val twiddleImag = DoubleArray(n / 2) { sin(-2 * PI * it / n) }
-        var windows = 0
+        var totalWindowWeight = 0.0
         val hop = n / 2
-        // shortcut: incomplete trailing windows are omitted, add a streaming tail policy for edge transients.
-        if ((pcm.size - n) % hop != 0) issues += "Incomplete trailing spectral window omitted"
-        for (start in 0..pcm.size - n step hop) {
-            val mean = (start until start + n).sumOf { pcm[it].toDouble() } / n
-            for (i in 0 until n) { real[i] = (pcm[start + i] - mean) / 32768.0 * window[i]; imag[i] = 0.0 }
+        var start = 0
+        var coveredUntil = 0
+        while (start < pcm.size) {
+            val valid = minOf(n, pcm.size - start)
+            if (valid < n && coveredUntil >= pcm.size) break
+            if (valid < n) issues += "Incomplete trailing spectral window zero-padded"
+            val mean = (start until start + valid).sumOf { pcm[it].toDouble() } / valid
+            var windowEnergy = 0.0
+            for (i in 0 until n) {
+                val weight = window[i]
+                if (i < valid) {
+                    real[i] = (pcm[start + i] - mean) / 32768.0 * weight
+                    windowEnergy += weight * weight
+                } else real[i] = 0.0
+                imag[i] = 0.0
+            }
             fft(real, imag, twiddleReal, twiddleImag)
+            // ponytail: observed-fraction weighting is approximate; use a validated boundary PSD estimator if needed.
+            val segmentWeight = valid.toDouble() / n
+            val scale = n * windowEnergy
             for (k in 0..n / 2) {
                 val sided = if (k == 0 || k == n / 2) 1.0 else 2.0
-                bands[(k * 16 / n).coerceAtMost(7)] += sided * (real[k] * real[k] + imag[k] * imag[k]) / scale
+                bands[(k * 16 / n).coerceAtMost(7)] +=
+                    segmentWeight * sided * (real[k] * real[k] + imag[k] * imag[k]) / scale
             }
-            windows++
+            totalWindowWeight += segmentWeight
+            if (valid < n) break
+            coveredUntil = start + n
+            start += hop
         }
-        return bands.map { it / windows }
+        return bands.map { it / totalWindowWeight }
     }
 
     private fun fft(real: DoubleArray, imag: DoubleArray, twiddleReal: DoubleArray, twiddleImag: DoubleArray) {
