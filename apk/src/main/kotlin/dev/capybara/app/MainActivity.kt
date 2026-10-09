@@ -12,6 +12,12 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,8 +30,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -62,7 +71,7 @@ class MainActivity : ComponentActivity() {
     private var pendingShowcaseScan by mutableStateOf<Scan?>(null)
     private var pendingShowcaseEvidence by mutableStateOf<PhysicsEvidence?>(null)
     private var showcasePaths by mutableStateOf<List<String>>(emptyList())
-    private var showcaseFingerprint by mutableStateOf<String?>(null)
+    private var showcaseProvenanceDigest by mutableStateOf<String?>(null)
     private var logs by mutableStateOf<List<String>>(emptyList())
     private val permission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         microphoneGranted = granted
@@ -117,6 +126,11 @@ class MainActivity : ComponentActivity() {
         var scientificDetails by rememberSaveable { mutableStateOf(false) }
         var introVisible by remember { mutableStateOf(false) }
         LaunchedEffect(Unit) { introVisible = true }
+        val introScale by animateFloatAsState(
+            targetValue = if (introVisible) 1f else 0.92f,
+            animationSpec = tween(700, easing = FastOutSlowInEasing),
+            label = "intro-logo-scale",
+        )
         var showcaseMode by remember { mutableStateOf<String?>(null) }
         var showcaseName by remember { mutableStateOf("") }
         var showcaseCaptureId by remember { mutableStateOf("") }
@@ -143,7 +157,7 @@ class MainActivity : ComponentActivity() {
             showcaseStep = if (mode == "scan") "capture" else "name"
             showcaseEvidence = emptyList()
             showcasePaths = emptyList()
-            showcaseFingerprint = null
+            showcaseProvenanceDigest = null
             pendingShowcaseScan = null
             pendingShowcaseEvidence = null
             problem = null
@@ -225,7 +239,7 @@ class MainActivity : ComponentActivity() {
                 Column(Modifier.safeDrawingPadding().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Image(painterResource(R.drawable.ic_capybara), "Capybara", Modifier.size(38.dp))
+                            Image(painterResource(R.drawable.ic_capybara), "Capybara", Modifier.size(38.dp).graphicsLayer { scaleX = introScale; scaleY = introScale })
                             Text("CAPYBARA", letterSpacing = 2.sp, fontWeight = FontWeight.Bold, fontSize = 22.sp, modifier = Modifier.padding(top = 4.dp))
                         }
                         IconButton(onClick = { scope.launch { drawer.open() } }, modifier = Modifier.semantics { contentDescription = "Open menu" }) {
@@ -314,7 +328,7 @@ class MainActivity : ComponentActivity() {
                                     Text("Capturing side ${showcasePositionIndex + 1}", color = Cyan, fontSize = 18.sp)
                                     if (busy) {
                                         LinearProgressIndicator(Modifier.fillMaxWidth(), color = Cyan)
-                                        Text(capturePhase(stage), color = Cyan)
+                                        CapturePulse(Modifier.align(androidx.compose.ui.Alignment.CenterHorizontally))
                                         if (!committing) OutlinedButton(onClick = { captureJob?.cancel() }, modifier = Modifier.fillMaxWidth()) { Text("Cancel capture") }
                                     } else {
                                         TextButton(onClick = { showcaseStep = "capture" }) { Text("Return to capture controls") }
@@ -343,7 +357,7 @@ class MainActivity : ComponentActivity() {
                                                     showcasePositionIndex++
                                                     showcaseStep = "rotate"
                                                 } else {
-                                                    showcaseFingerprint = researchFingerprint(showcasePaths)
+                                                    showcaseProvenanceDigest = captureProvenanceDigest(showcasePaths)
                                                     showcaseStep = "result"
                                                 }
                                             }
@@ -376,6 +390,10 @@ class MainActivity : ComponentActivity() {
                                         slideInVertically(animationSpec = tween(420)) { it / 10 }
                                 ) {
                                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                                        ResearchResultMark(
+                                            saved = showcaseMode != "scan" && showcaseReferenceSaved,
+                                            inconclusive = showcaseMode == "scan",
+                                        )
                                         if (showcaseMode == "scan") {
                                             Text("INCONCLUSIVE", color = Copper, fontFamily = FontFamily.Serif, fontSize = 32.sp)
                                             Text("The physical response was captured, but no validated identity decision is available.", color = Sand, fontSize = 18.sp)
@@ -395,7 +413,7 @@ class MainActivity : ComponentActivity() {
                                             Text("Reference not saved", color = Copper, fontFamily = FontFamily.Serif, fontSize = 32.sp)
                                             Text("Both captures remain private research data, but no complete encrypted reference was created. This object is not listed as enrolled.", color = Sand, fontSize = 18.sp)
                                         }
-                                        showcaseFingerprint?.let { Text("Measured digest: ${it.take(24)}…", color = Muted, fontSize = 12.sp) }
+                                        showcaseProvenanceDigest?.let { Text("Capture provenance digest: ${it.take(24)}…", color = Muted, fontSize = 12.sp) }
                                         showcaseEvidence.forEach { (position, measured) -> ShowcaseEvidenceCard(position, measured) }
                                         Text("Trained specialists, a Capybara Laya model, and calibration are unavailable. No identity decision or confidence is reported.", color = Muted, lineHeight = 21.sp)
                                         Button(onClick = {
@@ -425,7 +443,7 @@ class MainActivity : ComponentActivity() {
                                 Text("Enroll object", fontSize = 17.sp)
                             }
                             OutlinedButton(onClick = { openShowcase("scan") }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
-                                Text("Scan object")
+                                Text("Scan")
                             }
                             if (availableNames.isNotEmpty()) {
                                 HorizontalDivider(color = Color(0xFF394247))
@@ -616,6 +634,51 @@ private fun ShowcaseEvidenceCard(position: String, evidence: PhysicsEvidence) {
 
 
 @Composable
+private fun CapturePulse(modifier: Modifier = Modifier) {
+    val transition = rememberInfiniteTransition(label = "capture-pulse")
+    val phase by transition.animateFloat(
+        initialValue = 0.55f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1100, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "capture-ring",
+    )
+    Canvas(modifier.size(68.dp).clearAndSetSemantics {}) {
+        drawCircle(
+            color = Cyan.copy(alpha = 1f - phase),
+            radius = size.minDimension * 0.42f * phase,
+            style = Stroke(width = 2.dp.toPx()),
+        )
+        drawCircle(Copper, radius = 3.dp.toPx())
+    }
+}
+
+@Composable
+private fun ResearchResultMark(saved: Boolean, inconclusive: Boolean) {
+    var entered by remember { mutableStateOf(false) }
+    LaunchedEffect(saved, inconclusive) { entered = true }
+    val scale by animateFloatAsState(
+        targetValue = if (entered) 1f else 0.72f,
+        animationSpec = tween(360, easing = FastOutSlowInEasing),
+        label = "result-mark-scale",
+    )
+    val color = if (saved) Cyan else Copper
+    Box(
+        Modifier.size(64.dp)
+            .graphicsLayer { scaleX = scale; scaleY = scale }
+            .clearAndSetSemantics {},
+        contentAlignment = androidx.compose.ui.Alignment.Center,
+    ) {
+        Canvas(Modifier.matchParentSize()) {
+            drawCircle(color, radius = size.minDimension * 0.45f, style = Stroke(width = 2.dp.toPx()))
+        }
+        Text(if (saved) "✓" else if (inconclusive) "?" else "—", color = color, fontSize = 32.sp)
+    }
+}
+
+@Composable
 private fun ObjectGuide(sideIndex: Int) {
     Column(
         Modifier.fillMaxWidth().background(Charcoal).padding(20.dp),
@@ -681,7 +744,7 @@ private fun ObjectGuide(sideIndex: Int) {
 
 private fun format(value: Double): String = if (value.isFinite()) String.format(Locale.ROOT, "%.3f", value) else "unavailable"
 
-private fun researchFingerprint(paths: List<String>): String {
+private fun captureProvenanceDigest(paths: List<String>): String {
     require(paths.size == 2)
     val source = paths.joinToString("|") { path ->
         val metadata = JSONObject(File(path, "metadata.json").readText())

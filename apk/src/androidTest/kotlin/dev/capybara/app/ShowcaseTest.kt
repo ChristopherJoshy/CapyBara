@@ -15,7 +15,7 @@ class ShowcaseTest {
     @get:Rule val rule = createAndroidComposeRule<MainActivity>()
 
     @Test fun scanStartsWithTwoSidePlacementAndNoNamePrompt() {
-        rule.onNodeWithText("Scan object").performClick()
+        rule.onNodeWithText("Scan").performClick()
         rule.onNodeWithText("Place the phone on the object.", substring = true).assertIsDisplayed()
         rule.onNodeWithText("Side 1 of 2", substring = true).assertIsDisplayed()
         rule.onNodeWithText("Capture side 1", substring = true).assertIsDisplayed()
@@ -27,7 +27,7 @@ class ShowcaseTest {
         rule.onNodeWithText("V6").assertDoesNotExist()
         rule.onNodeWithText("Intelligence").assertIsNotDisplayed()
         rule.onNodeWithText("Enroll object").assertIsDisplayed()
-        rule.onNodeWithText("Scan object").assertIsDisplayed()
+        rule.onNodeWithText("Scan").assertIsDisplayed()
         snapshot("home")
         rule.onNodeWithContentDescription("Open menu").performClick()
         rule.onNodeWithText("Intelligence").assertIsDisplayed()
