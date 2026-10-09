@@ -1,0 +1,6 @@
+Capybara V6 source is licensed under Apache-2.0.
+Gradle wrapper files retain their upstream Apache-2.0 notices.
+AndroidX and Kotlin dependencies retain their respective upstream licenses.
+No Laya checkpoint or source is redistributed by this initial implementation.
+Pinned upstream Laya source/model licensing and attribution are documented in
+sdk/docs/laya-integration.md before importing any trained assets.

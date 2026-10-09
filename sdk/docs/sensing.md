@@ -1,0 +1,95 @@
+# Capture and physical evidence
+
+Capybara preserves microphone PCM16, IMU samples with sensor-event timestamps,
+excitation request markers and capture metadata. `PhysicsEngine.analyze(scan)`
+runs deterministic Kotlin DSP on the CPU. It supplies evidence, not an integrity
+decision, contact-quality score or calibrated confidence.
+
+## Evidence units and definitions
+
+| Field | Meaning |
+| --- | --- |
+| `audioRms` | RMS of all recorded mono samples divided by 32768; includes DC and every capture stage. |
+| `noiseRms` | RMS of exactly the pre-excitation prefix identified by `baselineSampleCount`; unavailable prefixes produce NaN. |
+| `peak` | Largest absolute PCM sample divided by 32768. |
+| `clippedSamples` | Count at either PCM16 rail. Rail occupancy can indicate saturation but does not prove its cause. |
+| `acousticBandEnergy` | Eight integrated one-sided PSD bands in normalized PCM amplitude squared. Band i spans `[i*sampleRate/16, (i+1)*sampleRate/16)` Hz; the final band includes Nyquist. |
+| `accelerationRms` | RMS vector deviation after subtracting each axis's mean, in m/s². |
+| `gyroRms` | RMS uncentered angular-velocity vector magnitude, in rad/s. |
+| `accelerometerHz`, `gyroscopeHz` | `(count-1)/(last timestamp-first timestamp)` from each recorded stream. |
+| `durationSeconds` | Entire acquisition envelope from recorded BOOTTIME start/end; not the PCM length or end-to-end verification duration. |
+| `limitations` | Missing data, capture-state errors and scientific interpretation limits. |
+
+NaN denotes unavailable numerical evidence, distinct from measured zero. Consumers
+must check finiteness before serializing strict JSON or comparing values. Invalid
+audio sample rates raise `IllegalArgumentException`. Empty/invalid IMU values or
+non-increasing timestamps do not become plausible RMS/rate evidence.
+
+Centering acceleration removes a constant gravity/bias vector only while the
+phone orientation remains stable. It is not an orientation-aware gravity estimate
+and also removes genuine static acceleration. Rotating or repositioning during
+capture changes gravity components and can inflate the result. Gyroscope RMS
+includes sensor bias; neither number establishes contact quality.
+
+## Spectral computation
+
+The FFT is a radix-2 CPU implementation. Segments use a periodic Hann window,
+per-segment mean subtraction and 50% overlap. Segment length is the largest power
+of two no greater than 1024 or the recording length. Fewer than eight samples
+cannot produce spectral evidence. Incomplete trailing windows are omitted and
+reported. Frequency resolution is `sampleRate/segmentLength`; zero padding does
+not create additional physical resolution.
+
+For each segment, the integrated contribution of bin k is
+`c[k]*abs(FFT(window*(x-mean)))²/(N*sum(window²))`, where c is 1 at DC/Nyquist
+and 2 elsewhere. Averaging segments gives Welch band power, equivalent to PSD
+integration with bin width `sampleRate/N`. This normalization preserves expected
+sinusoidal power rather than comparing unscaled FFT magnitudes.
+[Welch method and scaling](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html).
+
+These bands describe the complete recording, including silence and haptic stages.
+They are not isolated object transfer responses, inferred material properties,
+acoustic pressure in pascals or ultrasound capability. The signal includes the
+phone, object, support surface, microphone processing and ambient noise. Phase,
+coherence, impulse response and damping require validated excitation alignment,
+coupling and signal-to-noise conditions; they are not claimed by this module.
+
+## Timing and capture validity
+
+IMU timestamps and AudioRecord BOOTTIME timestamps share elapsed-realtime units.
+AudioTrack presentation timestamps use MONOTONIC. Cross-clock mapping must retain
+its uncertainty; excitation requests do not timestamp physical onset. Framework
+audio timestamps are estimates of the available pipeline point, not a guaranteed
+phase lock. [AudioTimestamp](https://developer.android.com/reference/android/media/AudioTimestamp).
+
+Requested IMU sampling periods are hints. The rate is derived from actual event
+timestamps. A gap above three median intervals is flagged descriptively; this
+heuristic has not been calibrated and does not count lost samples. No resampling
+or IMU spectral interpretation occurs here.
+[SensorManager](https://developer.android.com/reference/android/hardware/SensorManager).
+
+Capture must preserve `audioSilencedEver`, `audioRouteChanged`,
+`audioConfigurationChanged`, `audioTimestampCount` and `baselineSampleCount`.
+Unknown states are reported as unavailable. A baseline prefix consists only of
+samples already read before the first excitation request, never an assumed first
+percentage of the recording. A route/effect change invalidates comparisons even
+when the same client sample format is returned.
+[Capture configuration changes](https://developer.android.com/media/platform/sharing-audio-input).
+
+`audioExpectedSamples` is compared with the actual PCM length, and
+`audioSampleCount` is cross-checked when present. Partial or inconsistent captures
+are explicit limitations; successful PCM reads do not establish sample continuity.
+When start/end clock audit metadata is present, an offset change exceeding half
+the sum of both clock-read bracket widths is flagged as unstable cross-clock
+timing. This bound covers clock-read uncertainty, not unknown hardware latency.
+Positive RMS or spectral energy cannot establish good contact or object/self
+response separation; these remain unavailable without experimental calibration.
+
+## Validation scope
+
+`PhysicsEngineTest` uses clearly named synthetic fixtures to check tone energy,
+frequency-band placement, DC removal, Nyquist normalization, baseline indexing,
+PCM rails, gravity centering, timestamp-derived rate and invalid evidence.
+These tests establish arithmetic behavior only. Real-device synchronization,
+signal separability, repeatability and object/session-held-out integrity accuracy
+still require physical measurements and calibration.

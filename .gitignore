@@ -1,0 +1,25 @@
+.gradle/
+.kotlin/
+**/build/
+local.properties
+*.log
+*.jks
+*.keystore
+*.pem
+.env*
+__pycache__/
+.venv/
+sdk/models/artifacts/
+sdk/training/artifacts/
+sdk/training/upstream/
+sdk/evaluation/artifacts/
+sdk/captures/
+kaggle.json
+*.onnx
+*.safetensors
+*.pt
+
+# Keep local device screenshots out of public checkpoints.
+apk/docs/screenshots/device-current.png
+apk/docs/screenshots/device-showcase-latest.png
+apk/docs/screenshots/home.png

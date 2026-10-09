@@ -1,0 +1,2 @@
+# Official source includes the actual training loop and ONNX exporter dependencies.
+laya[onnx] @ git+https://github.com/NandhaKishorM/laya.git@1adc59f7e371deb601fcfa18a14e25db238addcc
