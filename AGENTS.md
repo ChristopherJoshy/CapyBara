@@ -56,5 +56,7 @@ definition of done above is verified.
 Use licensed pretrained weights wherever they fit the measured sensor modality
 and product constraints. Pin source revisions and hashes, compare against held-out
 data, and reject models that do not transfer or fit offline CPU deployment.
-Commit and push after each verified coherent slice, not on a timer. Keep captures,
-downloaded data, model artifacts and credentials out of Git.
+After every repository change, run the relevant checks, commit it, and push it
+before making another change. If verification or push fails, record the blocker
+and do not start another repository change until the current change is pushed.
+Keep captures, downloaded data, model artifacts and credentials out of Git.
