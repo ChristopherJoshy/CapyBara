@@ -29,3 +29,21 @@ Android lint rejected `VibratorManager.vibratorIds` at minSdk 29 despite the man
 
 The full instrumented suite initially failed before capture because `HardwareCaptureTest` assumed `RECORD_AUDIO` had been granted externally; the test process saw `PERMISSION_DENIED (-1)`. Added `GrantPermissionRule` and the AndroidX test-rules dependency so the test is self-contained. After explicitly waking/dismissing the device keyguard, the final complete run passed all APK and SDK device tests. Keep runtime permissions inside test setup rather than relying on a prior manual grant.
 Keep new claims bounded to actual tested implementation.
+
+## 2026-10-09: connected instrumentation cleanup removed the demo package
+
+After `:apk:connectedDebugAndroidTest` passed 3/3 on verified serial
+`10BFAT1UT2000XP`, `adb shell pm path dev.capybara.app` returned no installed
+APK. The connected-test task appears to have uninstalled the app, which may also
+have deleted its private captures and encrypted baselines. The built APK was
+reinstalled and launched; no unrelated package was touched. Do not rerun the
+connected task until its cleanup behavior can be avoided or a verified backup
+exists. Host compile, lint and unit checks remain safe.
+
+## 2026-10-09: pretrained evaluation venv cannot start
+
+The ignored training venv's Python executable is present but fails to create a
+process because its config points to a Microsoft Store Python 3.13 base. The
+bundled Python 3.12.14 works, but using it with the venv's compiled PyTorch
+packages would mix runtimes. Do not install ML packages globally or claim MOMENT
+results until a compatible venv interpreter is restored.

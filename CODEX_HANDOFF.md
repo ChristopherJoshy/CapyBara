@@ -31,9 +31,10 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
 
 - Android SDK and Compose demo are present. The SDK uses real `AudioRecord`, `AudioTrack`, `SensorManager` and `VibratorManager` APIs, CPU DSP, cancellation cleanup, private atomic capture storage and Android Keystore-protected baselines.
 - The connected iQOO is I2501 / Android 16 API 36 / `arm64-v8a`, serial `10BFAT1UT2000XP`. Two vibrator IDs are exposed; the app requests the same finite waveform on both. This does not establish independent actuator axes, physical onset or speaker activation.
-- Scan starts without requiring an object name. It captures two approved sides and reports `INCONCLUSIVE`; no validated recognition or integrity comparison is integrated.
-- Previously verified commands/results are recorded in `README.md` and `sdk/docs/progress.md`: Gradle unit/build and lint checks passed; the latest device suite passed 3 APK tests and 2 SDK tests on the awake device. These establish acquisition/UI/storage behavior only, not model behavior or integrity accuracy.
+- Showcase enrollment and scan guide four registered positions A–D. A complete enrollment stores an encrypted but uncalibrated research baseline; scan remains anonymous and `INCONCLUSIVE` because validated comparison models are unavailable.
+- Earlier device evidence includes 3 APK and 2 SDK tests on the awake device. This turn's latest APK suite and its cleanup incident are recorded in `README.md` and `sdk/docs/progress.md`; all such checks establish acquisition/UI/storage behavior only, not model behavior or integrity accuracy.
 - No user-selected rigid-case experiment captures or labels exist. The controlled A–D experiment and repetitions are specified in `sdk/docs/experiments.md`; human physical work remains a blocker.
+- Latest APK connected suite passed 3/3 tests; its UI assertions checked scan entry and position A only, not a complete A–D run or baseline save. The Gradle task removed `dev.capybara.app`; the demo APK was reinstalled and launched. Private app data may have been cleared. Avoid that task until its cleanup can be prevented or a verified backup exists.
 - All five specialists (EchoNet, VibraNet, PhysFusion, StateNet, SpatialNet), actual Capybara-Laya training, CPU export parity, calibration, TrustGate and full offline MATCH/CHANGED behavior remain incomplete.
 
 ## Public data and trained baseline
@@ -41,6 +42,7 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
 The following assets are in ignored `sdk/training/artifacts/`; do not add them to Git:
 
 - `venv/`: Python 3.13.14; PyTorch `2.14.1+cpu` installed. The recent training run emitted PyTorch's optional NumPy-initialization warning because NumPy is absent; the script itself does not use NumPy and completed successfully.
+- Recheck: the venv interpreter currently cannot start because its configured Microsoft Store Python 3.13 base is unavailable to process creation. The separate bundled Python 3.12.14 launches but is not suitable for mixing with the venv's binary ML packages. MOMENT weights remain uncached and unevaluated.
 - `accelerometer-uci-846.zip` and `uci-accelerometer.csv`: official UCI 846 download. Dataset record: [UCI Accelerometer](https://archive.ics.uci.edu/dataset/846/accelerometer), CC BY 4.0. It has 153,000 three-axis samples at 50 Hz from a single cooler fan, with three blade-weight configurations and 17 speeds. ZIP SHA256 `00557d031124defb8cebc6ae62cb1833e4cadde546c6c2b1997a8925d92816b0`; CSV SHA256 `296a94eaf40643e1188012a4ee37d0b2c397bbc04decd39cfbe9952b8c841674`.
 - `uci-fan-baseline/`: a small CNN trained from scratch by
   `sdk/training/train_uci_vibration_baseline.py`. It classifies the fan's weight
@@ -73,8 +75,8 @@ Reproduce the scratch baseline with:
 
 ## Immediate continuation order
 
-1. Confirm this handoff and the current files; do not rerun already successful checks just to reconfirm them.
-2. Test a licensed pretrained time-series encoder (start with pinned MOMENT-1-small or a smaller compatible alternative) on the same group split as the UCI scratch baseline. Record exact package/model revisions, hashes, license, resource costs, and held-out metrics. The user specifically requested pretrained weights wherever possible.
+1. Keep the restored Capybara APK installed. Find a device-test path that preserves its installation and private data before rerunning connected tests; host builds, lint and unit checks remain available.
+2. Restore a working Python 3.13 interpreter for `sdk/training/artifacts/venv`, pin the official `momentfm` revision, and evaluate frozen MOMENT-1-small on the existing UCI speed-group split. Record hashes, package/model pins, resource cost and metrics; do not treat fan labels as package-integrity evidence.
 3. Investigate licensed, modality-matched public data for acoustic response and paired fusion. Preserve the rule that unrelated labels cannot become package-integrity labels. Do not use Knocker/YCB training data without license terms.
 4. Continue independent implementation while waiting for the user's physical case captures. Once available, collect and label real A–D sessions under the experiment plan, preserve failures, and split by connected object/session/run groups.
 5. Train only specialists supported by actual modality/label evidence; do not train final Laya from primitive physics or unrelated public labels. Then implement CPU export/parity, calibration, TrustGate and offline end-to-end device evaluation.

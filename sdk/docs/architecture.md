@@ -14,6 +14,11 @@ and IMU acquisition; raw measurements retain clocks, routes and provenance.
 PhysicsEngine analyzes real captured signals on CPU. CaptureStore commits private
 recordings atomically with labels and SHA256 provenance.
 
+The guided showcase collects positions A–D for enrollment and scans. A completed
+enrollment stores an encrypted `RESEARCH_BASELINE_UNCALIBRATED` reference; scans
+still return `INCONCLUSIVE` because no validated comparison model or calibration
+is available.
+
 The current probe is explicitly a fixed characterization sequence, not adaptive
 ProbeBrain. Full ReferenceGuard compensation and contact reliability require
 repeat measurements and calibration. No learned module, Laya fine-tuning,

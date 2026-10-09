@@ -23,6 +23,13 @@ temporary fixtures only; they are never training or evaluation evidence.
 - Bundled Python has NumPy but no PyTorch, ONNX, ONNX Runtime, Transformers,
   Tokenizers, Safetensors, or Laya. ML execution is unverified.
 
+Recheck on 9 October 2026: `artifacts/venv/Scripts/python.exe` is present but
+Windows cannot start it. Its `pyvenv.cfg` points to the Microsoft Store Python
+3.13.14 base; the bundled Python 3.12.14 launches, but must not be used to mix
+the venv's binary ML packages. MOMENT weights are not cached and no pretrained
+evaluation has run. Restore a working Python 3.13 runtime for this venv before
+installing the pinned MOMENT tooling or interpreting any model results.
+
 This read-only check prints only the account name and quota, never credentials:
 
 ```powershell

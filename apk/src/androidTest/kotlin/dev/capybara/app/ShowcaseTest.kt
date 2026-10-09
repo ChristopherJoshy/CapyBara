@@ -16,7 +16,9 @@ class ShowcaseTest {
 
     @Test fun scanStartsWithoutAskingForObjectName() {
         rule.onNodeWithText("Scan object").performClick()
-        rule.onNodeWithText("Place the phone on any side of the object.", substring = true).assertIsDisplayed()
+        rule.onNodeWithText("REGISTERED CONTACT POINTS · TOP VIEW").assertIsDisplayed()
+        rule.onNodeWithText("Position 1 of 4").assertIsDisplayed()
+        rule.onNodeWithText("Place the phone at mark A.", substring = true).assertIsDisplayed()
         rule.onNodeWithText("Object name").assertDoesNotExist()
         snapshot("scan-start")
     }

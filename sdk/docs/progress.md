@@ -15,8 +15,8 @@
 - The same suite's Compose showcase test failed because no Compose hierarchy was visible while the device activity was stopped/off-screen. A later targeted rerun hit a transient ddmlib property timeout and classified the connected API as unknown before executing tests. Do not count either as product success.
 - Host training safety checks pass: `sdk/training/test_training.py` ran 10 tests successfully. These are schema/safety tests, not physical model evidence.
 External blocker now actionable: user selected a rigid closable case for the first labeled physical experiment. No capture files or labels exist yet. Collection must follow `sdk/docs/experiments.md`: enrollment A–D, five unchanged repositioned repeats per position, controlled removed-item repeats, restored unchanged repeats, and preserved invalid/noisy cases. Training remains refused until those real files and labels are copied into the private capture root.
-2026-10-09 scan UX update: Scan opens directly at placement guidance, creates an anonymous candidate label, records two approved sides without asking for a name, and states no identity comparison occurred. Saved enrollment labels are listed only as available data; no validated recognition model exists, so the result remains `INCONCLUSIVE`. The focused no-name Compose test and complete `ShowcaseTest` class now pass on the awake iQOO 15.
-Final 2026-10-09 verification with device awake: `:apk:connectedDebugAndroidTest` passed 3/3 tests (real hardware capture/cancellation, anonymous scan entry, menu/capture navigation); `:sdk:connectedDebugAndroidTest` passed 2/2 storage/vault tests. `:sdk:lintDebug`, `:apk:lintDebug`, and `testDebugUnitTest` passed. The instrumentation rule grants microphone permission for the real capture test. These checks prove acquisition/UI entry only—not object identification or trained-model behavior.
+2026-10-09 initial scan UX update (superseded by the four-position update below): Scan opened anonymously and recorded two sides without comparison. It reported `INCONCLUSIVE`; no validated recognition model existed.
+Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndroidTest` passed 3/3 tests (real hardware capture/cancellation, anonymous scan entry, menu/capture navigation); `:sdk:connectedDebugAndroidTest` passed 2/2 storage/vault tests. `:sdk:lintDebug`, `:apk:lintDebug`, and `testDebugUnitTest` passed. The instrumentation rule grants microphone permission for the real capture test. These checks prove acquisition/UI entry only—not object identification or trained-model behavior.
 
 2026-10-09 public-data training:
 
@@ -32,15 +32,43 @@ Final 2026-10-09 verification with device awake: `:apk:connectedDebugAndroidTest
 - Public paired KAIST rotating-machine data is a possible multimodal pretraining
   source. The user-selected rigid-case experiment still has no real captures.
 
+2026-10-09 four-position showcase update:
+
+- Enrollment and scan now guide real captures at registered A–D points with a
+  top-down placement diagram. Enrollment saves a Keystore-encrypted research
+  baseline only after all four approved positions; it remains explicitly
+  uncalibrated. Scan remains anonymous and `INCONCLUSIVE` because no validated
+  identity or integrity comparison is available.
+- Verified `cmd.exe /c gradlew.bat :apk:assembleDebug
+  :apk:assembleDebugAndroidTest :apk:lintDebug :sdk:testDebugUnitTest` passed.
+- With `$env:ANDROID_SERIAL='10BFAT1UT2000XP'`,
+  `cmd.exe /c gradlew.bat :apk:connectedDebugAndroidTest` passed 3/3 on the
+  verified device (one real hardware capture/cancellation test and two Compose
+  tests). The
+  Gradle task removed `dev.capybara.app` after the run; `adb install -r` restored
+  it and the launcher succeeded. Existing app-private captures/references may
+  have been removed with the package. Do not rerun this connected task until a
+  path that preserves the installed app and its data is established.
+- The UI tests checked scan entry and the A guide only; they did not complete
+  four physical positions or create a new baseline.
+- The training venv's Python cannot start; its base path is the Store Python
+  3.13.14. The bundled 3.12.14 runtime launches but is not a substitute for the
+  venv's ML packages. MOMENT-1-small remains unevaluated and uncached.
+- No user physical-case captures, trained Capybara specialists, calibrated
+  decisions or held-out physical evaluation exist.
+
 ## Next acceptance milestones
 
-1. Build library + Compose acquisition app and verify real capture on device.
-2. Preserve real PCM, IMU, timestamps, routing and labels in app-private storage.
-3. Test deterministic DSP and real-device resource lifecycle.
-4. Collect object/session separated physical data, nuisance cases and reference
-   calibration. User-assisted experiments required; currently unavailable.
-5. Train EchoNet, VibraNet, PhysFusion, StateNet, SpatialNet and actual Laya.
-6. Validate CPU export parity, calibration, TrustGate and offline end-to-end result.
+1. Preserve the restored app and its private data while finding a safe connected
+   test path; host build, lint and unit validation already pass.
+2. Restore a working Python 3.13 base for the ignored training venv and evaluate
+   licensed MOMENT transfer on the existing held-out UCI speed groups.
+3. Collect real rigid-case A–D enrollment, unchanged repeats, removed-item
+   changes and restored repeats. User physical manipulation is required.
+4. Train EchoNet, VibraNet, PhysFusion, StateNet, SpatialNet and actual Laya only
+   from modality-matched, labeled evidence with leakage-safe splits.
+5. Validate CPU export parity, calibration, TrustGate and offline end-to-end
+   results on held-out physical sessions and the iQOO.
 
 No task-specific specialist weights, labeled physical-integrity corpus,
 calibration, or integrity accuracy currently exists. The ignored UCI baseline

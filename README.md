@@ -10,7 +10,7 @@ Capybara is an offline Android physical-measurement SDK and demonstration app. I
 - Real `AudioRecord` microphone capture, stereo `AudioTrack` excitation request, IMU capture, finite haptic excitation, cancellation cleanup, private atomic capture storage and CPU DSP are implemented.
 - The device exposes two vibrator IDs. On API 31+, Capybara requests the same finite waveform on all exposed IDs through `CombinedVibration`; Android does not expose independent-axis semantics for them.
 - Encrypted immutable four-position research baselines use Android Keystore AES-GCM.
-- `cmd.exe /c gradlew.bat testDebugUnitTest assembleDebug` passes. The latest device run also passed all 3 APK instrumentation tests (real hardware capture/cancellation and two showcase UI cases), both SDK device tests, and both module lint tasks. UI tests are run with the device display awake.
+- `cmd.exe /c gradlew.bat testDebugUnitTest assembleDebug` passes. The latest APK device suite passed all 3 tests (real capture/cancellation and two showcase UI cases) on the awake phone. The Gradle connected-test task then removed the target package; the APK was reinstalled and launched. That cleanup may have removed app-private data, so do not rerun the connected task until its cleanup behavior is understood.
 - A prior real-device diagnostic recorded 48 kHz PCM, approximately 462 Hz accelerometer/gyroscope event rates, and CPU DSP timing. That diagnostic is not training or accuracy evidence.
 
 ## What is not yet claimed
@@ -23,7 +23,7 @@ labels, but it is not a Capybara model and is not integrated. Missing prerequisi
 produce unavailable/INCONCLUSIVE behavior; the app never substitutes a threshold
 classifier or fabricated result.
 
-The generic-object showcase uses real two-side captures. Enrollment asks for a label; Scan starts at the placement prompt with an anonymous candidate ID and no name entry. It records a provenance digest, not a physical identity signature. Object recognition is still unavailable: no validated model compares the scan with saved enrollments, so the current outcome is explicitly `INCONCLUSIVE`.
+The showcase guides four real captures at registered positions A–D with a top-down placement guide. Completing enrollment stores an encrypted research baseline marked uncalibrated; it cannot support an integrity decision. Scan starts anonymously and also captures A–D, but no validated model compares it with enrollments, so the outcome remains `INCONCLUSIVE`. Its digest is capture provenance, not an identity signature. The latest device UI test checked scan entry and the A guide only; a four-position physical enrollment/scan has not yet been completed.
 
 ## Repository
 

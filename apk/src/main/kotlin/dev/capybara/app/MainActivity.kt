@@ -59,7 +59,6 @@ class MainActivity : ComponentActivity() {
     private var savedCount by mutableIntStateOf(0)
     private var baselines by mutableStateOf<List<ResearchBaseline>>(emptyList())
     private var bundle by mutableStateOf<List<Pair<CaptureLabel, String>>>(emptyList())
-    private var savedObjectNames by mutableStateOf<List<String>>(emptyList())
     private var pendingShowcaseScan by mutableStateOf<Scan?>(null)
     private var pendingShowcaseEvidence by mutableStateOf<PhysicsEvidence?>(null)
     private var showcasePaths by mutableStateOf<List<String>>(emptyList())
@@ -84,11 +83,6 @@ class MainActivity : ComponentActivity() {
                 val capturePaths = withContext(Dispatchers.IO) { sdk.listCaptures() }
                 savedCount = capturePaths.size
                 bundle = withContext(Dispatchers.IO) { restoredPaths.map { sdk.getCaptureLabel(it) to it } }
-                savedObjectNames = withContext(Dispatchers.IO) {
-                    capturePaths.map { sdk.getCaptureLabel(it) }
-                        .filter { it.condition == "showcase_enrollment" }
-                        .map { it.objectId }.distinct()
-                }
                 baselines = withContext(Dispatchers.IO) { SignatureVault(this@MainActivity).listResearchBaselines() }
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) { problem = "Saved data could not be read."; log("Saved data read failed: ${error.message}") }
@@ -126,9 +120,12 @@ class MainActivity : ComponentActivity() {
         var showcaseCaptureId by remember { mutableStateOf("") }
         var showcaseSession by remember { mutableStateOf("") }
         var showcaseStep by remember { mutableStateOf("name") }
-        var showcaseSide by remember { mutableIntStateOf(1) }
+        var showcasePositionIndex by remember { mutableIntStateOf(0) }
+        var showcaseReferenceSaved by remember { mutableStateOf(false) }
         var showcaseEvidence by remember { mutableStateOf<List<Pair<String, PhysicsEvidence>>>(emptyList()) }
-        val availableNames = (baselines.map { it.objectId } + savedObjectNames).distinct()
+        val positions = listOf("A", "B", "C", "D")
+        val showcasePosition = positions[showcasePositionIndex]
+        val availableNames = baselines.map { it.objectId }.distinct()
         val drawer = rememberDrawerState(DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
@@ -137,7 +134,8 @@ class MainActivity : ComponentActivity() {
             showcaseName = ""
             showcaseCaptureId = if (mode == "scan") "candidate-${java.util.UUID.randomUUID()}" else ""
             showcaseSession = ""
-            showcaseSide = 1
+            showcasePositionIndex = 0
+            showcaseReferenceSaved = false
             showcaseStep = if (mode == "scan") "capture" else "name"
             showcaseEvidence = emptyList()
             showcasePaths = emptyList()
@@ -147,7 +145,7 @@ class MainActivity : ComponentActivity() {
             problem = null
         }
 
-        fun startShowcaseSide() {
+        fun startShowcasePosition() {
             val mode = showcaseMode ?: return
             if (mode == "enroll" && showcaseName.isBlank()) {
                 problem = "Enter an object name before capturing."
@@ -161,7 +159,7 @@ class MainActivity : ComponentActivity() {
             }
             if (showcaseSession.isBlank()) showcaseSession = "showcase-${System.currentTimeMillis()}"
             showcaseStep = "capturing"
-            startShowcaseCapture(captureObjectId, showcaseSession, mode, showcaseSide) { succeeded ->
+            startShowcaseCapture(captureObjectId, showcaseSession, mode, showcasePosition) { succeeded ->
                 showcaseStep = if (succeeded) "review" else "capture"
             }
         }
@@ -284,6 +282,8 @@ class MainActivity : ComponentActivity() {
                             when (showcaseStep) {
                                 "name" -> {
                                     Text("Name the object to label its enrollment captures. The label is not an identity decision.", color = Muted, lineHeight = 21.sp)
+                                    PositionGuide("A")
+                                    Text("Mark four repeatable contact points A–D around the closed object. Keep it on a stable surface and hold its orientation fixed.", color = Muted, lineHeight = 21.sp)
                                     OutlinedTextField(
                                         value = showcaseName,
                                         onValueChange = { showcaseName = it },
@@ -292,27 +292,19 @@ class MainActivity : ComponentActivity() {
                                         enabled = !busy,
                                         modifier = Modifier.fillMaxWidth()
                                     )
-                                    Button(onClick = { startShowcaseSide() }, enabled = showcaseName.isNotBlank() && !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                                        Text(if (microphoneGranted) "Capture Side 1" else "Enable microphone")
+                                    Button(onClick = { startShowcasePosition() }, enabled = showcaseName.isNotBlank() && !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                                        Text(if (microphoneGranted) "Capture position A" else "Enable microphone")
                                     }
                                 }
                                 "capture" -> {
-                                    Text(
-                                        when {
-                                            showcaseMode == "scan" && showcaseSide == 1 -> "Place the phone on any side of the object. After this capture, the app will ask you to scan another side."
-                                            showcaseMode == "scan" -> "Place the phone on a different side of the same object, then capture again."
-                                            showcaseSide == 1 -> "Set the object on a stable surface, then capture Side 1."
-                                            else -> "Side 2 was not captured. Position the object and capture again."
-                                        },
-                                        color = Muted,
-                                        lineHeight = 21.sp
-                                    )
-                                    Button(onClick = { startShowcaseSide() }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                                        Text(if (microphoneGranted) "Capture Side $showcaseSide" else "Enable microphone")
+                                    PositionGuide(showcasePosition)
+                                    Text("Position ${showcasePositionIndex + 1} of 4", color = Cyan)
+                                    Button(onClick = { startShowcasePosition() }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                                        Text(if (microphoneGranted) "Capture position $showcasePosition" else "Enable microphone")
                                     }
                                 }
                                 "capturing" -> {
-                                    Text("Capturing Side $showcaseSide", color = Cyan, fontSize = 18.sp)
+                                    Text("Capturing position $showcasePosition", color = Cyan, fontSize = 18.sp)
                                     if (busy) {
                                         LinearProgressIndicator(Modifier.fillMaxWidth(), color = Cyan)
                                         Text(capturePhase(stage), color = Cyan)
@@ -325,53 +317,54 @@ class MainActivity : ComponentActivity() {
                                     val captured = pendingShowcaseScan
                                     val measured = pendingShowcaseEvidence
                                     if (captured != null && measured != null) {
-                                        Text("Side $showcaseSide · measured response", color = Copper, fontSize = 20.sp)
+                                        Text("Position $showcasePosition · measured response", color = Copper, fontSize = 20.sp)
                                         Waveform(captured.pcm)
-                                        ShowcaseEvidenceCard("Side $showcaseSide", measured)
-                                        Text("Approve to save, retry to record this side again, or reject to end this run.", color = Muted, lineHeight = 21.sp)
+                                        ShowcaseEvidenceCard("Position $showcasePosition", measured)
+                                        Text("Approve this measured position, retry it, or reject it and end the run.", color = Muted, lineHeight = 21.sp)
                                         if (busy) {
                                             LinearProgressIndicator(Modifier.fillMaxWidth(), color = Cyan)
                                             Text(if (committing) "Saving approved capture" else capturePhase(stage), color = Cyan)
                                         }
                                         Button(onClick = {
-                                            val sideLabel = "Side $showcaseSide"
-                                            approveShowcaseCapture { approvedEvidence, path ->
-                                                showcaseEvidence = showcaseEvidence + (sideLabel to approvedEvidence)
+                                            approveShowcaseCapture { approvedEvidence, path, baselineSaved ->
+                                                showcaseEvidence = showcaseEvidence + ("Position $showcasePosition" to approvedEvidence)
                                                 showcasePaths = showcasePaths + path
-                                                if (showcaseSide == 2) {
-                                                    showcaseFingerprint = researchFingerprint(showcasePaths + path)
-                                                }
+                                                showcaseReferenceSaved = baselineSaved
                                                 pendingShowcaseScan = null
                                                 pendingShowcaseEvidence = null
-                                                if (showcaseSide == 1) {
-                                                    showcaseSide = 2
+                                                if (showcasePositionIndex < positions.lastIndex) {
+                                                    showcasePositionIndex++
                                                     showcaseStep = "rotate"
-                                                } else showcaseStep = "result"
+                                                } else {
+                                                    showcaseFingerprint = researchFingerprint(showcasePaths)
+                                                    showcaseStep = "result"
+                                                }
                                             }
                                         }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                                            Text(if (showcaseSide == 1) "Approve Side 1" else "Approve and finish")
+                                            Text(if (showcasePositionIndex == positions.lastIndex) "Approve final position" else "Approve position $showcasePosition")
                                         }
-                                        OutlinedButton(onClick = { startShowcaseSide() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
-                                            Text("Retry Side $showcaseSide")
+                                        OutlinedButton(onClick = { startShowcasePosition() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
+                                            Text("Retry position $showcasePosition")
                                         }
                                         TextButton(onClick = {
-                                            val rejectedSide = showcaseSide
+                                            val rejectedPosition = showcasePosition
                                             val approvedBefore = showcaseEvidence.isNotEmpty()
                                             pendingShowcaseScan = null
                                             pendingShowcaseEvidence = null
                                             showcaseMode = null
                                             showcaseStep = "name"
-                                            if (rejectedSide == 2 && approvedBefore) {
-                                                problem = "Side 2 was rejected; the approved Side 1 capture remains saved as research data."
+                                            if (rejectedPosition != "A" && approvedBefore) {
+                                                problem = "Position $rejectedPosition was rejected; earlier approved captures remain saved as research data."
                                             }
-                                            log("Showcase Side $rejectedSide rejected; run ended")
+                                            log("Showcase position $rejectedPosition rejected; run ended")
                                         }, enabled = !busy) { Text("Reject and end") }
                                     }
                                 }
                                 "rotate" -> {
-                                    Text("Rotate the object to expose the opposite side. Keep the phone and surface still.", color = Sand, lineHeight = 24.sp)
-                                    Button(onClick = { startShowcaseSide() }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
-                                        Text(if (microphoneGranted) "Capture Side 2" else "Enable microphone")
+                                    PositionGuide(showcasePosition)
+                                    Text("Move the phone to registered point $showcasePosition. Keep the closed object, surface and phone orientation consistent.", color = Sand, lineHeight = 24.sp)
+                                    Button(onClick = { startShowcasePosition() }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                                        Text(if (microphoneGranted) "Capture position $showcasePosition" else "Enable microphone")
                                     }
                                 }
                                 "result" -> AnimatedVisibility(
@@ -385,20 +378,26 @@ class MainActivity : ComponentActivity() {
                                             Text("No known identity was established.", color = Sand, fontSize = 18.sp)
                                             Text(
                                                 if (availableNames.isEmpty()) {
-                                                    "This anonymous scan is saved as research data. No saved enrollments are available to identify it."
+                                                    "Four measured positions are saved as research data. No saved enrollments are available to identify this anonymous scan."
                                                 } else {
-                                                    "${availableNames.size} saved enrollment label(s) exist, but validated recognition models are unavailable; this scan was not compared or identified."
+                                                    "${availableNames.size} saved enrollment(s) exist, but validated recognition models are unavailable; this four-position scan was not compared or identified."
                                                 },
                                                 color = Muted,
                                                 lineHeight = 21.sp
                                             )
                                         } else {
                                             Text("Added to research captures", color = Copper, fontFamily = FontFamily.Serif, fontSize = 28.sp)
-                                            Text("Two real sides were recorded for $showcaseName.", color = Sand, fontSize = 18.sp)
+                                            Text("Four measured positions A–D were recorded for $showcaseName.", color = Sand, fontSize = 18.sp)
+                                            Text(
+                                                if (showcaseReferenceSaved) "An encrypted, uncalibrated research baseline was saved. Verification remains unavailable."
+                                                else "Captures were saved, but the encrypted research baseline could not be created.",
+                                                color = Muted,
+                                                lineHeight = 21.sp
+                                            )
                                         }
                                         Text("Capture provenance digest · not an identity signature", color = Cyan, fontSize = 16.sp)
                                         showcaseFingerprint?.let { Text("Measured digest: ${it.take(24)}…", color = Muted, fontSize = 12.sp) }
-                                        showcaseEvidence.forEach { (side, measured) -> ShowcaseEvidenceCard(side, measured) }
+                                        showcaseEvidence.forEach { (position, measured) -> ShowcaseEvidenceCard(position, measured) }
                                         Text("Trained specialists, Laya, and calibration are unavailable. No identity decision or confidence is reported.", color = Muted, lineHeight = 21.sp)
                                         Button(onClick = {
                                             showcaseMode = null
@@ -465,12 +464,12 @@ class MainActivity : ComponentActivity() {
         objectName: String,
         sessionId: String,
         mode: String,
-        side: Int,
+        position: String,
         onFinished: (Boolean) -> Unit,
     ) {
         if (busy) return
         val condition = if (mode == "enroll") "showcase_enrollment" else "showcase_scan"
-        val label = try { CaptureLabel(objectName, sessionId, condition, "Side $side") }
+        val label = try { CaptureLabel(objectName, sessionId, condition, position) }
         catch (error: IllegalArgumentException) {
             problem = "Invalid capture details; return and try again."
             log(error.message ?: "Invalid showcase capture label")
@@ -489,7 +488,7 @@ class MainActivity : ComponentActivity() {
                 log(stage)
                 pendingShowcaseEvidence = withContext(Dispatchers.Default) { sdk.analyzePhysics(captured) }
                 pendingShowcaseScan = captured
-                stage = "Side $side ready for review"
+                stage = "Position $position ready for review"
                 log(stage)
                 onFinished(true)
             } catch (cancelled: CancellationException) {
@@ -508,7 +507,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun approveShowcaseCapture(onSaved: (PhysicsEvidence, String) -> Unit) {
+    private fun approveShowcaseCapture(onSaved: (PhysicsEvidence, String, Boolean) -> Unit) {
         if (busy) return
         val captured = pendingShowcaseScan ?: return
         val measured = pendingShowcaseEvidence ?: return
@@ -519,12 +518,24 @@ class MainActivity : ComponentActivity() {
             try {
                 val path = withContext(Dispatchers.IO) { sdk.saveCapture(captured) }
                 savedCount = withContext(Dispatchers.IO) { sdk.listCaptures().size }
-                if (captured.label.condition == "showcase_enrollment") {
-                    savedObjectNames = (savedObjectNames + captured.label.objectId).distinct()
+                val baselineSaved = if (captured.label.condition == "showcase_enrollment" && captured.label.position == "D") {
+                    try {
+                        val reference = createResearchBaseline(showcasePaths + path)
+                        baselines = listOf(reference) + baselines
+                        true
+                    } catch (cancelled: CancellationException) {
+                        throw cancelled
+                    } catch (error: Exception) {
+                        problem = "All four captures were saved, but the encrypted research baseline could not be created."
+                        log("Research baseline save failed: ${error.message}")
+                        false
+                    }
+                } else {
+                    false
                 }
                 stage = "${captured.label.position} saved"
                 log(stage)
-                onSaved(measured, path)
+                onSaved(measured, path, baselineSaved)
             } catch (cancelled: CancellationException) {
                 stage = "Capture save cancelled"
                 log(stage)
@@ -546,7 +557,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             busy = true; committing = true; problem = null
             try {
-                val reference = withContext(Dispatchers.IO) { SignatureVault(this@MainActivity).saveResearchBaseline(paths) }
+                val reference = createResearchBaseline(paths)
                 bundle = emptyList()
                 baselines = listOf(reference) + baselines
                 stage = "Measured baseline saved"; log(stage)
@@ -554,6 +565,10 @@ class MainActivity : ComponentActivity() {
             catch (error: Exception) { problem = "Baseline could not be saved. See logs in the menu."; log("Baseline save failed: ${error.message}") }
             finally { busy = false; committing = false }
         }
+    }
+
+    private suspend fun createResearchBaseline(paths: List<String>): ResearchBaseline = withContext(Dispatchers.IO) {
+        SignatureVault(this@MainActivity).saveResearchBaseline(paths)
     }
 }
 
@@ -573,12 +588,12 @@ private fun capturePhase(stage: String): String = when {
     }
 }
 @Composable
-private fun ShowcaseEvidenceCard(side: String, evidence: PhysicsEvidence) {
+private fun ShowcaseEvidenceCard(position: String, evidence: PhysicsEvidence) {
     Column(
         Modifier.fillMaxWidth().background(Charcoal).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(side, color = Copper, fontSize = 18.sp)
+        Text(position, color = Copper, fontSize = 18.sp)
         Text("Audio RMS: ${format(evidence.audioRms)} · Noise RMS: ${format(evidence.noiseRms)}", color = Sand)
         Text("Peak: ${format(evidence.peak)} · Clipped samples: ${evidence.clippedSamples}", color = Muted, fontSize = 13.sp)
         Text("Acceleration RMS: ${format(evidence.accelerationRms)} · Gyroscope RMS: ${format(evidence.gyroRms)}", color = Sand)
@@ -590,11 +605,31 @@ private fun ShowcaseEvidenceCard(side: String, evidence: PhysicsEvidence) {
 
 
 @Composable private fun PositionGuide(position: String) {
-    Column(Modifier.fillMaxWidth().background(Charcoal).padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(position, color = Copper, fontFamily = FontFamily.Serif, fontSize = 52.sp)
-        Text("Place the phone at mark $position.", color = Sand, fontSize = 18.sp)
-        Text("Keep the case closed and the phone still.", color = Muted, fontSize = 13.sp)
+    Column(Modifier.fillMaxWidth().background(Charcoal).padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text("REGISTERED CONTACT POINTS · TOP VIEW", color = Cyan, fontSize = 11.sp, letterSpacing = 1.sp)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            PositionMarker("A", position == "A")
+            PositionMarker("B", position == "B")
+        }
+        Box(Modifier.fillMaxWidth().height(52.dp).background(Obsidian), contentAlignment = androidx.compose.ui.Alignment.Center) {
+            Text("CLOSED CASE", color = Muted, fontSize = 13.sp, letterSpacing = 1.sp)
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            PositionMarker("D", position == "D")
+            PositionMarker("C", position == "C")
+        }
+        Text("Place the phone at mark $position. Keep the case closed and its orientation fixed.", color = Sand, fontSize = 16.sp, lineHeight = 22.sp)
     }
+}
+
+@Composable private fun PositionMarker(position: String, selected: Boolean) {
+    Text(
+        position,
+        Modifier.background(if (selected) Copper else Obsidian).padding(horizontal = 18.dp, vertical = 8.dp),
+        color = if (selected) Obsidian else Muted,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Bold,
+    )
 }
 
 @Composable private fun Waveform(pcm: ShortArray) {

@@ -105,3 +105,22 @@ contains controlled impact recordings and contact-force profiles, but its first
 10-object audio archive is about 36 GB and has no integrity-state labels.
 Public-data use is bounded by source labels, licensing, domain gap, and measured
 device validation; it cannot replace human-labeled Capybara captures.
+
+## MOMENT evaluation prerequisites (2026-10-09)
+
+The [official MOMENT model card](https://huggingface.co/AutonLab/MOMENT-1-small)
+lists the checkpoint as MIT-licensed. Its pinned model revision, weight hash and
+size are recorded above. The [official MOMENT repository](https://github.com/moment-timeseries-foundation-model/moment)
+documents frozen representation and classification tasks through
+`MOMENTPipeline`; this makes a frozen-encoder comparison on the existing UCI
+speed-group split a reasonable bounded transfer experiment. It cannot create
+Capybara integrity labels from fan-configuration labels.
+
+The evaluation did not run: the ignored Python 3.13 venv exists, including its
+PyTorch files, but Windows cannot start its interpreter. Its config points to a
+Microsoft Store Python base; only the separate bundled Python 3.12.14 launcher
+was confirmed working, and it was not used for ML. The MOMENT checkpoint is not
+cached. This is an environment blocker, not evidence for or against model
+transfer. Restore the intended venv runtime, pin the `momentfm` source revision,
+then measure the frozen encoder on the same split before considering any student
+or Android deployment.
