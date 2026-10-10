@@ -23,8 +23,9 @@ validation use their respective catalogs.
 The guided showcase collects two approved side captures for enrollment and scan.
 Enrollment persists a Keystore-encrypted `RESEARCH_BASELINE_UNCALIBRATED` pair
 and displays a digest of capture IDs and source hashes. It is provenance, not a
-physical identity signature. Only complete registered positions are saved as
-references; partial/rejected raw captures never appear as enrolled objects.
+physical identity signature. A baseline is saved only when every registered
+position has a complete audio record (stored, requested and reported sample
+counts agree); partial or rejected raw captures never appear as enrolled objects.
 Scan requires an explicit reference. `Capybara.evaluate` authenticates the saved
 reference, verifies stored capture provenance, requires the current object label
 to match the selected reference label, and produces per-position physics-v1

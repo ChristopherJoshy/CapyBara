@@ -16,7 +16,11 @@ class SignatureVaultTest {
         val vault = SignatureVault(context)
         val paths = listOf("A", "B", "C", "D").map { p ->
             sdk.saveCapture(Scan(CaptureLabel("storage-test-only", "test-session", "format_test", p), 48_000,
-                shortArrayOf(1), emptyList(), emptyList(), 1, 2, mapOf("purpose" to "test_fixture_not_physical_data")))
+                shortArrayOf(1), emptyList(), emptyList(), 1, 2, mapOf(
+                    "purpose" to "test_fixture_not_physical_data",
+                    "audioExpectedSamples" to "1",
+                    "audioSampleCount" to "1",
+                )))
         }
         val reference = vault.saveResearchBaseline(paths)
         val another = vault.saveResearchBaseline(paths)
@@ -54,7 +58,11 @@ class SignatureVaultTest {
                     CaptureLabel("generic-storage-test", "generic-session", "showcase_enrollment",
                         position, ProfileEngine.SHOWCASE_OBJECT_ID),
                     48_000, shortArrayOf(1), emptyList(), emptyList(), 1, 2,
-                    mapOf("purpose" to "test_fixture_not_physical_data")
+                    mapOf(
+                        "purpose" to "test_fixture_not_physical_data",
+                        "audioExpectedSamples" to "1",
+                        "audioSampleCount" to "1",
+                    )
                 ))
             }
             val reference = vault.saveResearchBaseline(paths)
@@ -73,6 +81,29 @@ class SignatureVaultTest {
         } finally {
             referenceId?.let { File(context.noBackupFilesDir, "capybara/references/$it.ref").delete() }
             paths.forEach { File(it).deleteRecursively() }
+        }
+    }
+
+    @Test fun partialAudioCaptureCannotBecomeResearchBaseline() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val sdk = Capybara(context)
+        val vault = SignatureVault(context)
+        val path = sdk.saveCapture(Scan(
+            CaptureLabel("partial-test-only", "partial-session", "showcase_enrollment",
+                "SIDE_1", ProfileEngine.SHOWCASE_OBJECT_ID),
+            48_000, shortArrayOf(1), emptyList(), emptyList(), 1, 2,
+            mapOf(
+                "purpose" to "test_fixture_not_physical_data",
+                "audioExpectedSamples" to "2",
+                "audioSampleCount" to "1",
+            )
+        ))
+        try {
+            assertThrows(IllegalArgumentException::class.java) {
+                vault.saveResearchBaseline(listOf(path))
+            }
+        } finally {
+            assertTrue(File(path).deleteRecursively())
         }
     }
 }

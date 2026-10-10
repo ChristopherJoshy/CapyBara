@@ -134,6 +134,10 @@ Reproduce the scratch baseline with:
 - The SDK data/capture directory is absent; no real labeled Capybara captures,
   task-trained specialists, calibrated Laya checkpoint or full-system accuracy
   evidence exist.
+- `SignatureVault` now rejects baseline captures unless stored PCM length matches
+  both requested and reported audio counts. A host predicate test passes and a
+  vault instrumentation regression compiles; instrumentation was not run under
+  the active iQOO-test pause. See progress and mistakes entries dated 2026-10-10.
 - The licensed KAIST data and these adjacent datasets were not downloaded or used for task-model training; using their unrelated labels would not create Capybara specialists.
 
 ## Immediate continuation order

@@ -339,6 +339,20 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   Capybara integrity claim; continue to require real labeled phone captures.
 - Sources, exact limitations and decision: `research.md`.
 
+## Partial-audio baseline rejection (2026-10-10)
+
+- Code-path review found that `CaptureEngine` can return a short PCM array after
+  its acquisition deadline and the app can expose that measurement for review.
+  `SignatureVault` previously checked complete profile positions but not complete
+  audio counts, so a user-approved partial capture could be persisted as a
+  research reference.
+- `SignatureVault` now requires each stored PCM count to match both the requested
+  and reported audio sample counts. Partial captures may remain raw research
+  records but cannot become enrolled references.
+- The pure-JVM sample-count regression and SDK unit/lint tasks passed;
+  `SignatureVaultTest`'s persistence regression compiled. Instrumentation and
+  iQOO tests were not run because the user paused device testing.
+
 ## Next acceptance milestones
 
 1. The user collects and labels real rigid-case A–D enrollment, unchanged

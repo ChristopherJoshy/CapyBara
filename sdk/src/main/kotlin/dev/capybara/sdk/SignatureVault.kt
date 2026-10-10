@@ -29,6 +29,12 @@ internal class SignatureVault(context: Context) {
             require(folder.parentFile == captureRoot) { "Baseline captures must belong to this application's private capture store." }
             JSONObject(File(folder, "metadata.json").readText()).also {
                 require(it.getInt("schemaVersion") == 1) { "Unsupported capture schema." }
+                val measurement = it.getJSONObject("metadata")
+                require(hasCompleteAudioCapture(
+                    it.getInt("sampleCount"),
+                    measurement.opt("audioExpectedSamples") as? String,
+                    measurement.opt("audioSampleCount") as? String,
+                )) { "Baseline captures must contain every requested audio sample." }
             }
         }
         val labels = captures.map { it.getJSONObject("label") }

@@ -13,6 +13,9 @@ Capybara is an offline Android physical-measurement SDK and demonstration app. I
 - Encrypted immutable research baselines are profile-scoped and use Android
   Keystore AES-GCM: four positions for the controlled `rigid_case` protocol and
   two sides for the generic `showcase_object` flow. Both remain uncalibrated.
+- Baseline enrollment rejects captures whose stored PCM count does not match
+  both the requested and reported sample counts; incomplete captures remain raw
+  research data and cannot create an enrolled reference.
 - `Capybara.evaluate(referenceId, paths)` authenticates the encrypted reference, checks sealed capture metadata and PCM/IMU hashes, requires the current capture's user-entered object label to match the selected reference label (not proof of physical identity), derives per-position reference/current physics features and deltas on CPU, and returns explicit TrustGate blockers. Its current result remains `INCONCLUSIVE`; it does not run Laya inference.
 - The profile catalog separates `rigid_case` A–D research capture from the
   `showcase_object` SIDE_1/SIDE_2 acquisition flow. The latter accepts any stable

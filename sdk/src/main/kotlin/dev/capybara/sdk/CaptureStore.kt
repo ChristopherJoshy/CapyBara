@@ -177,3 +177,13 @@ internal class CaptureStore(context: Context) {
 }
 
 internal data class StoredCapture(val id: String, val scan: Scan, val metadata: JSONObject)
+
+internal fun hasCompleteAudioCapture(
+    storedSamples: Int,
+    expectedSamples: String?,
+    reportedSamples: String?,
+): Boolean {
+    val expected = expectedSamples?.toIntOrNull() ?: return false
+    val reported = reportedSamples?.toIntOrNull() ?: return false
+    return expected > 0 && storedSamples == expected && reported == storedSamples
+}

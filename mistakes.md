@@ -117,3 +117,15 @@ fresh session. Added SDK tests for the label guard and an app test for the
 reference-selection gate. Host unit/build/lint checks passed; instrumentation was
 compiled but not run, and no iQOO test was performed. Treat the label as
 annotation consistency, never physical identity evidence.
+
+## 2026-10-10: do not enroll incomplete audio captures
+
+Code-path review found that `CaptureEngine` can return a partial PCM buffer at
+its deadline and the app permits user review. `SignatureVault` checked profile
+positions but did not compare stored PCM length with requested/reported sample
+counts, so approved partial audio could be included in an encrypted baseline.
+The baseline validator now fails closed on any missing or mismatched count.
+The host count-boundary test passes and an instrumentation regression checks
+that the vault rejects such a capture; the instrumentation test was compiled,
+not run, because iQOO testing is paused. Keep partial measurements as raw
+research data only; never let user approval bypass sample completeness.
