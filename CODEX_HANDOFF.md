@@ -166,6 +166,9 @@ Reproduce the scratch baseline with:
   built-in speaker-system routes are accepted. Route type alone cannot prove both
   physical speakers were used. Route types are observed while streams are active,
   per Android's `AudioRouting` contract. The iQOO remains untested.
+- Added `sdk/docs/device-capabilities.md`; it records queried SDK fields separately
+  from unmeasured iQOO-specific values. No ADB/device command was run during the
+  user's pause. Hardware values remain a human/device prerequisite.
 - The licensed KAIST data and these adjacent datasets were not downloaded or used for task-model training; using their unrelated labels would not create Capybara specialists.
 
 ## Immediate continuation order

@@ -410,6 +410,12 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   safe-speaker route regression. No iQOO test or physical haptic confirmation was
   performed.
 
+## Device capability record (2026-10-10)
+
+- Added `sdk/docs/device-capabilities.md` to distinguish SDK API queries from
+  actual iQOO observations. All iQOO-specific values remain explicitly unmeasured.
+- No ADB or device command was run because the user's pause remains active.
+
 ## Next acceptance milestones
 
 1. After the user's iQOO pause is lifted, collect and label real rigid-case A–D
