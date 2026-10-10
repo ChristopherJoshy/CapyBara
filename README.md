@@ -109,12 +109,13 @@ suspend fun recordShowcaseReference(
 }
 ```
 
-This SDK-level example leaves turn prompts and retry controls to the caller.
-`approveCapture` must await a real user decision; rejecting aborts the run
-without creating a reference, while earlier saved captures remain private
-research data. Call `saveResearchBaseline` only after all profile positions are
-approved. For each verification, use a distinct session ID and capture every
-registered position, then call
+This minimal SDK example aborts on a rejected side; production UI should retain
+per-side state to retry without restarting the pair. `approveCapture` must await
+a real user decision; rejection creates no reference, while earlier saved
+captures remain private research data.
+Call `saveResearchBaseline` only after every position is approved. For each
+verification, use a distinct session ID and capture every registered position,
+then call
 `capybara.evaluate(reference.id, currentCapturePaths)`. The current decision is
 `INCONCLUSIVE` without trained specialists and calibration; this API does not
 claim a physical identity fingerprint or calibrated verification.
