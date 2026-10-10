@@ -412,10 +412,10 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 
 ## Next acceptance milestones
 
-1. The user collects and labels real rigid-case A–D enrollment, unchanged
-   repositioned repeats, removed-item changes, restored repeats and invalid
-   captures using `sdk/docs/experiments.md`. These physical labels cannot be
-   supplied by code or public fan data.
+1. After the user's iQOO pause is lifted, collect and label real rigid-case A–D
+   trials plus `showcase_object` SIDE_1/SIDE_2 trials across distinct physical
+   boxes, following `sdk/docs/experiments.md`. Keep both protocols separate;
+   neither can be supplied by code or public fan data.
 2. Develop and evaluate EchoNet, VibraNet, PhysFusion, StateNet and SpatialNet
    only from modality-matched real evidence with object/session/run-separated
    splits. Continue only if repeated-state separability supports the task.

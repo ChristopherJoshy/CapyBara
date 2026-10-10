@@ -171,13 +171,14 @@ Reproduce the scratch baseline with:
 ## Immediate continuation order
 
 1. Keep the rebuilt Capybara APK installed and preserve its private data.
-2. Do not test on the iQOO while the user's pause remains active. When the user
-   resumes testing, use `sdk/docs/experiments.md` to collect the controlled
-   earbuds-case experiment: five independent repeats per position and physical
-   state; a single object is feasibility evidence only.
-3. Obtain multiple independent object IDs, sessions, run labels and controlled
-   physical states before training. Keep each object's captures and references
-   within one train/calibration/test split.
+2. Do not test on the iQOO while the user's pause remains active. Once lifted,
+   follow `sdk/docs/experiments.md` for both rigid-case A–D trials and the generic
+   `showcase_object` two-side protocol. The generic initial pilot needs ten
+   distinct boxes (six/two/two train/calibration/test), all three labels per
+   split, and repeatable SIDE_1/SIDE_2 contact surfaces; it does not establish
+   universal object coverage.
+3. Keep each object's captures, references, sessions and physical runs within
+   one train/calibration/test split. One object proves feasibility only.
 4. Train EchoNet/VibraNet/PhysFusion/StateNet/SpatialNet from measured iQOO data
    only after separability and held-out evaluation are demonstrated; then
    fine-tune Laya on their versioned evidence.

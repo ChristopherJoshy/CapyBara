@@ -67,6 +67,40 @@ accuracy sample size. Repeated readings from one object cannot establish held-ou
 object generalization. Keep timestamps and operator labels independently of model
 outputs, and preserve every failed/inconclusive recording.
 
+## Two-side generic showcase profile
+
+`showcase_object` registers exactly `SIDE_1` and `SIDE_2`; it is a research
+capture workflow, not evidence that one model generalizes to every box, material
+or shape. Use a closed, safely changeable rigid box for the initial pilot. Record
+its material, dimensions, shape, contents, support surface and contact spot.
+Choose repeatable SIDE_1/SIDE_2 surfaces and mark orientation away from the phone
+contact areas so the marker itself does not alter the measurement.
+
+For each physical object:
+
+1. Enroll one complete two-side reference in a single fresh `sessionId`.
+2. Run five unchanged trials. Lift and reposition the phone between trials; use
+   a fresh `sessionId` and unique `runId` for each two-side trial. Keep the object
+   state, support and side order unchanged.
+3. Make one safe, recorded content change without changing the box or its support.
+   Capture five changed trials with fresh sessions and unique run IDs. Restore the
+   contents, then capture five more unchanged trials.
+4. Approve only complete real captures. Preserve every rejected/partial capture
+   for quality review, but do not use it as an enrolled reference. Label valid
+   ambiguous or contaminated readings `INCONCLUSIVE`, never force them to
+   `CHANGED`/`MATCH`.
+5. Keep both positions, each reference and all sessions/runs for one physical
+   object within one data split. For the minimum ten-object pilot, reserve six
+   objects for training, two for calibration and two untouched for test; each
+   split must contain all three outcomes. Ten objects are still far too few to
+   claim universal coverage or reliable accuracy.
+
+Add distinct objects across shapes, materials, closures, masses and contents
+before making a generalization claim. Keep these `showcase_object` records
+separate from `rigid_case` A–D evidence unless a shared model has been validated
+across both protocols. Until held-out physical evidence and calibration exist,
+the app must continue returning `INCONCLUSIVE`.
+
 ## Required condition matrix
 
 | Condition | Purpose and labeling |
