@@ -327,6 +327,18 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   even if the authorized phone reconnects; do not test it unless the user changes
   the instruction.
 
+## Public-data fit review (2026-10-10)
+
+- Reviewed primary records for impact-echo concrete defects, an iPhone motor-
+  vibration dataset, multimodal bare-finger texture sensing and VibTac-12.
+- The first three publish CC BY 4.0 records but do not jointly match Capybara's
+  active phone-speaker/haptic contact, rigid-object states and object-separated
+  generalization. VibTac-12 records texture classes using a probe and does not
+  state reuse terms; its access requires an IEEE account.
+- No dataset was downloaded or used for training. No candidate supports a
+  Capybara integrity claim; continue to require real labeled phone captures.
+- Sources, exact limitations and decision: `research.md`.
+
 ## Next acceptance milestones
 
 1. The user collects and labels real rigid-case A–D enrollment, unchanged

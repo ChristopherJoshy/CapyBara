@@ -117,14 +117,32 @@ Reproduce the scratch baseline with:
 - [YAMNet](https://www.tensorflow.org/hub/tutorials/yamnet) is a pretrained MobileNetV1 audio-event classifier trained for 521 AudioSet labels, with 16 kHz mono input. Its weight-asset license was not verified in the sources read. It is environmental-audio pretraining, not active phone/object response. Do not use until rights and domain transfer are checked.
 - [Vibration measurements with observer-declared variance change points](https://github.com/witulska/vibration-changepoint-dataset) is CC BY 4.0 and contains nine smartphone inertial recordings (one person, motorbike and car), up to 100 Hz, with observer-declared variance shifts. It lacks active excitation, audio and object-integrity labels.
 - [ORION-AE](https://doi.org/10.7910/DVN/FBRDU0) is CC0 1.0 and labels bolt-loosening levels using bonded 5 MHz acoustic-emission sensors and a laser vibrometer. This structural-health dataset is incompatible with phone microphone/IMU input.
+- Additional 2026-10-10 dataset audit: the CC BY 4.0 bare-deck impact-echo
+  dataset has relevant concrete labels but no verified phone sensor transfer;
+  the CC BY 4.0 iPhone induction-motor set is one motor domain with attached
+  phone IMU and no active phone excitation; the 20.9 GB bare-finger texture
+  dataset uses skin-mounted sensors and texture labels; VibTac-12's license is
+  unstated and access requires IEEE login. No new data was downloaded or used.
+  See `research.md`; none supports Capybara integrity training.
+- The latest host-only integration build passed. SDK/APK lint and SDK unit
+  regression passed; Android instrumentation was compiled but not executed.
+  Commit `3218733` was pushed to `codex/v6-handoff`.
+- Current `Capybara.evaluate` derives authenticated per-position physics
+  evidence and remains fail-closed `INCONCLUSIVE`. The scan caller now uses the
+  selected reference's annotation label. No model inference or identity proof.
+- Do not run iQOO experiments while the user pause remains in force.
+- The SDK data/capture directory is absent; no real labeled Capybara captures,
+  task-trained specialists, calibrated Laya checkpoint or full-system accuracy
+  evidence exist.
 - The licensed KAIST data and these adjacent datasets were not downloaded or used for task-model training; using their unrelated labels would not create Capybara specialists.
 
 ## Immediate continuation order
 
 1. Keep the rebuilt Capybara APK installed and preserve its private data.
-2. Request the first controlled earbuds-case experiment from
-   `sdk/docs/experiments.md`. Collect five independent repeats per position and
-   physical state; a single object is feasibility evidence only.
+2. Do not test on the iQOO while the user's pause remains active. When the user
+   resumes testing, use `sdk/docs/experiments.md` to collect the controlled
+   earbuds-case experiment: five independent repeats per position and physical
+   state; a single object is feasibility evidence only.
 3. Obtain multiple independent object IDs, sessions, run labels and controlled
    physical states before training. Keep each object's captures and references
    within one train/calibration/test split.

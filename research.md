@@ -318,6 +318,58 @@ existing UCI fan classifier remains a local transfer baseline only. Train the
 V6 specialists and fine-tune Laya only after real iQOO captures have profile
 labels, independent object/session/run splits, and specialist evidence.
 
+## Adjacent public acoustic and vibration datasets (2026-10-10)
+
+Question: does a public dataset provide both reusable rights and task/sensor
+alignment strong enough to train a Capybara specialist before iQOO captures?
+
+The Mendeley Data record for [Annotated Impact Echo Dataset (bare
+decks)](https://data.mendeley.com/datasets/44rb96872r/1) (Sattar Dorafshan and
+Hoda Azari; published 19 February 2020; DOI
+`10.17632/44rb96872r.1`) reports 2,016 impact-echo signals from eight
+laboratory-made concrete specimens, labeled sound or defected, under CC BY 4.0.
+These are task-relevant concrete defect labels, but the record does not establish
+phone microphone/IMU capture, phone-generated excitation, or transfer to rigid
+consumer objects. The data archive was not downloaded; do not treat it as V6
+training data.
+
+The [smartphone-based induction-motor vibration
+dataset](https://data.mendeley.com/datasets/rs4vz8n3t5/1) (Govind Vashishtha,
+Merve Ertarğın, Ahmet Orhan, Özal Yıldırım and Sumika Chauhan; published
+2 January 2026; DOI `10.17632/rs4vz8n3t5.1`) reports six motor fault states,
+three speeds and two load conditions from an iPhone 15 Pro Max attached to a
+motor housing; tri-axial acceleration is sampled at 100 Hz. The record states
+CC BY 4.0 and provides CSV/MAT files. Its phone IMU and fault labels are closer
+than laboratory-only vibration sets, but the attached-phone rotating-motor
+domain has no acoustic/haptic phone excitation or separate consumer-object
+identity. It cannot establish general physical-integrity decisions; no data was
+downloaded or model trained.
+
+The [bare-finger tactile/audio/visual dataset](https://doi.org/10.6084/m9.figshare.26965267.v1)
+(Devillard et al., *Scientific Data* 12, 484; published 23 March 2025; DOI
+`10.1038/s41597-025-04670-0`) is public CC BY 4.0. Its paper describes ten
+textured surfaces, ten participants, directional microphones and accelerometers
+mounted to the finger; the Figshare record lists 20.9 GB of files. The labels
+identify textures and interaction trials, not object integrity; contact
+microphones/skin-mounted accelerometers during sliding are not the phone's
+active speaker-to-object response. Access and files were not downloaded.
+
+The IEEE DataPort [VibTac-12 record](https://doi.org/10.21227/kwsy-x398)
+(Kursun and Patooghy, 2020) describes a rotating texture drum, probe-mounted
+accelerometer at 200 Hz and microphone at 8 kHz, with 12 texture classes and one
+20-second recording per class. Files require an IEEE account, and the record
+does not state a reuse license. Both licensing and sample-level independence
+are unresolved; do not download or train from it.
+
+Decision: none of these records authorizes training a Capybara physical-integrity
+model. Impact-echo has relevant defect labels but unverified device/sensor
+transfer; the smartphone motor set has relevant phone IMU but a single
+application domain and no active excitation; the tactile datasets classify
+surfaces under different contact mechanics, and VibTac-12's rights are
+unresolved. Keep them as documented research leads only. Wait for labeled,
+object/session-separated Capybara measurements before specialist or Laya
+training.
+
 ## Compose motion and truthfulness (official Android sources, observed 2026-10-10)
 
 Question: which Compose motion APIs can polish the showcase without implying
