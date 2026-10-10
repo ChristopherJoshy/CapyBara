@@ -1,9 +1,10 @@
 # Real physical training workflow
 
-No trained Capybara weights or physical training set exist yet. These scripts
-validate real recordings, preserve provenance, and call actual upstream Laya.
-They do not manufacture sensor data or launch remote jobs. The schema tests use
-temporary fixtures only; they are never training or evaluation evidence.
+No trained Capybara weights or physical training set exist yet. The current
+workflow validates real recordings, prepares Laya evidence, and fine-tunes actual
+upstream Laya; it does not implement training or inference for EchoNet, VibraNet,
+PhysFusion, StateNet, or SpatialNet. The UCI fan classifier is unrelated and must
+not be relabeled as a specialist. No synthetic training data or results are used.
 
 ## Verified environment, 9 October 2026
 

@@ -30,10 +30,12 @@ Capybara is an offline Android physical-measurement SDK and demonstration app. I
 
 ## What is not yet claimed
 
-No task-specific V6 specialist weights, labeled physical-integrity dataset,
-calibration, trained Capybara-Laya checkpoint, Android ONNX parity, calibrated
-TrustGate acceptance, integrity accuracy, or full offline MATCH/CHANGED decision
-is currently verified. The base Laya host smoke test is not physical evidence.
+The five specialist training and inference implementations (EchoNet, VibraNet,
+PhysFusion, StateNet, SpatialNet) are not present yet. No task-specific V6
+weights, labeled physical-integrity dataset, calibration, trained Capybara-Laya
+checkpoint, Android ONNX parity, calibrated TrustGate acceptance, integrity
+accuracy, or full offline MATCH/CHANGED decision is verified. The base Laya host
+smoke test is not physical evidence.
 A separate UCI fan classifier was trained on public labels, but it is not a
 Capybara model and is not integrated. Missing prerequisites produce
 unavailable/INCONCLUSIVE behavior; the app never substitutes a threshold

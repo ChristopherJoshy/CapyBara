@@ -426,6 +426,9 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 - `sdk/captures/`, the prepared dataset, and the specialist manifest are absent.
   No notebook was launched and no GPU availability was asserted; no valid
   task-specific training input exists.
+- The repository currently has no EchoNet/VibraNet/PhysFusion/StateNet/SpatialNet
+  trainer or inference implementation. Do not synthesize a model pipeline;
+  choose and validate those objectives against collected real measurements.
 
 ## Next acceptance milestones
 

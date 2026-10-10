@@ -192,9 +192,10 @@ Reproduce the scratch baseline with:
    universal object coverage.
 3. Keep each object's captures, references, sessions and physical runs within
    one train/calibration/test split. One object proves feasibility only.
-4. Train EchoNet/VibraNet/PhysFusion/StateNet/SpatialNet from measured iQOO data
-   only after separability and held-out evaluation are demonstrated; then
-   fine-tune Laya on their versioned evidence.
+4. The five specialist trainer/inference paths do not exist yet. After real
+   labeled measurements define the separability and objective, implement and
+   evaluate each path with object/session-separated splits; then fine-tune Laya
+   on their versioned evidence.
 5. Qualify quantization with held-out decision/calibration evidence before
    Android CPU parity, memory/latency measurements, TrustGate and offline
    end-to-end validation.
