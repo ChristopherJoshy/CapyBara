@@ -150,44 +150,32 @@ The tutorial establishes its input/task but not the weight asset's license here;
 verify that before reuse. Environmental-event pretraining is not evidence of
 active object-response or integrity recognition.
 
-The [Knocker data](https://nmsl.kaist.ac.kr/projects/knocker/) and
-[YCB-impact OSF record](https://api.osf.io/v2/nodes/4tcp6/) are publicly
-reachable but provide no dataset license. YCB reports `node_license: null`.
-Do not use either dataset for training or distribution without explicit terms.
-
-The [ObjectFolder-Real download page](https://www.objectfolder.org/objectfolder-real-download)
-describes real-object impacts, force profiles and tactile captures, but states no
-data license. The separate [ObjectFolder 2.0 download page](https://www.objectfolder.org/objectfolder2-0-download)
-says ObjectFolder is CC BY 4.0; that does not establish terms for the Real archives.
-Correction: ObjectFolder-Real is not verified as licensed. Do not download or
-train on those recordings until their data terms are explicit.
-
-Closest physical-audio leads audited 2026-10-10; none is currently usable:
-- [FillImpact](https://arxiv.org/abs/2607.17773) is described as over 5,000
-  48 kHz impact recordings from 88 real containers with hollow, water, rice and
-  fill-level labels. The paper gives no dataset download URL or data license.
-  Its DJI Mic/physical-striker setup also differs from Capybara's phone probe.
-- [SonicSense](https://proceedings.mlr.press/v270/liu25h.html) studies container
-  inventory and object properties with contact microphones. Its
-  [Apache-2.0 code repository](https://github.com/generalroboticslab/SonicSense)
-  links the recordings separately on Google Drive but states no dataset license.
-- [YCB-impact](https://api.osf.io/v2/nodes/4tcp6/) has `node_license: null`.
-  [RealImpact](https://github.com/samuel-clarke/RealImpact) publishes a separate
-  MIT-licensed code repository and data download script, but no data license was
-  found. Both are controlled impact-audio datasets without integrity-state
-  labels and do not match the phone active-probe setup.
-
-- [VibeCheck](https://arxiv.org/abs/2504.15535) is a closer active-sensing
-  precedent: it transmits a 20 Hz–20 kHz sweep through a gripped object using a
-  piezo emitter and receives it with a contact microphone; its tasks include
-  object, internal-pose and contact-state inference with session-separated
-  test sets. The transducers are mechanically coupled to the object, unlike
-  Capybara's phone air-speaker/microphone path. The paper and
-  [project page](https://roamlab.github.io/vibecheck/) provide no dataset
-  download. The [code repository](https://github.com/roamlab/acoustic-sensing-public)
-  has no dataset license; its Apache-2.0 file is nested under
-  `src/keyboard_control`. Do not reuse its data or model assets.
-
+Closest public-data leads audited 2026-10-10; none matches Capybara's iQOO
+speaker-plus-haptic acquisition and generic enrolled-object integrity task:
+- [The Boombox](https://proceedings.mlr.press/v164/chen22c.html), Chen et al.,
+  CoRL 2022, reconstructs contents from vibrations recorded by contact
+  microphones on boxes. The authors publish audio/video data for three box
+  shapes through their [project page](https://boombox.cs.columbia.edu/) and
+  [code repository](https://github.com/BoyuanChen/boombox). The code is MIT,
+  but no separate dataset license is stated. It is the closest hidden-content
+  task, but do not train on or redistribute its data until data rights are
+  explicit; it uses attached contact microphones, not a phone's speakers or
+  haptics.
+- The [EPFL object-manipulation audio/tactile dataset](https://doi.org/10.5281/zenodo.6372438)
+  (Prabhakar, Billard and Reber, 2021-10-09; official
+  [Zenodo record](https://zenodo.org/api/records/6372438)) is CC BY 4.0. It
+  contains 300 robot trials, five contents (empty, vitamins, gummies, cornflakes,
+  rice), two motions, microphone audio, tactile force/pressure, and joint data
+  for one plastic container. This is a legally reusable auxiliary content-state
+  benchmark, not phone-probe evidence. There is no held-out object; trials are
+  grouped by three collection dates, with some motion/content combinations
+  confined to particular dates. Random trial splitting risks session confounds.
+- ROS ingestion uses `rosbags==0.11.6` (Apache-2.0, Python >=3.10;
+  [PyPI metadata](https://pypi.org/project/rosbags/0.11.6/)). Its
+  [AnyReader API](https://ternaris.gitlab.io/rosbags/topics/highlevel.html)
+  auto-registers embedded message definitions, allowing this legacy bag format
+  to be read without a ROS installation. This parses the public dataset; it adds
+  no Capybara sensor evidence.
 - [CORSMAL Containers Manipulation](https://corsmal.github.io/containers_manip.html)
   has 1,140 recordings of 15 containers and 12 people, with content and fill-level
   labels and a 9/3/3 container-separated train/public-test/private-test split.
@@ -195,14 +183,25 @@ Closest physical-audio leads audited 2026-10-10; none is currently usable:
   or shaking, not Capybara's active phone speaker/microphone probe. The dataset
   is CC BY-NC 4.0 (official [data record](https://doi.org/10.17636/101CORSMAL1)).
   Its [ACC pretrained weights](https://doi.org/10.5281/zenodo.4770061) are
-  separately listed as CC BY 4.0 and trained on the dataset's train split, but
-  the TensorFlow classifier uses the mismatched dataset/audio setup. No data or
-  weights were downloaded, evaluated, or integrated.
-- The [EPFL object-manipulation audio/tactile dataset](https://doi.org/10.5281/zenodo.6372438)
-  is CC BY 4.0 and contains 300 robot trials for five contents and two motions.
-  It uses a hand-mounted microphone, tactile skin and robot-joint data on one
-  plastic container; collection dates vary by condition. It has no object-held-out
-  split and no phone-generated active probe, so it is not V6 training evidence.
+  separately listed as CC BY 4.0; that separate license does not change the
+  dataset license. Neither the weights nor dataset were evaluated or integrated.
+- [Knocker](https://miil.kaist.ac.kr/projects/knocker/) reports smartphone
+  microphone, accelerometer and gyroscope responses to user knocks, with 23
+  object classes. This is the closest phone-sensor dataset for object response,
+  but its labels are object identities rather than changes to contents or
+  physical state. Its linked archive asks users to read an included README; no
+  dataset license was verifiable from the public page, so do not train or
+  redistribute without explicit terms.
+- [YCB-impact](https://api.osf.io/v2/nodes/4tcp6/) has no explicit dataset
+  license (`node_license: null`) and uses controlled impact audio. The paper
+  license does not establish dataset reuse rights; do not train on it.
+- [ObjectFolder-Real](https://objectfolder.stanford.edu/objectfolder-real-download)
+  describes real-object impacts, force profiles and tactile captures, but states
+  no data license. The separate [ObjectFolder 2.0 download page](https://www.objectfolder.org/objectfolder2-0-download)
+  says ObjectFolder is CC BY 4.0; that does not establish terms for the Real
+  archives. [RealImpact](https://github.com/samuel-clarke/RealImpact) publishes
+  MIT-licensed code and a data download script, but no dataset license was
+  found. Do not treat code licenses as dataset licenses.
 - The [coin-tap defect dataset](https://github.com/PPhub-hy/torch-tapnet), described
   in the [paper](https://arxiv.org/abs/2203.12594), has 101,070 labeled 48 kHz
   samples from nine bonded-plate specimens and seven normal/defect classes. It
@@ -227,10 +226,39 @@ Closest physical-audio leads audited 2026-10-10; none is currently usable:
 
 These are task-adjacent leads only. Their different excitation/contact geometry,
 limited object coverage, or licensing do not support a Capybara model or product
-deployment. No candidate was downloaded, evaluated, trained, or integrated.
+deployment. The initial audit preceded the EPFL-only experiment below. No other
+candidate dataset or weights were downloaded, evaluated, trained, or integrated.
 Public-data use remains bounded by source labels, artifact-specific licensing,
 domain gap, and measured device validation; it cannot replace human-labeled
 Capybara captures.
+
+## EPFL source-domain content experiment (2026-10-10)
+
+The official [Zenodo record](https://zenodo.org/api/records/6372438) declares
+CC BY 4.0. The 795,903,546-byte archive was downloaded to ignored artifacts;
+its MD5 (`60ac6f12924764dc813977c053934c98`), SHA-256
+(`ec534a68ced0e36926b901af17aa10408805a3d57f115a086100acc37d88e4e2`), and ZIP
+CRC check passed. The selected ROS1 bags expose 16 kHz mono MP3 audio and
+robot-mounted Tekscan pressure frames (2,944 values per frame). `rosbags==0.11.6`
+reads the embedded message definitions without ROS installed; its POSIX
+message-type path handling needs a `PurePosixPath` compatibility substitution
+on Windows.
+
+The separate `sdk/training/train_epfl_mml_source.py` CNN uses only the three
+contents present on both selected dates: empty, gummies and rice. Its split is
+72 training and 18 validation trials from 2021-08-25, then 90 test trials from
+2021-08-26. The test date also changes the manipulation motion, so the two
+effects are confounded; no object is held out. Training, validation, and test
+each scored 33.33% accuracy and 16.67% macro-F1, equal to one-in-three chance.
+The classifier predicted `empty` for every trial, including all 72 training
+trials, so it failed to learn this source task and is rejected. This is not an
+integrity result, phone transfer, fine-tuning of Capybara, or venue-collected
+data.
+
+The host's libmpg123 decoder emitted repeated `part2_3_length` errors while
+returning waveform arrays. Audio continuity was not verified, further limiting
+the experiment. Keep the archive, extracted bags, checkpoint, and generated
+report under ignored `sdk/training/artifacts/`; no dataset or model is shipped.
 
 ## Pretrained transfer and Laya host evaluation (2026-10-09)
 

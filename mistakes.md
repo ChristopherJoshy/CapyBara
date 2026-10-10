@@ -221,3 +221,26 @@ its archive hashes, although the training code verified the published MD5. Local
 report inspection caught the provenance gap; the current trainer records both
 the source MD5 and computed SHA-256. The existing Kaggle report remains version
 2 and is not retroactively represented as containing those fields.
+
+## 2026-10-10: EPFL trial numbers are zero-based
+
+The first source-classifier pass stopped before extraction because the archive
+uses identifiers 0–29, while the parser assumed 1–30. A ZIP-name audit confirmed
+30 trials per selected class/date at 0–29; the parser and split test now match the
+actual archive. The failed run produced no training metrics.
+
+## 2026-10-10: rosbags uses POSIX path objects for message types on Windows
+
+`rosbags==0.11.6` raised `NotImplementedError` while constructing `PosixPath`
+from a ROS message type on Windows. Replacing only that type-name helper with
+`PurePosixPath` allowed `AnyReader` to open the verified ROS1 bag. The training
+script scopes this compatibility workaround to Windows and leaves the installed
+dependency unchanged.
+
+## 2026-10-10: MP3 decoder errors are not a successful audio-quality check
+
+The checksum-verified EPFL archive's MP3 streams produced repeated libmpg123
+`part2_3_length` errors during decoding, although libsndfile returned waveform
+arrays. The source-task run therefore has unverified audio continuity and no
+phone-transfer value. Preserve the warnings and quality limitation; do not treat
+successful array output as proof of clean audio.

@@ -28,18 +28,15 @@ Capybara is an offline Android physical-measurement SDK and demonstration app. I
 - The isolated training environment now runs CPU PyTorch and the pinned Laya source. The licensed English Laya base checkpoint loaded locally; its host ONNX export (1,685,258,240-byte external FP32 weights) matched eager output on one generic email example. Its shipped temperature is invalid/clamped, so confidence is uncalibrated; this checkpoint is not packaged or used for physical decisions.
 - MOMENT-1-small was evaluated as a frozen encoder on the public UCI fan split and underperformed the scratch fan baseline (55.56% versus 67.63% test accuracy). Neither fan result is Capybara integrity evidence; MOMENT is not promoted.
 
-## What is not yet claimed
+## Physical-integrity decision status
 
-The five specialist training and inference implementations (EchoNet, VibraNet,
-PhysFusion, StateNet, SpatialNet) are not present yet. No task-specific V6
-weights, labeled physical-integrity dataset, calibration, trained Capybara-Laya
-checkpoint, Android ONNX parity, calibrated TrustGate acceptance, integrity
-accuracy, or full offline MATCH/CHANGED decision is verified. The base Laya host
-smoke test is not physical evidence.
-A separate UCI fan classifier was trained on public labels, but it is not a
-Capybara model and is not integrated. Missing prerequisites produce
-unavailable/INCONCLUSIVE behavior; the app never substitutes a threshold
-classifier or fabricated result.
+Capybara captures and compares real recordings, but the current TrustGate result
+is `INCONCLUSIVE`. No trained EchoNet, VibraNet, PhysFusion, StateNet or
+SpatialNet weights, Capybara-Laya checkpoint, calibration set, or held-out
+physical-integrity evaluation exists. Public classifiers in research artifacts
+address unrelated tasks and are not integrated. No data collected at the
+hackathon venue is present; venue-based training is a goal, not an observed
+result.
 
 The showcase accepts any stable box or object through two real contact-side
 captures. Enrollment asks for a name, captures and reviews side 1, asks the user
@@ -199,15 +196,27 @@ serial and Capybara-owned packages only.
 
 The runtime has no `INTERNET` permission. Do not operate on packages named Hacker Tracker or Register.
 
-## Real-data training
+## Public-data training
 
-Training requires supervised recordings from multiple physical objects, sessions
-and controlled conditions. Public datasets can provide bounded pretraining, not
-Capybara integrity labels. Use `sdk/training/README.md` and
-`sdk/docs/experiments.md`. Diagnostics and schema fixtures must not be relabeled
-as training data. Laya training remains blocked until all five specialist model
-versions, calibration evidence and at least the required independent labeled cases
-exist.
+Public data supports source-specific research, not a substitute for Capybara's
+iQOO speaker-and-haptic measurements. The CC BY 4.0
+[EPFL container-manipulation dataset](https://doi.org/10.5281/zenodo.6372438)
+contains audio and tactile trials for five contents in one plastic container.
+The CC BY-NC 4.0 [CORSMAL dataset](https://doi.org/10.17636/101CORSMAL1)
+contains audio, inertial data and content labels for 15 containers, but uses
+human manipulation and an external microphone array. Neither establishes
+phone-probe integrity performance. No data collected at the hackathon venue is
+present in this repository; no model is described as venue-trained. See
+[`research.md`](research.md) and [`sdk/training/README.md`](sdk/training/README.md)
+for provenance and limitations.
+
+An auxiliary CPU experiment trained a separate three-class content classifier on
+180 EPFL trials (72 training, 18 validation, 90 held-out). It scored 33.33%
+held-out accuracy and 16.67% macro-F1, equal to one-in-three chance, and
+predicted `empty` for every held-out trial. MP3 decoding emitted frame-length
+errors, so audio continuity is unverified. This model is rejected and is neither
+a Capybara integrity classifier nor a phone-deployment candidate. No venue data
+or venue fine-tuning is claimed.
 
 ## Research
 

@@ -497,3 +497,46 @@ an unvalidated threshold.
 - `CaptureEngine` now cancels all exposed actuators with `VibratorManager.cancel()` on API 31+ after combined haptic excitation; older releases retain `Vibrator.cancel()`.
 - `cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug :sdk:assembleDebugAndroidTest :apk:assembleDebug` passed.
 - `adb devices -l` returned no attached devices. Physical haptic output, cancellation and onset remain unverified; no device test was run.
+
+## Public dataset audit (2026-10-10)
+
+- The closest licensed physical-state proxy found is EPFL's
+  [Multimodal Sensory Learning for Object Manipulation](https://doi.org/10.5281/zenodo.6372438),
+  CC BY 4.0: 300 trials, one plastic container, five contents, two robot motions,
+  microphone audio and robot-hand tactile pressure. The dataset does not contain
+  phone-generated speaker/haptic measurements or a held-out container. Collection
+  dates vary by condition, so random trial splitting can leak session conditions.
+- CORSMAL Containers Manipulation (CC BY-NC 4.0) has content/fill labels and
+  object-separated splits, but uses human manipulation and an external eight-mic
+  array. Its ACC weights are separately CC BY 4.0; that does not change the
+  dataset license or establish phone-probe transfer.
+- The Boombox is the closest published hidden-content task, but its downloadable
+  contact-microphone dataset has no separately stated data license. Knocker has
+  phone mic/IMU object-recognition data but no verified dataset license and no
+  integrity-change labels. Neither was downloaded or used.
+- No located public dataset contains iQOO speaker-plus-haptic captures with
+  generic object-integrity labels. Public models may support bounded source-task
+  research only; no venue dataset or Capybara integrity accuracy is claimed.
+
+## EPFL source-domain content experiment (2026-10-10)
+
+- Downloaded the public CC BY 4.0 archive to ignored artifacts; its size
+  (795,903,546 bytes), Zenodo MD5
+  (`60ac6f12924764dc813977c053934c98`), SHA-256
+  (`ec534a68ced0e36926b901af17aa10408805a3d57f115a086100acc37d88e4e2`), and
+  ZIP CRC check matched. The archive contains 300 trials; the experiment selected
+  180 `empty`/`gummies`/`rice` recordings.
+- `train_epfl_mml_source.py` uses 72 training and 18 validation trials from
+  2021-08-25 and 90 held-out trials from 2021-08-26. Test date and motion both
+  differ from training, so those effects are confounded; all trials use one
+  container.
+  CPU train, validation, and test accuracy all remained 33.33%, with 16.67%
+  macro-F1; loss stayed near 1.10 through epoch 9. It predicted `empty` for
+  every sample and was rejected. The ignored checkpoint SHA-256 is
+  `57ef019331c41d2a310063dbb9681dcf10a74dfed31d73d15ab4699673be25dd`. It is
+  not a Capybara specialist or Android candidate.
+- MP3 decoding emitted repeated libmpg123 frame-length errors while returning
+  waveform arrays; audio continuity is unverified. The experiment is only a
+  source-domain feasibility check, not phone transfer, venue data or fine-tuning.
+- Data and model stay ignored under `sdk/training/artifacts/`; no venue data,
+  physical-integrity accuracy or deployment claim is made.

@@ -1,10 +1,48 @@
 # Real physical training workflow
 
-No trained Capybara weights or physical training set exist yet. The current
-workflow validates real recordings, prepares Laya evidence, and fine-tunes actual
-upstream Laya; it does not implement training or inference for EchoNet, VibraNet,
-PhysFusion, StateNet, or SpatialNet. The UCI fan classifier is unrelated and must
-not be relabeled as a specialist. No synthetic training data or results are used.
+No task-specific Capybara weights or iQOO physical-integrity training set exist.
+The ReaLISED event classifier is auxiliary and is not a Capybara specialist.
+The CC BY 4.0 EPFL container dataset and CC BY-NC 4.0 CORSMAL dataset provide
+real content labels, but use robot-mounted contact sensors or human manipulation
+with an external microphone array, not the iQOO speaker-and-haptic probe. They
+may support source-specific research; they are not phone-probe integrity
+evidence, and no model is claimed as venue-trained. The current workflow
+validates real captures, prepares Laya evidence, and fine-tunes upstream Laya;
+it does not implement training or inference for EchoNet, VibraNet, PhysFusion,
+StateNet, or SpatialNet. No synthetic training data or results are used.
+
+## EPFL source-domain content experiment
+
+The checksum-verified [EPFL dataset](https://doi.org/10.5281/zenodo.6372438)
+is CC BY 4.0. The separate `train_epfl_mml_source.py` experiment uses only
+`empty`, `gummies`, and `rice` trials because those classes occur on both
+selected collection dates. It trains a small audio-plus-Tekscan-pressure CNN
+on CPU; these robot sensors and content labels are not phone-probe integrity
+evidence.
+
+The split contains 72 training trials from 2021-08-25, 18 validation trials
+from that same date, and 90 held-out trials from 2021-08-26. The test date also
+uses a different motion, so date and motion are confounded; all trials use one
+container. The run scored 33.33% test accuracy and 16.67% macro-F1, equal to
+one-in-three chance. It predicted `empty` for every test trial. Training and
+validation also remained at chance; the run never learned a class decision.
+The model is rejected. Its ignored checkpoint SHA-256 is
+`57ef019331c41d2a310063dbb9681dcf10a74dfed31d73d15ab4699673be25dd`. The MP3
+decoder emitted frame-length errors while returning audio arrays; continuity is
+unverified. No phone transfer, venue data, fine-tuning, or Capybara decision use
+is claimed.
+
+Reproduce with the checksum-pinned public archive:
+
+```powershell
+& sdk/training/artifacts/venv/Scripts/python.exe sdk/training/train_epfl_mml_source.py `
+  --archive sdk/training/artifacts/epfl-mml/annotated_bags_mml.zip `
+  --out sdk/training/artifacts/epfl-mml-source-classifier
+```
+
+The model and report stay in ignored `sdk/training/artifacts/`. `rosbags==0.11.6`
+is pinned in `requirements.txt`; the trainer applies a Windows-only POSIX
+message-type path compatibility fix without changing that dependency.
 
 ## Verified environment, 9 October 2026
 
@@ -229,6 +267,12 @@ accelerator can be allocated. Searching the exact Mendeley DOI found no Kaggle
 mirror. No kernel, training job, or dataset upload was created.
 
 The public-data review found no dataset suitable for V6 specialist/Laya labels:
+- The CC BY 4.0 [EPFL object-manipulation dataset](https://doi.org/10.5281/zenodo.6372438)
+  provides 300 labeled trials for five contents in one plastic container, with
+  microphone audio and robot-hand tactile pressure. Trials span only three
+  collection dates, and content/motion combinations correlate with date. It can
+  support a source-domain content experiment, but not phone-probe or
+  object-generalization claims.
 
 - The CC BY 4.0 [KAIST rotating-machine dataset](https://data.mendeley.com/datasets/ztmf3m7h5x/6)
   pairs industrial microphone and piezoelectric accelerometer data, but machine
