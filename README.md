@@ -77,6 +77,21 @@ Showcase UI and instrumentation APK compilation:
 cmd.exe /c gradlew.bat :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebugAndroidTest :apk:assembleDebug
 ```
 
+Partial-audio baseline rejection verification:
+
+```powershell
+cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug :sdk:assembleDebugAndroidTest
+```
+
+SDK unit tests, lint and instrumentation APK compilation passed. The vault
+instrumentation regression was compiled but not run; no iQOO test was performed.
+
+Downstream SDK/APK integration build and APK lint also passed:
+
+```powershell
+cmd.exe /c gradlew.bat :sdk:assembleDebug :apk:assembleDebug :apk:lintDebug
+```
+
 The APK unit-test task is `NO-SOURCE`; Android instrumentation was compiled
 but not executed. The APK was installed on `10BFBH1BH0001EY`; its home, status,
 technical-details and Scan placement screens rendered. The final Scan view
@@ -86,7 +101,7 @@ zero persisted captures/baselines and `Ready`. No accepted object-labeled data,
 physical pilot or integrity decision resulted; capability reports do not prove
 speaker or motor actuation.
 
-No device tests were performed in this continuation; the user paused iQOO testing.
+No device tests were performed for the partial-capture guard; the user paused iQOO testing.
 
 Install only the Capybara package on the verified device:
 

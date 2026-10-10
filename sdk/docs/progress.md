@@ -352,6 +352,8 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 - The pure-JVM sample-count regression and SDK unit/lint tasks passed;
   `SignatureVaultTest`'s persistence regression compiled. Instrumentation and
   iQOO tests were not run because the user paused device testing.
+- Commit `f0054d6` was pushed to `codex/v6-handoff`.
+- The updated SDK also passed `:sdk:assembleDebug :apk:assembleDebug :apk:lintDebug`.
 
 ## Next acceptance milestones
 

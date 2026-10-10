@@ -138,6 +138,10 @@ Reproduce the scratch baseline with:
   both requested and reported audio counts. A host predicate test passes and a
   vault instrumentation regression compiles; instrumentation was not run under
   the active iQOO-test pause. See progress and mistakes entries dated 2026-10-10.
+- Commit `f0054d6` was pushed to `codex/v6-handoff`. The focused verification
+  command was `cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug :sdk:assembleDebugAndroidTest`.
+- `:sdk:assembleDebug :apk:assembleDebug :apk:lintDebug` passed afterward, confirming
+  the app still builds against the updated SDK.
 - The licensed KAIST data and these adjacent datasets were not downloaded or used for task-model training; using their unrelated labels would not create Capybara specialists.
 
 ## Immediate continuation order
