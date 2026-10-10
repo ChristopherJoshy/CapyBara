@@ -225,6 +225,26 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   satisfies both verified data rights and Capybara's active phone-probe task;
   model training and physical decision validation remain blocked.
 
+## Additional public-data candidates (2026-10-10)
+
+- CORSMAL has CC BY-NC 4.0 content/fill labels and object-separated splits, but
+  uses an eight-microphone array while people pour or shake containers. Its
+  published ACC TensorFlow weights are separately CC BY 4.0 but were trained on
+  that dataset; neither the model nor the data were downloaded or evaluated.
+- EPFL's CC BY 4.0 audio/tactile dataset has 300 robot trials across five
+  container contents and two motions, but one plastic container, a hand-mounted
+  microphone, and condition-dependent collection dates; it has no object-held-out
+  evaluation or active phone probe.
+- The coin-tap paper reports 101,070 48 kHz samples from nine bonded-plate
+  specimens across normal and six defect classes. Its GitHub README provides a
+  Baidu link without dataset terms, and the paper uses sample-random folds rather
+  than specimen-held-out evaluation; it was not downloaded.
+- A surfaced TU Wien record was verified as manufacturing work-step audio, not
+  the claimed composite tap-test dataset, and was discarded.
+- No candidate satisfies Capybara's active phone-probe and physical-integrity
+  requirements. No data or model was downloaded or trained; task-specific
+  training remains blocked on a suitable licensed corpus or labeled iQOO captures.
+
 ## Authorized reference inspection attempt (2026-10-10)
 
 - The user authorized read-only inspection of the saved Capybara reference and

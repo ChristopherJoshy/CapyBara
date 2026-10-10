@@ -97,3 +97,10 @@ data artifact's license before download, training, or redistribution.
 Read-only inspection on authorized serial `10BFAT1UT2000XP` returned “device not
 found”; `adb devices -l` showed only `emulator-5554`. No emulator command was
 run. Reconnect the exact authorized phone before inspecting or capturing data.
+
+## 2026-10-10: verify dataset records behind search results
+
+A search result suggested a TU Wien composite tap-test dataset, but the official
+record is MSDv1 manufacturing work-step audio, not defect data. It was rejected
+before download. Open the primary data record and check its labels before treating
+a search snippet as a candidate.

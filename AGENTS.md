@@ -59,7 +59,7 @@ definition of done above is verified.
 Use licensed pretrained weights wherever they fit the measured sensor modality
 and product constraints. Pin source revisions and hashes, compare against held-out
 data, and reject models that do not transfer or fit offline CPU deployment.
-After every repository change, run the relevant checks, commit it, and push it
-before making another change. If verification or push fails, record the blocker
-and do not start another repository change until the current change is pushed.
+Group related repository changes into focused, verified milestones. Run the
+relevant checks before committing a coherent slice; push at milestone cadence,
+not after every small edit. Report push blockers without claiming remote delivery.
 Keep captures, downloaded data, model artifacts and credentials out of Git.

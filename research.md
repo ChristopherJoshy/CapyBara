@@ -137,9 +137,38 @@ Closest physical-audio leads audited 2026-10-10; none is currently usable:
   has no dataset license; its Apache-2.0 file is nested under
   `src/keyboard_control`. Do not reuse its data or model assets.
 
-No candidate was downloaded or used. Public-data use remains bounded by source
-labels, artifact-specific licensing, domain gap, and measured device validation;
-it cannot replace human-labeled Capybara captures.
+- [CORSMAL Containers Manipulation](https://corsmal.github.io/containers_manip.html)
+  has 1,140 recordings of 15 containers and 12 people, with content and fill-level
+  labels and a 9/3/3 container-separated train/public-test/private-test split.
+  Audio is captured by an eight-microphone array at 44.1 kHz during human pouring
+  or shaking, not Capybara's active phone speaker/microphone probe. The dataset
+  is CC BY-NC 4.0 (official [data record](https://doi.org/10.17636/101CORSMAL1)).
+  Its [ACC pretrained weights](https://doi.org/10.5281/zenodo.4770061) are
+  separately listed as CC BY 4.0 and trained on the dataset's train split, but
+  the TensorFlow classifier uses the mismatched dataset/audio setup. No data or
+  weights were downloaded, evaluated, or integrated.
+- The [EPFL object-manipulation audio/tactile dataset](https://doi.org/10.5281/zenodo.6372438)
+  is CC BY 4.0 and contains 300 robot trials for five contents and two motions.
+  It uses a hand-mounted microphone, tactile skin and robot-joint data on one
+  plastic container; collection dates vary by condition. It has no object-held-out
+  split and no phone-generated active probe, so it is not V6 training evidence.
+- The [coin-tap defect dataset](https://github.com/PPhub-hy/torch-tapnet), described
+  in the [paper](https://arxiv.org/abs/2203.12594), has 101,070 labeled 48 kHz
+  samples from nine bonded-plate specimens and seven normal/defect classes. It
+  uses an electromagnet striker and microphone; the paper's three-fold split
+  randomly partitions samples rather than specimens. The repository README links
+  a Baidu download but states no dataset license. The paper's arXiv license does
+  not establish dataset reuse rights; do not download or train on it.
+- The [TU Wien MSDv1 record](https://researchdata.tuwien.ac.at/records/hv20e-zzb35)
+  is a smartphone/laptop manufacturing work-step sound dataset, not the composite
+  tap-test defect dataset suggested by a search result; it was discarded.
+
+These are task-adjacent leads only. Their different excitation/contact geometry,
+limited object coverage, or licensing do not support a Capybara model or product
+deployment. No candidate was downloaded, evaluated, trained, or integrated.
+Public-data use remains bounded by source labels, artifact-specific licensing,
+domain gap, and measured device validation; it cannot replace human-labeled
+Capybara captures.
 
 ## Pretrained transfer and Laya host evaluation (2026-10-09)
 
