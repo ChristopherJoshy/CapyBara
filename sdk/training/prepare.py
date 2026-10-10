@@ -1,5 +1,5 @@
 """Validate genuine capture annotations and prepare object/session-disjoint Laya rows."""
-import argparse
+import re
 import hashlib
 import json
 import math
@@ -14,8 +14,30 @@ QUESTIONS = {"integrity": {"type": "choice", "instructions":
     "criteria": {"MATCH": "Consistent physical response under validated measurement conditions.",
                  "CHANGED": "Evidence supports a meaningful change in physical state.",
                  "INCONCLUSIVE": "Evidence or measurement quality is insufficient for a reliable decision."}}}
+FORBIDDEN_TOKENS = {"label", "expected", "gold", "condition", "annotator", "annotation",
+                    "decision", "result", "target", "truth", "answer"}
+FORBIDDEN_IDENTIFIERS = ("objectid", "captureid", "referenceid", "sessionid", "runid")
 FORBIDDEN = {"label", "expected", "gold", "condition", "objectid", "sessionid", "runid",
-             "captureid", "referencecaptureid", "annotator", "decision", "result"}
+             "captureid", "referencecaptureid", "annotator", "annotation", "decision",
+             "result", "target", "truth", "answer"}
+FORBIDDEN_ID_SEQUENCES = (("object", "id"), ("object", "identifier"),
+                          ("object", "name"), ("capture", "id"),
+                          ("session", "id"), ("run", "id"),
+                          ("reference", "id"), ("reference", "capture", "id"))
+
+
+def forbidden_key(key):
+    separated = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", key)
+    separated = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", separated)
+    tokens = re.findall(r"[a-z0-9]+", separated.lower())
+    normalized = "".join(tokens)
+    return (normalized in FORBIDDEN or any(identifier in normalized for identifier in FORBIDDEN_IDENTIFIERS)
+            or any(token.startswith("label") or token in FORBIDDEN_TOKENS for token in tokens)
+            or any(tuple(tokens[index:index + len(sequence)]) == sequence
+                   for sequence in FORBIDDEN_ID_SEQUENCES
+                   for index in range(len(tokens) - len(sequence) + 1)))
+
+
 
 
 def digest(path):
@@ -44,7 +66,7 @@ def safe_path(root, value):
 def check_values(value):
     if isinstance(value, dict):
         for key, item in value.items():
-            if key.replace("_", "").lower() in FORBIDDEN:
+            if forbidden_key(key):
                 raise ValueError("Annotation/identity cannot be input evidence: " + key)
             check_values(item)
     elif isinstance(value, list):

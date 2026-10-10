@@ -129,3 +129,13 @@ The host count-boundary test passes and an instrumentation regression checks
 that the vault rejects such a capture; the instrumentation test was compiled,
 not run, because iQOO testing is paused. Keep partial measurements as raw
 research data only; never let user approval bypass sample completeness.
+
+## 2026-10-10: annotation leakage checks must tokenize evidence keys
+
+`prepare.py` originally compared each evidence key to a list of exact normalized
+names. Nested camelCase fields such as `expectedLabel`, `conditionName`, and
+`objectIDHash` bypassed that check. `check_values` now rejects those common
+annotation and identity forms while preserving documented physical feature names.
+Training schema tests cover both rejection and valid feature keys. This lexical
+guard cannot detect a label semantically encoded in an innocent-looking value;
+review feature producers and never treat schema validation as proof of independence.

@@ -74,9 +74,12 @@ primitive producer has not demonstrated SpatialNet evidence.
 
 Preparation checks labels, timestamps, actual PCM byte counts, matching object,
 profile and position, reference/evidence identity, duplicate cases, finite values,
-annotation leakage, and artifacts confined to the capture root. It hashes raw
-metadata, PCM, IMU, and evidence. The validator cannot prove a recording was made
-on physical hardware: supervised collection and retained logs establish that.
+obvious annotation/identity-key leakage (recursively, including common
+snake_case, camelCase and acronym spellings), and artifacts confined to the capture
+root. This lexical guard cannot prove semantic independence; review every evidence
+producer and keep labels, conditions and identity metadata out of model inputs. It
+hashes raw metadata, PCM, IMU, and evidence. The validator cannot prove a recording
+was made on physical hardware: supervised collection and retained logs establish that.
 
 It joins rows connected by **either** an object, session, physical run, or shared
 capture/reference. Entire connected components enter one split. Seed 20261009

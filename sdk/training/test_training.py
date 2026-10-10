@@ -54,6 +54,12 @@ class TrainingSafetyTests(unittest.TestCase):
         for value in ({"nested": {"condition": "removed contents"}}, {"x": float("nan")}):
             with self.assertRaises(ValueError):
                 check_values(value)
+        for key in ("expectedLabel", "conditionName", "objectIdHash", "objectIDHash",
+                    "gold_label", "referenceCaptureId", "labelledAtUtc",
+                    "annotationNotes", "answer"):
+            with self.subTest(key=key), self.assertRaisesRegex(ValueError, "Annotation/identity"):
+                check_values({"nested": {key: "annotated"}})
+        check_values({"reference_reliability": 0.8, "acoustic_band_energy": [0.1, 0.2]})
 
     def test_primitive_physics_cannot_train_final_laya(self):
         parts = {name: [row(name + label, [], label) for label in ("MATCH", "CHANGED", "INCONCLUSIVE")]

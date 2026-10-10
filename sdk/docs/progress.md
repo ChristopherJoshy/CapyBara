@@ -355,6 +355,18 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 - Commit `f0054d6` was pushed to `codex/v6-handoff`.
 - The updated SDK also passed `:sdk:assembleDebug :apk:assembleDebug :apk:lintDebug`.
 
+
+## Training evidence key-leakage guard (2026-10-10)
+
+- Audit found `check_values` rejected only exact normalized forbidden keys.
+  Annotation fields such as `expectedLabel`, `conditionName` or `objectIDHash`
+  could therefore be nested in evidence without rejection.
+- The validator now tokenizes common snake/camel/acronym key spellings and rejects
+  annotation tokens plus compound object/capture/session/run identifiers. Regression
+  coverage also confirms legitimate features such as `reference_reliability` remain
+  accepted. This is a lexical guard, not proof against semantically encoded leakage.
+- `sdk/training/test_training.py` passed all 10 tests. No physical data was used.
+
 ## Next acceptance milestones
 
 1. The user collects and labels real rigid-case A–D enrollment, unchanged
