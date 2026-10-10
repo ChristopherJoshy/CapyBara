@@ -82,6 +82,7 @@ import dev.capybara.sdk.Capybara
 import dev.capybara.sdk.CaptureLabel
 import dev.capybara.sdk.ProfileEngine
 import dev.capybara.sdk.ResearchBaseline
+import dev.capybara.sdk.IntegrityAssessment
 import dev.capybara.sdk.Scan
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -107,16 +108,37 @@ suspend fun recordShowcaseReference(
 
     return withContext(Dispatchers.IO) { capybara.saveResearchBaseline(paths) }
 }
+
+suspend fun scanShowcaseReference(
+    context: Context,
+    referenceId: String,
+    approveCapture: suspend (String, Scan) -> Boolean,
+): IntegrityAssessment? {
+    val capybara = Capybara(context)
+    val reference = withContext(Dispatchers.IO) {
+        capybara.listResearchBaselines().firstOrNull { it.id == referenceId }
+    } ?: return null
+    val profile = capybara.getProfile(reference.profile)
+    val sessionId = UUID.randomUUID().toString()
+    val paths = mutableListOf<String>()
+
+    for (position in profile.positions) {
+        val scan = capybara.capture(
+            CaptureLabel(reference.objectId, sessionId, "verification", position, profile.id)
+        )
+        if (!approveCapture(position, scan)) return null
+        paths += withContext(Dispatchers.IO) { capybara.saveCapture(scan) }
+    }
+
+    return capybara.evaluate(referenceId, paths)
+}
 ```
 
-This minimal SDK example aborts on a rejected side; production UI should retain
-per-side state to retry without restarting the pair. `approveCapture` must await
-a real user decision; rejection creates no reference, while earlier saved
-captures remain private research data.
-Call `saveResearchBaseline` only after every position is approved. For each
-verification, use a distinct session ID and capture every registered position,
-then call
-`capybara.evaluate(reference.id, currentCapturePaths)`. The current decision is
+Both helpers abort on a rejected side; production UI should retain per-side state
+to retry without restarting the pair. `approveCapture` must await a real user
+decision. Rejection creates no baseline; earlier approved captures remain private
+research data. The scan helper uses a fresh session ID, captures every position,
+and evaluates that set against the selected reference. Its decision is
 `INCONCLUSIVE` without trained specialists and calibration; this API does not
 claim a physical identity fingerprint or calibrated verification.
 See [`sdk/docs/experiments.md`](sdk/docs/experiments.md) and
