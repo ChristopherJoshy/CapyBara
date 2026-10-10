@@ -564,3 +564,26 @@ an unvalidated threshold.
 - These diagnostics are not labeled object data or model/evaluation evidence.
   No venue dataset, model training, calibrated decision, or physical integrity
   evaluation resulted. Audio sample loss remains unknown.
+
+## Reconnected iQOO launch and live showcase UI smoke (2026-10-10)
+
+- ADB currently sees serial `10BFBH1BH0001EY`, product/model `I2501i` /
+  `I2501`, Android 16/API 36, `arm64-v8a`. This is the same serial/model as
+  the earlier diagnostic, not a newly verified hardware model.
+- `:apk:assembleDebug` completed successfully; `adb install -r` succeeded and
+  `dev.capybara.app/.MainActivity` resumed on-device.
+- Moved the four-position research entry off Home and into the Capture setup
+  menu. Serial-scoped `:apk:connectedDebugAndroidTest` then passed all 3 APK
+  tests (0 failures), including the updated navigation. A post-test install and
+  launch screenshot confirmed Home shows only the two primary Enroll/Scan
+  actions.
+- Actual 1440×3168 screenshots in ignored `apk/build/` confirmed the Home
+  Enroll/Scan actions, the no-reference Scan gate, and the enrollment prompt
+  for a named object and two real sides. The Scan gate correctly required a
+  complete saved reference and offered enrollment instead of capturing.
+- Manual UI navigation stopped before granting microphone permission or starting
+  the object workflow. The connected instrumentation suite separately ran the
+  real hardware diagnostic, but its contact condition was uncontrolled and
+  unrecorded; it is not object training/evaluation data. The screenshots prove
+  only the UI screens and no-reference gate, not enrollment or a decision. No
+  MATCH/CHANGED animation was exercised.

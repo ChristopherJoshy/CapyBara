@@ -261,6 +261,13 @@ class MainActivity : ComponentActivity() {
                             TextButton(onClick = { sessionId = "session-${System.currentTimeMillis()}" }, enabled = !busy) { Text("New session") }
                             Text("Same closed case, table and phone orientation. Mark four stable contact points. Disconnect charging and keep audio on the phone.", color = Muted, lineHeight = 21.sp)
                             Text("Audio and motion data stay private on this phone. These observed-state labels require physical preparation; captures are not model predictions.", color = Muted, fontSize = 12.sp)
+                            TextButton(
+                                onClick = {
+                                    scope.launch { drawer.close() }
+                                    page = "capture"
+                                },
+                                enabled = !busy,
+                            ) { Text("Open 4-position research capture") }
                         }
                     }
                 }
@@ -562,9 +569,6 @@ class MainActivity : ComponentActivity() {
                                 HorizontalDivider(color = Color(0xFF394247))
                                 Text("Saved research names", color = Copper, fontSize = 20.sp)
                                 availableNames.take(4).forEach { Text(it, color = Sand, fontSize = 16.sp) }
-                            }
-                            TextButton(onClick = { page = "capture" }, modifier = Modifier.fillMaxWidth()) {
-                                Text("Four-position research capture")
                             }
                         }
                     }
