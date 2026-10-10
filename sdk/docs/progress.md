@@ -466,4 +466,28 @@ an unvalidated threshold.
 - No physical object was placed or captured. Speaker-route output, both speaker
   transducers, haptic activation/onset, model inference, offline operation, and
   arbitrary-object generalization remain unverified. The UI tests prove navigation
-  only; no physical-integrity dataset or model training resulted.
+  only and yielded no physical-integrity labels or models.
+
+## Licensed ReaLISED auxiliary audio experiment (2026-10-10)
+
+- Verified Zenodo API license `cc-by-4.0`, archive size 280,551,607 bytes and
+  published MD5. All 2,479 archive FLACs decode as 44.1 kHz mono, despite the
+  source README's stereo description. Source labels cover 18 indoor sound events,
+  not phone-probed physical changes, and provide no object/session IDs.
+- Added a checksum-verifying audio-event trainer, filename/group-split tests,
+  and a private GPU-enabled Kaggle kernel. Version 1 failed on a local-path
+  assumption; version 2 completed on CUDA.
+- Full-dataset one-epoch CPU smoke covered all 2,479 clips; event-ID split test
+  accuracy was 32.80% and macro-F1 26.82%. This verifies decoding and execution,
+  not a selected model or Capybara behavior.
+- The 25-epoch Kaggle run selected epoch 21 after 400.7 seconds. On 372 held-out
+  event clips it scored 75.27% accuracy and 72.07% macro-F1; validation was
+  76.88% / 74.13%. Model SHA256:
+  `6c8986389426b6812935fba171953be14ef6bbdd9385403b52c59f9c7d8af867`.
+  This is event-class performance on event-ID splits; the dataset has no object/
+  session IDs and the result is not physical-integrity evidence.
+- Archive and weights remain under ignored `sdk/training/artifacts/`; only code,
+  source/license provenance and non-private evidence belong in Git.
+- Downloaded the private Kaggle output into ignored artifacts; the model SHA256
+  matches its report. It loads on host CPU and returns finite 18-class logits;
+  this checks artifact loading only, not Android integration or latency.

@@ -105,11 +105,35 @@ labels on an industrial testbed, not smartphone active-probe measurements or
 object/session-separated package-state labels. License permits reuse, but the
 task and sensor mismatch make it unsuitable for training V6 specialists.
 
-[ReaLISED](https://zenodo.org/records/6488321) contains 2,479 real indoor
-recordings at 44.1 kHz with event, action and material metadata. Its Zenodo
-record currently leaves the license field blank, so it is excluded from
-training intended for redistribution until reuse rights are clarified. In any
-case it has no controlled probe, paired IMU, or reference/change labels.
+[ReaLISED](https://zenodo.org/records/6488321) provides event, action and
+source-material labels. Its README describes 44.1 kHz stereo; the downloaded
+archive passed the published MD5 and all 2,479 FLAC files decoded as 44.1 kHz
+mono with SoundFile 0.13.1.
+Its canonical [Zenodo record API](https://zenodo.org/api/records/6488321)
+declares CC BY 4.0 and lists a 280,551,607-byte archive (MD5
+`fd75c906a022a2c82890547152867504`; local SHA-256
+`e1f3b897b94cbd60e00ed78a72ae4c9d436a7edc84293e3f81795536f3d6dbd2`). The
+recordings use external Olympus
+recorders 30–40 cm from sources, not Capybara's active phone probe; they have no
+paired phone IMU, reference/change labels or object/session identifiers. The
+implemented classifier trains only the dataset's indoor-event task; any use is
+auxiliary audio research, not V6 integrity training or object-separated
+validation. Keep the archive out of Git under repository data rules; preserve
+the license attribution in any derived use.
+
+The associated [Electronics paper](https://doi.org/10.3390/electronics11121811)
+frames it as sound-event classification data, consistent with its filename labels.
+
+The full-dataset local CPU pipeline smoke (seed 20261010, one epoch, event-ID
+groups) covered 1,735 train, 372 validation and 372 test clips. Test accuracy
+was 32.80% and macro-F1 26.82%; this one-epoch smoke validates decoding,
+partitioning and training execution, not a selected sound-event model or physical
+integrity performance. The private Kaggle CUDA run (version 2, 25 epochs,
+selected epoch 21, 400.7 seconds) scored 75.27% accuracy and 72.07% macro-F1 on
+372 held-out event-ID clips; validation was 76.88% / 74.13%. Model SHA256:
+`6c8986389426b6812935fba171953be14ef6bbdd9385403b52c59f9c7d8af867`. The split
+is not object/session separated, and these metrics do not measure Capybara
+integrity.
 
 The public [MOMENT-1-small checkpoint](https://huggingface.co/AutonLab/MOMENT-1-small)
 is MIT-licensed and exposes pretrained time-series representations and a

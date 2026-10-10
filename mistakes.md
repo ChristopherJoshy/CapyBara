@@ -190,3 +190,34 @@ different safety policy; rejecting it would unnecessarily block valid on-device
 audio. The guard now accepts either built-in speaker-system type, with a regression
 covering both and still rejecting an external headset route. Route type does not
 prove the iQOO's two physical speakers were both used.
+
+## 2026-10-10: inspect dataset API metadata before rejecting its license
+
+The ReaLISED audit called its license blank after reading the Zenodo HTML view.
+The canonical record API declares `cc-by-4.0`. No data was used under the
+incorrect assessment; research.md now records the API evidence and limits use to
+attributed auxiliary audio-event classification. Check authoritative metadata
+fields, not only the rendered landing page, before excluding a candidate.
+
+## 2026-10-10: validate audio files against the dataset README
+
+ReaLISED's README describes stereo recordings, but the checksum-verified archive
+decodes as 44.1 kHz mono for all 2,479 files. The first loader rejected its first
+sample by requiring two channels. The trainer now accepts one or two channels,
+converts them to mono, and records observed channel counts in its report. Verify
+the bytes and stream metadata rather than inheriting a dataset summary blindly.
+
+## 2026-10-10: Kaggle kernels do not preserve repository paths
+
+The first private Kaggle run failed before downloading data because the script
+assumed its local repository depth (`parents[3]`); Kaggle executes it from
+`/kaggle/src/script.py`. The kernel now selects `/kaggle/working` before
+resolving local paths, with a regression test using Kaggle's script location.
+
+## 2026-10-10: persist the archive fingerprint with model metrics
+
+The completed Kaggle model report recorded the dataset DOI/license but omitted
+its archive hashes, although the training code verified the published MD5. Local
+report inspection caught the provenance gap; the current trainer records both
+the source MD5 and computed SHA-256. The existing Kaggle report remains version
+2 and is not retroactively represented as containing those fields.
