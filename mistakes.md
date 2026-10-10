@@ -160,3 +160,12 @@ not apply that invariant. A partial reference or a partial current capture label
 for references and permits an incomplete current capture only as `INCONCLUSIVE`;
 schema regressions cover both boundaries. Keep the Python admission rule aligned
 with `hasCompleteAudioCapture` when that SDK invariant changes.
+
+## 2026-10-10: specialist SHA strings are not artifact verification
+
+`run_laya.validate_training` only checked that evidence contained five syntactically
+valid 64-character hashes. It never hashed the model files those values claimed to
+identify. The CLI now requires a local specialist manifest, computes each artifact's
+SHA256, and rejects dataset rows whose `modelVersions` disagree. Tests mutate an
+artifact and prove the gate refuses it. This binds evidence to bytes; it does not
+prove those bytes came from valid training or physical data.

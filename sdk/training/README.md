@@ -118,14 +118,21 @@ Download the genuine English checkpoint once, at its verified revision:
 
 ```powershell
 & sdk/training/artifacts/venv/Scripts/python.exe -c 'from huggingface_hub import snapshot_download; snapshot_download("convaiinnovations/laya", revision="7b928d828b7b0e022f929d9bd2e44165aa270148", local_dir="sdk/training/artifacts/laya-base", allow_patterns=["model.safetensors","rl_agent_config.json","encoder/*","tokenizer/*"])'
-& sdk/training/artifacts/venv/Scripts/python.exe sdk/training/run_laya.py train sdk/training/artifacts/dataset-v1 --base sdk/training/artifacts/laya-base --out sdk/training/artifacts/capybara-laya-v1 --device cuda
-& sdk/training/artifacts/venv/Scripts/python.exe sdk/training/run_laya.py export sdk/training/artifacts/dataset-v1 --checkpoint sdk/training/artifacts/capybara-laya-v1 --out sdk/training/artifacts/capybara-laya-onnx-v1
+& sdk/training/artifacts/venv/Scripts/python.exe sdk/training/run_laya.py train sdk/training/artifacts/dataset-v1 --base sdk/training/artifacts/laya-base --specialists sdk/training/artifacts/specialists.json --out sdk/training/artifacts/capybara-laya-v1 --device cuda
+& sdk/training/artifacts/venv/Scripts/python.exe sdk/training/run_laya.py export sdk/training/artifacts/dataset-v1 --checkpoint sdk/training/artifacts/capybara-laya-v1 --specialists sdk/training/artifacts/specialists.json --out sdk/training/artifacts/capybara-laya-onnx-v1
 ```
 
 These are future commands. Do not run training until actual labeled specialist
 evidence and calibration exist. CPU training is supported with `--device cpu`;
 Android inference and export parity always use CPU. Base weights must match
 SHA256 `891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c`.
+
+Both commands require `--specialists`: a schema-1 JSON manifest mapping exactly
+`EchoNet`, `VibraNet`, `PhysFusion`, `StateNet`, and `SpatialNet` to local artifact
+files relative to the manifest. The harness hashes those bytes and requires every
+dataset row's `modelVersions` to match. This verifies artifact identity, not that
+the files were trained correctly; real specialist training provenance and
+physical calibration remain required.
 The base tensor file is 842,609,210 bytes with SHA256
 `891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c`. The
 loaded Torch model reports 421,293,827 parameters; the upstream README says

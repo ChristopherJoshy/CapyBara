@@ -389,6 +389,16 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 - All 10 training tests pass, including complete, partial-current, and partial-
   reference schema fixtures. No physical data was used.
 
+## Specialist artifact hash admission (2026-10-10)
+
+- Laya's training gate previously checked only SHA256 string syntax, not the
+  specialist files those hashes claimed to identify.
+- Both train and export now require a schema-1 local artifact manifest; the
+  harness hashes files and requires evidence `modelVersions` to match those
+  bytes. Artifact mutation is covered by a schema-fixture regression.
+- `sdk/training/test_training.py` passes all 11 tests. This binds evidence to
+  artifact bytes, not to valid training provenance; no model was trained.
+
 ## Next acceptance milestones
 
 1. The user collects and labels real rigid-case A–D enrollment, unchanged

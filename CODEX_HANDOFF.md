@@ -156,6 +156,10 @@ Reproduce the scratch baseline with:
   require stored/expected/reported counts to match, and incomplete current audio
   is allowed only as `INCONCLUSIVE`. Regression tests pass; no physical captures
   were used.
+- Laya train/export now require `--specialists`, a schema-1 manifest of the five
+  local artifacts; file bytes are hashed and compared with every row's
+  `modelVersions`. Artifact-mutation regression passes; all 11 training tests
+  pass. This proves byte identity only; no Capybara model was trained.
 - The licensed KAIST data and these adjacent datasets were not downloaded or used for task-model training; using their unrelated labels would not create Capybara specialists.
 
 ## Immediate continuation order

@@ -7,7 +7,7 @@ import json
 from dataclasses import asdict
 from pathlib import Path
 
-from prepare import LABELS, digest, load_prepared, read_json
+from prepare import LABELS, digest, load_prepared, read_json, safe_path
 
 LAYA_COMMIT = "1adc59f7e371deb601fcfa18a14e25db238addcc"
 BASE_REVISION = "7b928d828b7b0e022f929d9bd2e44165aa270148"
@@ -16,15 +16,26 @@ EXPORT_SCRIPT_SHA256 = "3dc6eac8971358ad5531c7124f2e631ddd4da6890a8df8a6237051e5
 SPECIALISTS = {"EchoNet", "VibraNet", "PhysFusion", "StateNet", "SpatialNet"}
 
 
-def validate_training(parts):
+def verified_specialists(path):
+    path = Path(path).resolve()
+    manifest = read_json(path)
+    if not isinstance(manifest, dict):
+        raise ValueError("Specialist manifest must be a JSON object")
+    artifacts = manifest.get("artifacts")
+    if manifest.get("schemaVersion") != 1 or not isinstance(artifacts, dict) or set(artifacts) != SPECIALISTS:
+        raise ValueError("Specialist manifest must map exactly the five V6 specialists to artifact files")
+    return {name: digest(safe_path(path.parent, artifacts[name])) for name in SPECIALISTS}
+
+
+def validate_training(parts, specialist_hashes):
     identities = set()
     for split, rows in parts.items():
         if set(row["expected"]["integrity"] for row in rows) != set(LABELS):
             raise ValueError(split + " must represent all three physical decision labels")
         for row in rows:
             prov = row["provenance"]
-            models = prov["modelVersions"]
-            if not SPECIALISTS.issubset(models) or not prov.get("calibrationVersion"):
+            models = prov.get("modelVersions")
+            if not isinstance(models, dict) or not SPECIALISTS.issubset(models) or not prov.get("calibrationVersion"):
                 raise ValueError("Final Laya training requires all five trained specialists and physical calibration; primitive physics is insufficient")
             if not isinstance(prov["calibrationVersion"], str):
                 raise ValueError("calibrationVersion must identify the actual calibration")
@@ -32,6 +43,8 @@ def validate_training(parts):
                 value = models[name]
                 if not isinstance(value, str) or len(value) != 64 or any(c not in "0123456789abcdef" for c in value):
                     raise ValueError(name + " must identify its actual model SHA256")
+                if specialist_hashes.get(name) != value:
+                    raise ValueError(name + " model hash does not match the supplied specialist artifact")
             identities.add((tuple(sorted(models.items())), prov["calibrationVersion"]))
     if len(identities) != 1:
         raise ValueError("Mixed specialist or calibration versions are incompatible training evidence")
@@ -188,10 +201,12 @@ if __name__ == "__main__":
     for command in (training, exporting):
         command.add_argument("dataset", type=Path)
         command.add_argument("--out", required=True, type=Path)
+        command.add_argument("--specialists", required=True, type=Path)
     args = parser.parse_args()
     try:
         manifest, parts = load_prepared(args.dataset)
-        validate_training(parts)
+        specialist_hashes = verified_specialists(args.specialists)
+        validate_training(parts, specialist_hashes)
         if args.out.exists():
             raise ValueError("Use a new output directory to preserve existing artifacts")
         checked_upstream()

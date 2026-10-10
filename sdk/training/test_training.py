@@ -7,7 +7,7 @@ from pathlib import Path
 
 from prepare import (QUESTIONS, capture, check_split, connected_groups, safe_path,
                      validate_row, check_values, prepare, load_prepared, digest)
-from run_laya import SPECIALISTS, validate_training
+from run_laya import SPECIALISTS, validate_training, verified_specialists
 
 
 def row(cid, keys, label="MATCH"):
@@ -69,19 +69,41 @@ class TrainingSafetyTests(unittest.TestCase):
         parts = {name: [row(name + label, [], label) for label in ("MATCH", "CHANGED", "INCONCLUSIVE")]
                  for name in ("train", "calibration", "test")}
         with self.assertRaisesRegex(ValueError, "trained specialists"):
-            validate_training(parts)
+            validate_training(parts, {})
 
-    def test_specialist_versions_cannot_change_across_splits(self):
+    def test_specialist_versions_must_match_artifacts_and_cannot_change(self):
         parts = {name: [row(name + str(index), [], ("MATCH", "CHANGED", "INCONCLUSIVE")[index % 3])
                        for index in range(12)] for name in ("train", "calibration", "test")}
+        hashes = {name: "a" * 64 for name in SPECIALISTS}
         for rows in parts.values():
             for item in rows:
-                item["provenance"].update(modelVersions={name: "a" * 64 for name in SPECIALISTS},
-                                          calibrationVersion="schema-fixture")
-        validate_training(parts)
+                item["provenance"].update(modelVersions=dict(hashes), calibrationVersion="schema-fixture")
+        validate_training(parts, hashes)
         parts["test"][0]["provenance"]["modelVersions"]["EchoNet"] = "b" * 64
-        with self.assertRaisesRegex(ValueError, "Mixed specialist"):
-            validate_training(parts)
+        with self.assertRaisesRegex(ValueError, "does not match the supplied specialist artifact"):
+            validate_training(parts, hashes)
+
+    def test_verified_specialist_hashes_come_from_local_artifact_bytes(self):
+        parts = {name: [row(name + str(index), [], ("MATCH", "CHANGED", "INCONCLUSIVE")[index % 3])
+                       for index in range(12)] for name in ("train", "calibration", "test")}
+        with tempfile.TemporaryDirectory(dir=self.artifacts) as directory:
+            root = Path(directory)
+            artifacts = {}
+            for name in SPECIALISTS:
+                artifact = root / (name + ".onnx")
+                artifact.write_bytes(name.encode("ascii"))
+                artifacts[name] = artifact.name
+            manifest = root / "specialists.json"
+            manifest.write_text(json.dumps({"schemaVersion": 1, "artifacts": artifacts}))
+            hashes = verified_specialists(manifest)
+            for rows in parts.values():
+                for item in rows:
+                    item["provenance"].update(modelVersions=dict(hashes), calibrationVersion="schema-fixture")
+            validate_training(parts, hashes)
+            (root / artifacts["EchoNet"]).write_bytes(b"changed")
+            changed_hashes = verified_specialists(manifest)
+            with self.assertRaisesRegex(ValueError, "does not match the supplied specialist artifact"):
+                validate_training(parts, changed_hashes)
 
     def test_paths_cannot_escape_capture_root(self):
         with tempfile.TemporaryDirectory(dir=self.artifacts) as directory:
