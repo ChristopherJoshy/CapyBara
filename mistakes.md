@@ -166,6 +166,7 @@ with `hasCompleteAudioCapture` when that SDK invariant changes.
 `run_laya.validate_training` only checked that evidence contained five syntactically
 valid 64-character hashes. It never hashed the model files those values claimed to
 identify. The CLI now requires a local specialist manifest, computes each artifact's
-SHA256, and rejects dataset rows whose `modelVersions` disagree. Tests mutate an
-artifact and prove the gate refuses it. This binds evidence to bytes; it does not
-prove those bytes came from valid training or physical data.
+SHA256, and rejects dataset rows whose `modelVersions` disagree. Checkpoint config
+and train/export reports persist the mapping; export checks checkpoint and report
+lineage against supplied bytes. Tests mutate an artifact and checkpoint mapping.
+This binds evidence to bytes; it does not prove valid training or physical data.

@@ -52,6 +52,18 @@ def validate_training(parts, specialist_hashes):
         raise ValueError("Laya upstream needs at least 10 independent calibration items to fit its type temperature")
 
 
+def validate_checkpoint_lineage(cfg, manifest, specialist_hashes):
+    training = cfg.get("training") if isinstance(cfg, dict) else None
+    recorded = training.get("capybara") if isinstance(training, dict) else None
+    if not isinstance(recorded, dict):
+        raise ValueError("Checkpoint is missing Capybara lineage metadata")
+    if recorded.get("dataset") != manifest or not cfg.get("fine_tuned"):
+        raise ValueError("Checkpoint is not a fine-tune of this verified dataset")
+    if recorded.get("specialistArtifacts") != specialist_hashes:
+        raise ValueError("Checkpoint specialist artifact provenance does not match the supplied files")
+    return recorded
+
+
 def checked_upstream():
     dist = importlib.metadata.distribution("laya")
     source = json.loads(dist.read_text("direct_url.json") or "{}")
@@ -63,7 +75,7 @@ def write_json(path, value):
     path.write_text(json.dumps(value, indent=2, allow_nan=False), encoding="utf-8")
 
 
-def train(args, manifest, parts):
+def train(args, manifest, parts, specialist_hashes):
     if digest(args.base / "model.safetensors") != BASE_WEIGHTS_SHA256:
         raise ValueError("Base weights differ from the verified official English Laya checkpoint")
     from laya.train import (TrainConfig, load_checkpoint, items_from_rows, train_model,
@@ -115,22 +127,23 @@ def train(args, manifest, parts):
     trained_cfg = dict(cfg, fine_tuned=True, option_layout="sequential", temperature=fitted["temperature"],
                        temperature_by_options=fitted["temperature_by_options"])
     trained_cfg["training"] = {"capybara": {"sourceCommit": LAYA_COMMIT, "baseRevision": BASE_REVISION,
-        "dataset": manifest, "config": asdict(config), "calibration": calibration,
-        "abstentionThresholds": thresholds}}
+        "dataset": manifest, "specialistArtifacts": specialist_hashes,
+        "config": asdict(config), "calibration": calibration, "abstentionThresholds": thresholds}}
     save_checkpoint(model, tok, trained_cfg, str(args.out))
     test = calibration_records(model, tok, items["test"], device,
                                cfg["max_len"], cfg["head_max_len"], batch_size=1)
     after = evaluate_records(test, trained_cfg["temperature"], trained_cfg["temperature_by_options"])
     report = {"stage": "Laya model evaluation; full-system TrustGate metrics remain separate",
               "base": baseline, "fineTuned": after, "calibration": calibration,
-              "epochLosses": losses, "weightsSha256": digest(args.out / "model.safetensors"),
+              "specialistArtifacts": specialist_hashes, "epochLosses": losses,
+              "weightsSha256": digest(args.out / "model.safetensors"),
               "dependencies": {d.metadata["Name"]: d.version for d in importlib.metadata.distributions()},
               "device": str(device), "deploymentValidated": False}
     write_json(args.out / "training-report.json", report)
     print(json.dumps(report, indent=2))
 
 
-def export(args, manifest, parts):
+def export(args, manifest, parts, specialist_hashes):
     import numpy as np
     import onnxruntime as ort
     import torch
@@ -139,11 +152,13 @@ def export(args, manifest, parts):
 
     cfg = read_json(args.checkpoint / "rl_agent_config.json")
     training_report = read_json(args.checkpoint / "training-report.json")
+    if not isinstance(training_report, dict):
+        raise ValueError("Training report must be a JSON object")
     if digest(args.checkpoint / "model.safetensors") != training_report.get("weightsSha256"):
         raise ValueError("Fine-tuned weights no longer match their training report")
-    recorded = cfg.get("training", {}).get("capybara", {})
-    if recorded.get("dataset") != manifest or not cfg.get("fine_tuned"):
-        raise ValueError("Checkpoint is not a fine-tune of this verified dataset")
+    validate_checkpoint_lineage(cfg, manifest, specialist_hashes)
+    if training_report.get("specialistArtifacts") != specialist_hashes:
+        raise ValueError("Training report specialist artifact provenance does not match the supplied files")
     if cfg.get("option_layout", "sequential") != "sequential":
         raise ValueError("ONNX refuses parallel option-layout weights")
     exporter = Path(__file__).parent / "upstream" / "laya" / "scripts" / "export_onnx.py"
@@ -183,7 +198,8 @@ def export(args, manifest, parts):
     report = {"heldOutCases": len(items), "maxAbsoluteLogitDrift": max_drift,
               "provider": session.get_providers(), "quantized": False,
               "onnxSha256": digest(graph), "weightsSha256": digest(args.checkpoint / "model.safetensors"),
-              "artifactSha256": artifacts, "dataset": manifest, "androidValidated": False,
+              "specialistArtifacts": specialist_hashes, "artifactSha256": artifacts,
+              "dataset": manifest, "androidValidated": False,
               "modelSizeBytes": sum(path.stat().st_size for path in args.out.rglob("*") if path.is_file())}
     write_json(args.out / "export-report.json", report)
     print(json.dumps(report, indent=2))
@@ -210,6 +226,6 @@ if __name__ == "__main__":
         if args.out.exists():
             raise ValueError("Use a new output directory to preserve existing artifacts")
         checked_upstream()
-        (train if args.command == "train" else export)(args, manifest, parts)
+        (train if args.command == "train" else export)(args, manifest, parts, specialist_hashes)
     except (ValueError, OSError, KeyError, TypeError, importlib.metadata.PackageNotFoundError) as exc:
         parser.exit(2, "Laya operation refused: " + str(exc) + "\n")

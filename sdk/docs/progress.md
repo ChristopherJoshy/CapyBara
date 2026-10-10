@@ -393,11 +393,11 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 
 - Laya's training gate previously checked only SHA256 string syntax, not the
   specialist files those hashes claimed to identify.
-- Both train and export now require a schema-1 local artifact manifest; the
-  harness hashes files and requires evidence `modelVersions` to match those
-  bytes. Artifact mutation is covered by a schema-fixture regression.
-- `sdk/training/test_training.py` passes all 11 tests. This binds evidence to
-  artifact bytes, not to valid training provenance; no model was trained.
+- Both train and export require a schema-1 local artifact manifest; the harness
+  hashes files and requires evidence `modelVersions` to match those bytes. The
+  verified mapping is persisted in checkpoint config and reports; export rejects
+  a mismatched lineage. Schema-fixture tests cover artifact mutation and
+  checkpoint mismatch. All 12 training tests pass; no model was trained.
 
 ## Next acceptance milestones
 

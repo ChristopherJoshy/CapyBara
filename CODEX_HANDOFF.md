@@ -158,8 +158,9 @@ Reproduce the scratch baseline with:
   were used.
 - Laya train/export now require `--specialists`, a schema-1 manifest of the five
   local artifacts; file bytes are hashed and compared with every row's
-  `modelVersions`. Artifact-mutation regression passes; all 11 training tests
-  pass. This proves byte identity only; no Capybara model was trained.
+  `modelVersions`. Checkpoint config and training/export reports persist the
+  mapping; export checks it. All 12 tests pass, including artifact mutation and
+  checkpoint mismatch. Byte identity only; no Capybara model was trained.
 - The licensed KAIST data and these adjacent datasets were not downloaded or used for task-model training; using their unrelated labels would not create Capybara specialists.
 
 ## Immediate continuation order

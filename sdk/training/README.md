@@ -133,6 +133,11 @@ files relative to the manifest. The harness hashes those bytes and requires ever
 dataset row's `modelVersions` to match. This verifies artifact identity, not that
 the files were trained correctly; real specialist training provenance and
 physical calibration remain required.
+
+The final checkpoint config and training report persist the verified hash map;
+export refuses a checkpoint or report tied to different specialist bytes. Its
+export report repeats the same hashes.
+
 The base tensor file is 842,609,210 bytes with SHA256
 `891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c`. The
 loaded Torch model reports 421,293,827 parameters; the upstream README says

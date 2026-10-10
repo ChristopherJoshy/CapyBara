@@ -7,7 +7,8 @@ from pathlib import Path
 
 from prepare import (QUESTIONS, capture, check_split, connected_groups, safe_path,
                      validate_row, check_values, prepare, load_prepared, digest)
-from run_laya import SPECIALISTS, validate_training, verified_specialists
+from run_laya import (SPECIALISTS, validate_checkpoint_lineage, validate_training,
+                      verified_specialists)
 
 
 def row(cid, keys, label="MATCH"):
@@ -104,6 +105,19 @@ class TrainingSafetyTests(unittest.TestCase):
             changed_hashes = verified_specialists(manifest)
             with self.assertRaisesRegex(ValueError, "does not match the supplied specialist artifact"):
                 validate_training(parts, changed_hashes)
+
+    def test_checkpoint_keeps_specialist_lineage(self):
+        hashes = {name: "a" * 64 for name in SPECIALISTS}
+        dataset = {"schemaVersion": 1}
+        config = {"fine_tuned": True, "training": {"capybara": {
+            "dataset": dataset, "specialistArtifacts": dict(hashes)}}}
+        self.assertEqual(validate_checkpoint_lineage(config, dataset, hashes),
+                         config["training"]["capybara"])
+        with self.assertRaisesRegex(ValueError, "missing Capybara lineage"):
+            validate_checkpoint_lineage([], dataset, hashes)
+        config["training"]["capybara"]["specialistArtifacts"]["EchoNet"] = "b" * 64
+        with self.assertRaisesRegex(ValueError, "provenance"):
+            validate_checkpoint_lineage(config, dataset, hashes)
 
     def test_paths_cannot_escape_capture_root(self):
         with tempfile.TemporaryDirectory(dir=self.artifacts) as directory:
