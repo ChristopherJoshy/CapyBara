@@ -549,14 +549,15 @@ an unvalidated threshold.
 - The final serial-scoped Gradle run passed SDK/APK unit-test, lint, assembly,
   Android-test assembly, and both connected-device test tasks (`BUILD SUCCESSFUL`).
   Device suites passed APK 3/3 and SDK 5/5 tests.
-- Two logged hardware-diagnostic captures each recorded 48 kHz mono
-  `UNPROCESSED` input, 288,000 samples, 12 audio timestamp anchors, and no audio
-  silencing or clipping. Capture condition was not controlled or recorded.
-- Run A: signal RMS 0.00467869, noise RMS 0.00090969, accelerometer/gyroscope
-  476.9476 Hz, capture call 6,384.85 ms, Physics Engine analysis 860.74 ms.
-  Run B: signal RMS 0.00443769, noise RMS 0.00236456, accelerometer/gyroscope
-  476.9486 Hz, capture 6,230.07 ms, Physics Engine analysis 121.26 ms. No
-  neural inference ran; these are not AI latency measurements.
+- Three logged hardware-diagnostic captures each recorded 48 kHz mono
+  `UNPROCESSED` input, 288,000 samples, 12 audio timestamp anchors, no audio
+  silencing and no clipping. Contact conditions were uncontrolled and unrecorded.
+- Run A: RMS 0.00467869, noise RMS 0.00090969, accelerometer/gyroscope
+  476.9476 Hz, capture 6,384.85 ms, Physics Engine 860.74 ms.
+  Run B: RMS 0.00443769, noise RMS 0.00236456, rates 476.9486 Hz,
+  capture 6,230.07 ms, Physics Engine 121.26 ms.
+  Run C: RMS 0.00319538, noise RMS 0.00104014, rates 476.9272 Hz,
+  capture 6,251.34 ms, Physics Engine 120.57 ms. No neural inference ran.
 - Audio input route type 15; output route type 2. Identical audio was requested
   on both stereo channels, but separate physical speaker-driver emission is
   unproven. Android exposed vibrator IDs `0,1`; both were included in the
@@ -577,6 +578,7 @@ an unvalidated threshold.
   tests (0 failures), including the updated navigation. A post-test install and
   launch screenshot confirmed Home shows only the two primary Enroll/Scan
   actions.
+- `:apk:lintDebug` passed after this navigation change.
 - Actual 1440×3168 screenshots in ignored `apk/build/` confirmed the Home
   Enroll/Scan actions, the no-reference Scan gate, and the enrollment prompt
   for a named object and two real sides. The Scan gate correctly required a

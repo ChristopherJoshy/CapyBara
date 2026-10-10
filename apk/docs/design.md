@@ -18,8 +18,8 @@ pair creates a Keystore-encrypted uncalibrated research reference and provenance
 digest; incomplete or rejected captures are not listed as enrolled. Scan uses
 the same side-1/side-2 approve/retry/reject flow without a name. It ends
 `INCONCLUSIVE`: the digest is not an identity signature and validated comparison
-models/calibration are unavailable. The four-position research path remains
-separate. Actual capture callbacks drive progress; results follow completed SDK
+models/calibration are unavailable. The four-position research path remains an
+advanced route from Capture setup in the menu, separate from the Home showcase.
 operations. Raw captures stay private.
 
 Microphone permission is requested only when needed. Cancelling or leaving the
@@ -56,9 +56,10 @@ support ([release notes](https://developer.android.com/jetpack/androidx/releases
 - Each captured side can be approved, retried, or rejected. Only approval moves
   the flow forward; only two approved sides create an encrypted research
   reference. A completed capture is not a calibrated physical fingerprint.
-- The hamburger menu contains Status, Logs, and Capture setup. Status shows
-  actual capability reports and model/calibration blockers; technical details
-  expose recorded capture metadata. Logs are limited to Capybara operations.
+- The hamburger menu contains Status, Logs, and Capture setup. Capture setup
+  opens the separate four-position research flow. Status shows capability and
+  model/calibration blockers; technical details expose recorded metadata. Logs
+  are limited to Capybara operations.
 - The app requests `RECORD_AUDIO` at the first capture that needs it. The SDK
   declares `VIBRATE` and `HIGH_SAMPLING_RATE_SENSORS`; microphone permission is
   runtime-gated. The APK requires microphone hardware and declares no camera or
@@ -75,7 +76,9 @@ cmd.exe /c gradlew.bat :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebugA
 Instrumentation compilation is not device execution. A physical procedure must
 use the verified Capybara device and package, obtain microphone permission, and
 follow `sdk/docs/experiments.md`; never describe emulator or host output as
-physical evidence. The current Capybara-only iQOO UI smoke passed two tests, but
-no object capture, routing, or transducer output was tested. `screenshots/` is
-currently empty; add only genuine application screenshots from authorized
-device runs.
+physical evidence. On 2026-10-10, `:apk:connectedDebugAndroidTest` passed 3/3
+tests on I2501: one real capture/cancellation diagnostic plus two UI tests.
+Visual review covered Home, the no-reference Scan gate, and enrollment
+instructions. No controlled-object measurement or physical speaker/haptic
+response was established. `screenshots/` remains empty; add only genuine
+application screenshots from authorized device runs.

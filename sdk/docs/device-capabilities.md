@@ -12,7 +12,7 @@ onset follows from these checks.
 
 `Capabilities.kt` reads `Build.MANUFACTURER`, `Build.MODEL`, API level and supported ABIs; enumerates sensors and their advertised timing/range/resolution/FIFO fields; reads Android audio properties and enumerated audio devices; and queries vibrator presence, exposed IDs, amplitude control, resonance, and API 36 envelope/profile support. `CaptureEngine` requests 48 kHz mono PCM16 input, stereo output to the built-in speaker route, a finite chirp, and a finite waveform on exposed haptic actuators where available. It records actual Android routes while the streams are active. `PhysicsEngine` marks missing/non-built-in routes, absent haptic requests, and unmeasured physical haptic onset as limitations.
 
-The diagnostic below records two logged capture runs. Android exposes one
+The diagnostic below records three logged capture runs. Android exposes one
 built-in speaker-system route, not a mapping from output channels to separate
 transducers. Physical two-driver emission, haptic acceleration/onset, and
 phone-on-object response remain unverified.
@@ -20,17 +20,17 @@ phone-on-object response remain unverified.
 ## Measured device diagnostic (2026-10-10)
 
 `HardwareCaptureTest.realCaptureAndCancellationReleaseHardware` passed on the
-authorized device. Capture condition was not controlled or recorded. The test
-labels the run as a hardware diagnostic, not object/state data, training data,
-or integrity evidence.
+authorized device. The three capture conditions were not controlled or recorded.
+The test labels them as hardware diagnostics, not object/state data, training
+data, or integrity evidence.
 
 | Observation | Measured result |
 | --- | --- |
-| AudioRecord input | Both runs: 48,000 Hz mono, 288,000 samples (6 seconds), `UNPROCESSED`, input route type 15 (built-in microphone), `audioSilencedEver=false`, 12 timestamp anchors |
+| AudioRecord input | All three runs: 48,000 Hz mono, 288,000 samples (6 seconds), `UNPROCESSED`, input route type 15 (built-in microphone), `audioSilencedEver=false`, 12 timestamp anchors |
 | AudioTrack output | Identical chirp samples requested on left and right stereo channels; active route type 2 (built-in speaker system). The API does not expose the number or channel mapping of physical drivers. |
-| Captured signal quality | Run A: RMS 0.00467869, noise RMS 0.00090969; run B: RMS 0.00443769, noise RMS 0.00236456. Both had 0 clipped samples. |
-| IMU | Run A: accelerometer/gyroscope 476.9476 Hz; run B: 476.9486 Hz. These are two observed rates, not a stability guarantee. |
-| Timing | Run A capture 6,384.85 ms / Physics Engine 860.74 ms; run B 6,230.07 ms / 121.26 ms. No neural inference ran; this is not an AI latency result. |
+| Captured signal quality | Run A: RMS 0.00467869, noise RMS 0.00090969; run B: 0.00443769 / 0.00236456; run C: 0.00319538 / 0.00104014. All had 0 clipped samples. |
+| IMU | Run A: accelerometer/gyroscope 476.9476 Hz; run B 476.9486 Hz; run C 476.9272 Hz. Observed rates only, not a stability guarantee. |
+| Timing | Run A capture 6,384.85 ms / Physics Engine 860.74 ms; run B 6,230.07 / 121.26 ms; run C 6,251.34 / 120.57 ms. No neural inference ran; not AI latency. |
 | Haptic request | `VibratorManager` IDs `0,1` received the synchronized finite waveform request; the system logged completion for both IDs. Physical onset/amplitude at the phone-object interface was not measured. |
 
 Both vibrator services advertise amplitude/frequency-control flags and a legacy

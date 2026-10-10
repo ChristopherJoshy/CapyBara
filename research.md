@@ -519,15 +519,17 @@ APIs; SDK acquisition in `sdk/src/main/kotlin/dev/capybara/sdk/CaptureEngine.kt`
 
 Measured result: manufacturer/brand/model `vivo` / `iQOO` / `I2501`, Android
 16/API 36, `arm64-v8a`. `HardwareCaptureTest.realCaptureAndCancellationReleaseHardware`
-passed. The report labels the capture as a hardware diagnostic; capture
-condition was not controlled or recorded. Two logged runs measured 48 kHz mono
-`UNPROCESSED` microphone input (route type 15), 288,000 samples, 12 audio
-timestamp anchors, and no audio silencing. Run A: RMS 0.00467869, baseline
-noise RMS 0.00090969, zero clipped samples, accelerometer/gyroscope 476.9476 Hz,
-capture call 6,384.85 ms, and `PhysicsEngine` analysis 860.74 ms. Run B: RMS
-0.00443769, baseline noise RMS 0.00236456, zero clipped samples,
-accelerometer/gyroscope 476.9486 Hz, capture 6,230.07 ms, and
-`PhysicsEngine` analysis 121.26 ms. No neural inference ran.
+passed. Three logged runs were labeled hardware diagnostics; contact condition
+was not controlled or recorded. Each measured 48 kHz mono `UNPROCESSED`
+microphone input (route type 15), 288,000 samples, 12 audio timestamp anchors,
+and no audio silencing. Run A: RMS 0.00467869, baseline noise RMS 0.00090969,
+zero clipped samples, accelerometer/gyroscope 476.9476 Hz, capture 6,384.85 ms,
+and `PhysicsEngine` analysis 860.74 ms. Run B: RMS 0.00443769, noise RMS
+0.00236456, zero clipped samples, accelerometer/gyroscope 476.9486 Hz, capture
+6,230.07 ms, and `PhysicsEngine` analysis 121.26 ms. Run C: RMS 0.00319538,
+noise RMS 0.00104014, zero clipped samples, accelerometer/gyroscope 476.9272
+Hz, capture 6,251.34 ms, and `PhysicsEngine` analysis 120.57 ms. No neural
+inference ran.
 
 `VibratorManager` listed IDs `0,1`. The SDK requested a synchronized finite
 waveform on both; `dumpsys vibrator_manager` logged the completed combined
@@ -544,12 +546,12 @@ or useful integrity separability. Audio sample-loss counters are unavailable.
 This diagnostic is not labeled training/evaluation data, no neural model ran,
 and no accuracy or AI-inference result is claimed.
 
-The final serial-scoped Gradle run passed
-`:sdk:testDebugUnitTest :sdk:lintDebug :sdk:assembleDebugAndroidTest
-:apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug
-:apk:assembleDebugAndroidTest :apk:connectedDebugAndroidTest
-:sdk:connectedDebugAndroidTest` (`BUILD SUCCESSFUL`). Device suites: APK 3/3
-tests and SDK 5/5 tests. The showcase tests cover the no-reference Scan gate
-and home/menu/setup navigation; SDK tests cover private capture/reference
-storage, integrity, and fail-closed evaluation. No object-state experiment or
-visual inspection of the physical display was performed.
+The full serial-scoped Gradle verification on this device passed APK 3/3 and SDK
+5/5 tests, including unit tests, lint, assembly, and both connected test suites.
+After the dashboard-navigation change, `:apk:connectedDebugAndroidTest` passed
+3/3 tests on the same serial; this includes one hardware-capture/cancellation
+test and two showcase UI tests. The updated APK installed and launched. Live
+visual inspection covered Home, the no-reference Scan gate, and the two-side
+enrollment prompt; startup and capture/result animations were not inspected.
+No controlled-object enrollment, stored-reference evaluation, or physical
+state decision was performed.

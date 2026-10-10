@@ -6,7 +6,10 @@ Capybara is an offline Android physical-measurement SDK and demonstration app. I
 
 ## Last verified implementation and evidence
 
-- Last successful iQOO identity report (2026-10-10): I2501, Android 16 / API 36, `arm64-v8a`, serial `10BFBH1BH0001EY` (build fingerprint `iQOO/I2501i/I2501`). A later recorded ADB listing showed only `5XVSGE8HJBIF55T8` (CPH2781IN) and `emulator-5554`; neither was used for Capybara testing. Current device connectivity is unknown because iQOO testing is paused.
+- Current authorized device (2026-10-10): ADB sees serial `10BFBH1BH0001EY`,
+  product `I2501i`, model `I2501`, Android 16 / API 36, `arm64-v8a`. This is
+  the same I2501 used for the earlier hardware diagnostics; connectivity is
+  currently confirmed, not assumed.
 - Historical capability report (2026-10-10): Android advertised 48 kHz output / 144 frames and unprocessed-source support; built-in speaker type 2 advertised 48 kHz stereo and built-in microphone type 15 advertised 48 kHz. `VibratorManager` exposed IDs 0 and 1, both present with amplitude control; resonant frequency was `NaN` and envelope effects unsupported. These reports do not establish current availability, achieved rates, routing or physical response.
 - Real `AudioRecord` microphone capture, stereo `AudioTrack` excitation request, IMU capture, finite haptic excitation, cancellation cleanup, private atomic capture storage and CPU DSP are implemented.
 - The 2026-10-10 inventory reported two vibrator IDs. On API 31+, Capybara requests the same finite waveform on every exposed ID through `CombinedVibration`; Android does not expose independent-axis semantics for them.
@@ -167,9 +170,9 @@ Partial-audio baseline rejection verification:
 cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug :sdk:assembleDebugAndroidTest
 ```
 
-SDK unit tests, lint and instrumentation APK compilation passed in the recorded
-host runs. The vault instrumentation was compiled but not run.
-
+The full serial-scoped verification on `I2501 - 16` passed APK instrumentation
+3/3 and SDK instrumentation 5/5, including the SignatureVault tests. SDK/APK
+unit tests, lint, assembly and Android-test APK assembly also passed in that run.
 Downstream SDK/APK integration build and APK lint also passed:
 
 ```powershell
@@ -184,15 +187,24 @@ captures/baselines and `Ready`. No accepted object-labeled data, physical pilot
 or integrity decision resulted; capability reports do not prove speaker or
 motor actuation.
 
-Current iQOO 15 identity/UI smoke (2026-10-10): serial-scoped properties report
-`vivo` / `iQOO` / `I2501`, Android 16/API 36, `arm64-v8a`. The focused
-`:apk:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=dev.capybara.app.ShowcaseTest`
-run passed 2/2 tests on `I2501 - 16`; it verified home/status/setup navigation
-and that Scan requires a saved reference before capture. No object capture,
-speaker-route/output measurement, haptic-onset test, model inference or offline
-verification occurred. Do not infer physical speaker/motor activation from API
-requests or UI success. Further device operations must target the verified
-serial and Capybara-owned packages only.
+Current iQOO 15 verification (2026-10-10): the debug APK installed and
+`dev.capybara.app/.MainActivity` launched on serial `10BFBH1BH0001EY`. After
+moving the four-position research capture entry into the Capture setup menu,
+`:apk:connectedDebugAndroidTest` passed 3/3 tests on that serial: one actual
+microphone/IMU/audio-route/haptic-request capture-and-cancellation test and two
+showcase UI tests. `:apk:lintDebug` also passed after the navigation refactor.
+Live visual checks covered Home, the no-reference Scan gate, and the two-side
+enrollment prompt. Home now presents Enroll and Scan as its two primary
+actions.
+
+Three logged diagnostic runs recorded 48 kHz mono `UNPROCESSED` audio, 288,000
+samples, 12 timestamp anchors, and no clipped samples. Capture calls took
+6.23–6.38 seconds; `PhysicsEngine` analysis took 0.12–0.86 seconds. These
+diagnostics had no controlled or labeled object/contact condition, and no
+neural inference ran; the analysis time is not AI latency. Audio route type 2
+and the two exposed vibrator requests do not prove separate speaker-driver
+emission or mechanical haptic response. No physical enrollment, saved-reference
+scan, accuracy result, or offline end-to-end verification was produced.
 
 The runtime has no `INTERNET` permission. Do not operate on packages named Hacker Tracker or Register.
 
