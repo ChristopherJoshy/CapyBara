@@ -56,7 +56,9 @@ object PhysicsEngine {
             issues += "Audio BOOTTIME frame timestamps unavailable"
         if (scan.metadata["audioInputRoutedDeviceTypeObserved"] != AudioDeviceInfo.TYPE_BUILTIN_MIC.toString())
             issues += "Built-in microphone route was not confirmed"
-        if (scan.metadata["audioOutputRoutedDeviceTypeObserved"] != AudioDeviceInfo.TYPE_BUILTIN_SPEAKER.toString())
+        val speakerType = scan.metadata["audioOutputRoutedDeviceTypeObserved"]?.toIntOrNull()
+        if (speakerType != AudioDeviceInfo.TYPE_BUILTIN_SPEAKER &&
+            speakerType != AudioDeviceInfo.TYPE_BUILTIN_SPEAKER_SAFE)
             issues += "Built-in speaker route was not confirmed"
         if (scan.excitations.none { it.kind == "haptic_finite_waveform" })
             issues += "Haptic waveform request was not recorded"

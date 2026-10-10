@@ -68,6 +68,10 @@ class PhysicsEngineTest {
         assertFalse(evidence.limitations.any { "Haptic waveform request" in it })
         assertTrue(evidence.limitations.any { "Haptic physical onset" in it })
 
+        val safeSpeaker = routed.copy(metadata = routed.metadata +
+            ("audioOutputRoutedDeviceTypeObserved" to AudioDeviceInfo.TYPE_BUILTIN_SPEAKER_SAFE.toString()))
+        assertFalse(PhysicsEngine.analyze(safeSpeaker).limitations.any { "Built-in speaker route" in it })
+
         val externalOutput = routed.copy(metadata = routed.metadata +
             ("audioOutputRoutedDeviceTypeObserved" to AudioDeviceInfo.TYPE_WIRED_HEADSET.toString()))
         assertTrue(PhysicsEngine.analyze(externalOutput).limitations.any { "Built-in speaker route" in it })

@@ -94,10 +94,12 @@ response separation; these remain unavailable without experimental calibration.
 input/output streams are active; an accepted preferred-device request is not
 treated as the routed device. Android only guarantees this query while the
 stream is recording or playing ([AudioRouting API](https://developer.android.com/reference/android/media/AudioRouting#getRoutedDevice())).
-`PhysicsEngine` reports a limitation unless both the built-in microphone and
-built-in speaker system routes were observed. This identifies Android's route
-type, not individual speaker transducers or proof that both physical speakers
-emitted the signal.
+`PhysicsEngine` requires the built-in microphone route and accepts either Android
+speaker-system route type: `TYPE_BUILTIN_SPEAKER` or
+`TYPE_BUILTIN_SPEAKER_SAFE` ([AudioDeviceInfo API](https://developer.android.com/reference/android/media/AudioDeviceInfo#TYPE_BUILTIN_SPEAKER_SAFE)).
+Android says the safe route may be the same physical speaker system driven
+differently. Route types do not identify individual transducers or prove that
+both physical speakers emitted the signal.
 
 `haptic_finite_waveform` is an excitation request marker, not measured actuation.
 No request and the current `hapticPhysicalOnset=unavailable` each produce a

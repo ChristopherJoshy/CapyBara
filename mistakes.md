@@ -181,3 +181,12 @@ device types during active routing callbacks; physics evidence marks non-built-i
 or missing mic/speaker routes, missing haptic requests, and unmeasured haptic
 onset as limitations. A JVM regression covers those gates. Gradle unit tests and
 lint pass; actual iQOO routes and haptic onset remain unverified.
+
+## 2026-10-10: Android safe-speaker routing is still built-in hardware
+
+The first route guard accepted only `TYPE_BUILTIN_SPEAKER`. Android documents
+`TYPE_BUILTIN_SPEAKER_SAFE` as the same built-in speaker system driven under a
+different safety policy; rejecting it would unnecessarily block valid on-device
+audio. The guard now accepts either built-in speaker-system type, with a regression
+covering both and still rejecting an external headset route. Route type does not
+prove the iQOO's two physical speakers were both used.

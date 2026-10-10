@@ -404,10 +404,11 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 - `PhysicsEngine` previously ignored actual playback/recording routes and whether
   a haptic waveform was requested. `CaptureEngine` now records route device types
   while streams are active; quality evidence marks missing/non-built-in routes,
-  absent haptic requests, and haptic onset that remains unmeasured.
-- `./gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug` passed. Tests cover
-  missing/external routes and the request-versus-onset distinction. No iQOO test
-  or physical haptic confirmation was performed.
+  accepting both standard and safe built-in speaker-system types. It also flags
+  absent haptic requests and onset that remains unmeasured.
+- `./gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug` passed, including the
+  safe-speaker route regression. No iQOO test or physical haptic confirmation was
+  performed.
 
 ## Next acceptance milestones
 
