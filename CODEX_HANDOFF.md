@@ -50,7 +50,7 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
   regression and full host/lint/assembly checks passed. This diagnostic remains
   uncalibrated and is not integrity evidence.
 - On the previous serial `10BFAT1UT2000XP`, the home UI rendered and a scoped read-only probe found no capture directory. The home listed a saved research reference, but its captures, labels and provenance remain uninspected; do not use or export it without user approval. That unit is no longer connected.
-- The new serial `10BFBH1BH0001EY` had no Capybara APK before this milestone. The APK is now installed; home, status and technical-details screens rendered. Status reports microphone permission needed, zero captures and zero baselines. No capture was run, and speaker/motor response remains unverified.
+- The new serial `10BFBH1BH0001EY` had no Capybara APK before the device milestone. The APK is installed; home, status and technical-details screens rendered. A real but unlabelled acquisition reached review and was rejected; post-rejection Status reported microphone permission granted, zero persisted captures/baselines and `Ready`. It produced no accepted data, reference or integrity decision; speaker/motor response remains unverified.
 - On the previous serial `10BFAT1UT2000XP`, the installed home and side-1
   placement screens were visually inspected; no physical capture/review ran.
   Physical actuator onset, offline scan and verification remain unverified.
@@ -59,6 +59,11 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
   by real SDK busy state; the success check requires encrypted reference save,
   while scans still show `INCONCLUSIVE`. APK unit task was `NO-SOURCE`;
   instrumentation compiled but was not executed. Device install/render passed.
+- `2287498` improves Compose enrollment keyboard/inset handling and keeps the
+  Scan capture action and review decisions accessible before explanatory
+  details. Full SDK/APK unit, lint and assembly checks passed; the APK unit task
+  was `NO-SOURCE`. The final device build visibly showed the complete Scan
+  action. Do not treat the rejected unlabelled acquisition as pilot data.
 - All five specialists (EchoNet, VibraNet, PhysFusion, StateNet, SpatialNet),
   task-specific Capybara-Laya training, Android CPU parity, calibration,
   TrustGate and full offline MATCH/CHANGED behavior remain incomplete.

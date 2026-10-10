@@ -20,7 +20,7 @@ Capybara is an offline Android physical-measurement SDK and demonstration app. I
   same excitation on left and right outputs, and haptics are requested on every
   exposed vibrator ID when Android reports them. These are requests, not proof
   of physical transducer onset.
-- A previous handset capture on serial `10BFAT1UT2000XP` recorded 48 kHz PCM and approximately 462 Hz accelerometer/gyroscope event rates. The new handset has not run a capture; neither result is training or accuracy evidence.
+- A previous handset capture on serial `10BFAT1UT2000XP` recorded 48 kHz PCM and approximately 462 Hz accelerometer/gyroscope event rates. On the new handset, one unlabelled acquisition reached review and was rejected; Status afterward showed zero persisted captures and baselines. Neither run is training or accuracy evidence.
 - The isolated training environment now runs CPU PyTorch and the pinned Laya source. The licensed English Laya base checkpoint loaded locally; its host ONNX export (1,685,258,240-byte external FP32 weights) matched eager output on one generic email example. Its shipped temperature is invalid/clamped, so confidence is uncalibrated; this checkpoint is not packaged or used for physical decisions.
 - MOMENT-1-small was evaluated as a frozen encoder on the public UCI fan split and underperformed the scratch fan baseline (55.56% versus 67.63% test accuracy). Neither fan result is Capybara integrity evidence; MOMENT is not promoted.
 
@@ -73,10 +73,13 @@ cmd.exe /c gradlew.bat :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebugA
 ```
 
 The APK unit-test task is `NO-SOURCE`; Android instrumentation was compiled
-but not executed. The APK installed on `10BFBH1BH0001EY`; its home, status and
-technical-details screens rendered. Status showed microphone permission needed
-and zero captures/baselines. No physical capture or integrity decision was
-performed; capability reports do not prove speaker or motor actuation.
+but not executed. The APK was installed on `10BFBH1BH0001EY`; its home, status,
+technical-details and Scan placement screens rendered. The final Scan view
+showed the complete capture action. One unlabelled acquisition reached review
+and was rejected; Status afterward reported microphone permission granted,
+zero persisted captures/baselines and `Ready`. No accepted object-labeled data,
+physical pilot or integrity decision resulted; capability reports do not prove
+speaker or motor actuation.
 
 Install only the Capybara package on the verified device:
 

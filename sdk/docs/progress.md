@@ -268,7 +268,25 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 - `cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug` passed; `:apk:testDebugUnitTest` was `NO-SOURCE`.
 - `adb install -r` and package-scoped launch succeeded. The home, status and technical-details views rendered. Status showed microphone permission needed, zero captures and zero baselines.
 - Android reports 48 kHz output, a stereo built-in speaker, two exposed vibrator IDs and nominal 479.85 Hz accelerometer/gyroscope maxima. Both vibrator IDs report amplitude control; physical speaker/motor onset and achieved sensor rates remain unmeasured.
-- No microphone permission was granted and no physical capture was made. The new phone is ready for the user-prepared rigid-case A–D pilot; no prior-device reference was copied.
+
+## Showcase UI and acquisition smoke (2026-10-10)
+
+- `2287498` fixes enrollment text-entry dismissal/keyboard insets, keeps the
+  Scan capture action visible on the landscape device, and places review
+  decisions before waveform/evidence details. `:sdk:testDebugUnitTest`,
+  SDK/APK lint, APK assembly and `:apk:testDebugUnitTest` passed; the APK test
+  task is `NO-SOURCE`.
+- The final APK was installed on `10BFBH1BH0001EY`; the Scan placement screen
+  visibly showed the full `Capture side 1` action and side instructions. The
+  measured-response review exposed approve/retry/reject; an unlabelled smoke
+  acquisition was rejected without approval.
+- The post-rejection Status view reported microphone permission granted,
+  `Captures: 0`, `Baselines: 0`, and `Current operation: Ready`. No saved
+  reference or accepted measurement was created. Object placement/state was
+  not controlled or labeled; this is not rigid-case pilot or integrity evidence.
+- Physical speaker/motor onset and achieved sensor rates remain unverified.
+  The user-prepared rigid-case A–D pilot remains pending.
+- Commit `2287498` was pushed to `codex/v6-handoff`.
 
 ## Next acceptance milestones
 
