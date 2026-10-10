@@ -510,13 +510,18 @@ an unvalidated threshold.
   object-separated splits, but uses human manipulation and an external eight-mic
   array. Its ACC weights are separately CC BY 4.0; that does not change the
   dataset license or establish phone-probe transfer.
-- The Boombox is the closest published hidden-content task, but its downloadable
-  contact-microphone dataset has no separately stated data license. Knocker has
-  phone mic/IMU object-recognition data but no verified dataset license and no
-  integrity-change labels. Neither was downloaded or used.
-- No located public dataset contains iQOO speaker-plus-haptic captures with
-  generic object-integrity labels. Public models may support bounded source-task
-  research only; no venue dataset or Capybara integrity accuracy is claimed.
+- The [Knocker](https://miil.kaist.ac.kr/projects/knocker/) archive was
+  downloaded only to ignored `sdk/training/artifacts/KnockerDataset.zip` so its
+  included README could be inspected. It describes Pixel 2 knock recordings
+  (48 kHz microphone, 400 Hz accelerometer/gyroscope) from 20 lab and 10
+  in-the-wild participants; 23 main and 12 similar-object identities, not
+  contents/state-change labels. No dataset license is present in the archive;
+  it was not trained on or redistributed. Local archive SHA256:
+  `9f9f190612786b5631b9acca0c206c8e18debbc6fbb8b3f4956266cb4b208847`.
+- The closest licensed proxy remains EPFL; no located public dataset contains
+  iQOO speaker-plus-haptic captures with generic object-integrity labels. Public
+  models may support bounded source-task research only; no venue dataset or
+  Capybara integrity accuracy is claimed.
 
 ## EPFL source-domain content experiment (2026-10-10)
 

@@ -185,13 +185,18 @@ speaker-plus-haptic acquisition and generic enrolled-object integrity task:
   Its [ACC pretrained weights](https://doi.org/10.5281/zenodo.4770061) are
   separately listed as CC BY 4.0; that separate license does not change the
   dataset license. Neither the weights nor dataset were evaluated or integrated.
-- [Knocker](https://miil.kaist.ac.kr/projects/knocker/) reports smartphone
-  microphone, accelerometer and gyroscope responses to user knocks, with 23
-  object classes. This is the closest phone-sensor dataset for object response,
-  but its labels are object identities rather than changes to contents or
-  physical state. Its linked archive asks users to read an included README; no
-  dataset license was verifiable from the public page, so do not train or
-  redistribute without explicit terms.
+- [Knocker](https://miil.kaist.ac.kr/projects/knocker/) publishes smartphone
+  knock-response data from 20 in-lab users and 10 in-the-wild users, using a
+  Pixel 2 microphone (48 kHz), accelerometer and gyroscope (400 Hz); each row
+  contains 4,096 audio and 32 samples per inertial axis. Its 23 main and 12
+  similar-object labels identify objects, not changes in a known object's
+  contents or physical state. The official [paper](https://doi.org/10.1145/3351240)
+  evaluates impact-driven knocks, not Capybara's active speaker/haptic probe.
+  The archive was downloaded only to ignored
+  `sdk/training/artifacts/KnockerDataset.zip` to inspect its README; the archive
+  provides no dataset license, so it is not trained on or redistributed. Local
+  archive SHA256:
+  `9f9f190612786b5631b9acca0c206c8e18debbc6fbb8b3f4956266cb4b208847`.
 - [YCB-impact](https://api.osf.io/v2/nodes/4tcp6/) has no explicit dataset
   license (`node_license: null`) and uses controlled impact audio. The paper
   license does not establish dataset reuse rights; do not train on it.

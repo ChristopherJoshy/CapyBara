@@ -284,6 +284,14 @@ The public-data review found no dataset suitable for V6 specialist/Laya labels:
 - The CC0 1.0 [ORION-AE bolt-loosening dataset](https://doi.org/10.7910/DVN/FBRDU0)
   uses attached 5 MHz acoustic-emission sensors and a laser vibrometer, not a
   phone microphone/IMU.
+- The [KAIST Knocker dataset](https://miil.kaist.ac.kr/projects/knocker/) has
+  Pixel 2 knock responses (48 kHz microphone, 400 Hz accelerometer/gyroscope),
+  23 main and 12 similar-object labels, 20 in-lab users and 10 in-the-wild
+  users. Its labels are object identities, not object-state changes, and its
+  impact excitation differs from Capybara's active speaker/haptic probe. The
+  downloaded archive is kept only in ignored artifacts for README inspection;
+  no dataset license is stated in the archive, so do not train on or redistribute
+  it without permission.
 
 These sources may inform literature review but are not promoted as V6 models or
 training evidence. Do not train task models from a dataset until its license,
