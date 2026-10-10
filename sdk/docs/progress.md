@@ -540,3 +540,27 @@ an unvalidated threshold.
   source-domain feasibility check, not phone transfer, venue data or fine-tuning.
 - Data and model stay ignored under `sdk/training/artifacts/`; no venue data,
   physical-integrity accuracy or deployment claim is made.
+
+## iQOO capture, routed actuators, and device suites (2026-10-10)
+
+- ADB now exposes the authorized device as `vivo` / `iQOO` / `I2501`,
+  Android 16/API 36, `arm64-v8a`. SensorService lists the LSM6DSVX
+  accelerometer and vsen_gyro with a nominal 479.85 Hz maximum.
+- The final serial-scoped Gradle run passed SDK/APK unit-test, lint, assembly,
+  Android-test assembly, and both connected-device test tasks (`BUILD SUCCESSFUL`).
+  Device suites passed APK 3/3 and SDK 5/5 tests.
+- Two logged hardware-diagnostic captures each recorded 48 kHz mono
+  `UNPROCESSED` input, 288,000 samples, 12 audio timestamp anchors, and no audio
+  silencing or clipping. Capture condition was not controlled or recorded.
+- Run A: signal RMS 0.00467869, noise RMS 0.00090969, accelerometer/gyroscope
+  476.9476 Hz, capture call 6,384.85 ms, Physics Engine analysis 860.74 ms.
+  Run B: signal RMS 0.00443769, noise RMS 0.00236456, accelerometer/gyroscope
+  476.9486 Hz, capture 6,230.07 ms, Physics Engine analysis 121.26 ms. No
+  neural inference ran; these are not AI latency measurements.
+- Audio input route type 15; output route type 2. Identical audio was requested
+  on both stereo channels, but separate physical speaker-driver emission is
+  unproven. Android exposed vibrator IDs `0,1`; both were included in the
+  completed combined request. Physical haptic onset/response was not measured.
+- These diagnostics are not labeled object data or model/evaluation evidence.
+  No venue dataset, model training, calibrated decision, or physical integrity
+  evaluation resulted. Audio sample loss remains unknown.

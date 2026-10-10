@@ -1,6 +1,7 @@
 package dev.capybara.app
 
 import android.Manifest
+import android.util.Log
 import android.content.pm.PackageManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -54,6 +55,21 @@ class HardwareCaptureTest {
             .put("accelerometerHz", evidence.accelerometerHz).put("gyroscopeHz", evidence.gyroscopeHz)
             .put("accelerationRms", evidence.accelerationRms).put("gyroRms", evidence.gyroRms)
             .put("metadata", JSONObject(scan.metadata))
+        Log.i("CapybaraHardwareTest", JSONObject()
+            .put("purpose", "hardware_diagnostic_not_training_or_accuracy_evidence")
+            .put("captureMillis", captureMillis).put("dspMillis", dspMillis)
+            .put("sampleRate", scan.sampleRate).put("sampleCount", scan.pcm.size)
+            .put("audioRms", evidence.audioRms).put("noiseRms", evidence.noiseRms)
+            .put("clippedSamples", evidence.clippedSamples)
+            .put("accelerometerHz", evidence.accelerometerHz).put("gyroscopeHz", evidence.gyroscopeHz)
+            .put("audioInputRouteType", scan.metadata["audioInputRoutedDeviceTypeObserved"])
+            .put("audioOutputRouteType", scan.metadata["audioOutputRoutedDeviceTypeObserved"])
+            .put("audioSource", scan.metadata["audioSourceName"])
+            .put("audioSilencedEver", scan.metadata["audioSilencedEver"])
+            .put("audioTimestampCount", scan.metadata["audioTimestampCount"])
+            .put("hapticActuatorIds", scan.metadata["hapticActuatorsRequested"])
+            .put("hapticMode", scan.metadata["hapticMode"])
+            .put("hapticPhysicalOnset", scan.metadata["hapticPhysicalOnset"]).toString())
         File(context.filesDir, "hardware-report.json").writeText(report.toString(2))
     }
 }

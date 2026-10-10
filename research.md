@@ -503,3 +503,53 @@ interpret the generic showcase as validated generalization to arbitrary objects.
 Android documents `VibratorManager.cancel()` as turning all vibrators off; the method is available from API 31: https://developer.android.com/reference/android/os/VibratorManager#cancel().
 
 `CaptureEngine` can start one `CombinedVibration` across all exposed vibrator IDs, but cleanup previously cancelled only the default `Vibrator`. Cleanup now uses `VibratorManager.cancel()` on API 31+ and retains default-vibrator cancellation on older releases. No device was connected during this host check, so physical haptic cancellation remains unverified.
+
+## Real iQOO audio, IMU, and vibrator diagnostic (2026-10-10)
+
+Question: do the authorized I2501's Android APIs deliver a non-silent capture
+while the SDK requests stereo speaker excitation and synchronized output to
+every exposed vibrator?
+
+Sources: direct serial-scoped `getprop`, `dumpsys sensorservice`,
+`dumpsys vibrator_manager`, and the `HardwareCaptureTest` runtime report;
+Android [`AudioDeviceInfo`](https://developer.android.com/reference/android/media/AudioDeviceInfo),
+[`Sensor`](https://developer.android.com/reference/android/hardware/Sensor),
+and [`VibratorManager`](https://developer.android.com/reference/android/os/VibratorManager)
+APIs; SDK acquisition in `sdk/src/main/kotlin/dev/capybara/sdk/CaptureEngine.kt`.
+
+Measured result: manufacturer/brand/model `vivo` / `iQOO` / `I2501`, Android
+16/API 36, `arm64-v8a`. `HardwareCaptureTest.realCaptureAndCancellationReleaseHardware`
+passed. The report labels the capture as a hardware diagnostic; capture
+condition was not controlled or recorded. Two logged runs measured 48 kHz mono
+`UNPROCESSED` microphone input (route type 15), 288,000 samples, 12 audio
+timestamp anchors, and no audio silencing. Run A: RMS 0.00467869, baseline
+noise RMS 0.00090969, zero clipped samples, accelerometer/gyroscope 476.9476 Hz,
+capture call 6,384.85 ms, and `PhysicsEngine` analysis 860.74 ms. Run B: RMS
+0.00443769, baseline noise RMS 0.00236456, zero clipped samples,
+accelerometer/gyroscope 476.9486 Hz, capture 6,230.07 ms, and
+`PhysicsEngine` analysis 121.26 ms. No neural inference ran.
+
+`VibratorManager` listed IDs `0,1`. The SDK requested a synchronized finite
+waveform on both; `dumpsys vibrator_manager` logged the completed combined
+request with both IDs. Android advertised amplitude/frequency-control flags and
+a legacy 140–160 Hz profile, but its current frequency-profile data were
+`NaN`/null and envelope support size was zero. The capture still records
+`hapticPhysicalOnset=unavailable`; a service-accepted command is not a
+measurement of mechanical response.
+
+The built-in speaker-system route and stereo channel request do not identify
+separate physical speaker drivers or prove that each driver emitted. The
+internal capture does not establish phone-on-object coupling, repeatability,
+or useful integrity separability. Audio sample-loss counters are unavailable.
+This diagnostic is not labeled training/evaluation data, no neural model ran,
+and no accuracy or AI-inference result is claimed.
+
+The final serial-scoped Gradle run passed
+`:sdk:testDebugUnitTest :sdk:lintDebug :sdk:assembleDebugAndroidTest
+:apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug
+:apk:assembleDebugAndroidTest :apk:connectedDebugAndroidTest
+:sdk:connectedDebugAndroidTest` (`BUILD SUCCESSFUL`). Device suites: APK 3/3
+tests and SDK 5/5 tests. The showcase tests cover the no-reference Scan gate
+and home/menu/setup navigation; SDK tests cover private capture/reference
+storage, integrity, and fail-closed evaluation. No object-state experiment or
+visual inspection of the physical display was performed.
