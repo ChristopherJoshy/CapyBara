@@ -170,8 +170,8 @@ Partial-audio baseline rejection verification:
 cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug :sdk:assembleDebugAndroidTest
 ```
 
-SDK unit tests, lint and instrumentation APK compilation passed. The vault
-instrumentation regression was compiled but not run; no iQOO test was performed.
+SDK unit tests, lint and instrumentation APK compilation passed in the recorded
+host runs. The vault instrumentation was compiled but not run.
 
 Downstream SDK/APK integration build and APK lint also passed:
 
@@ -187,9 +187,15 @@ captures/baselines and `Ready`. No accepted object-labeled data, physical pilot
 or integrity decision resulted; capability reports do not prove speaker or
 motor actuation.
 
-No device tests were performed for the partial-capture guard; the user paused iQOO testing.
-
-No device interaction is permitted during the active iQOO testing pause.
+Current iQOO 15 identity/UI smoke (2026-10-10): serial-scoped properties report
+`vivo` / `iQOO` / `I2501`, Android 16/API 36, `arm64-v8a`. The focused
+`:apk:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=dev.capybara.app.ShowcaseTest`
+run passed 2/2 tests on `I2501 - 16`; it verified home/status/setup navigation
+and that Scan requires a saved reference before capture. No object capture,
+speaker-route/output measurement, haptic-onset test, model inference or offline
+verification occurred. Do not infer physical speaker/motor activation from API
+requests or UI success. Further device operations must target the verified
+serial and Capybara-owned packages only.
 
 The runtime has no `INTERNET` permission. Do not operate on packages named Hacker Tracker or Register.
 

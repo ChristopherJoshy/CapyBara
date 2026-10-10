@@ -416,7 +416,32 @@ unmeasured. Android's route type does not prove both transducers emitted sound;
 that requires hardware evidence.
 
 Capybara verification: `:sdk:testDebugUnitTest :sdk:lintDebug` passed after the
-change. No iQOO routing or haptic response was measured; the user's device-test
-pause remains active. The current acquisition's `hapticPhysicalOnset` remains
+change. No iQOO routing or haptic response was measured in that pass; device
+testing was paused then. The current acquisition's `hapticPhysicalOnset` remains
 `unavailable`, so these captures are not demonstrated as verified multimodal
 excitation.
+
+## Current iQOO identity and showcase UI smoke (2026-10-10)
+
+Question: is the connected target actually the specified iQOO 15, and does the
+current APK expose the intended home and two-side Scan entry on that device?
+
+Sources: serial-scoped `adb devices -l` and `getprop` observations reported
+manufacturer `vivo`, brand `iQOO`, model `I2501`, Android 16/API 36 and ABI
+`arm64-v8a`. Android's [`Build`](https://developer.android.com/reference/android/os/Build)
+API documents model, manufacturer, SDK and supported ABI properties; the ADB
+property values are direct device observations.
+
+Finding: the debug APK installed successfully to the verified target. The
+Capybara-only instrumentation command
+`:apk:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=dev.capybara.app.ShowcaseTest`
+passed both `scanRequiresAReferenceBeforeCapture` and
+`conciseShowcaseKeepsStatusInMenuAndRestoresSetup` (2 tests, 0 failures, device
+`I2501 - 16`). This verifies home/menu state, the no-reference Scan gate, and
+navigation into the four-position setup.
+
+Limitations and decision: no object capture, route inspection, speaker-output
+measurement, haptic-onset measurement, model inference, or physical data
+collection was performed. The test confirms UI navigation only. Continue to
+request genuine, object-separated labeled recordings before training; do not
+interpret the generic showcase as validated generalization to arbitrary objects.

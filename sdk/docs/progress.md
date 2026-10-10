@@ -415,8 +415,10 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 ## Device capability record (2026-10-10)
 
 - Added `sdk/docs/device-capabilities.md` to distinguish SDK API queries from
-  actual iQOO observations. All iQOO-specific values remain explicitly unmeasured.
-- No ADB or device command was run because the user's pause remains active.
+  actual iQOO observations. At that point, iQOO capability values remained
+  unmeasured.
+- No ADB or device command was run during that earlier pass; reauthorization and
+  the later UI-only smoke are recorded below.
 
 ## Kaggle readiness check (2026-10-10)
 
@@ -432,10 +434,10 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 
 ## Next acceptance milestones
 
-1. After the user's iQOO pause is lifted, collect and label real rigid-case A–D
-   trials plus `showcase_object` SIDE_1/SIDE_2 trials across distinct physical
-   boxes, following `sdk/docs/experiments.md`. Keep both protocols separate;
-   neither can be supplied by code or public fan data.
+1. With the user physically placing and changing the objects, collect labeled
+   `rigid_case` A–D trials and `showcase_object` SIDE_1/SIDE_2 trials across
+   distinct boxes, following `sdk/docs/experiments.md`. Keep protocols and every
+   object's sessions within one data split; no data currently exists locally.
 2. Develop and evaluate EchoNet, VibraNet, PhysFusion, StateNet and SpatialNet
    only from modality-matched real evidence with object/session/run-separated
    splits. Continue only if repeated-state separability supports the task.
@@ -444,10 +446,24 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 4. Reduce or qualify the 1.69 GB FP32 export only with held-out accuracy and
    calibration evidence; then implement Android CPU tokenizer/runtime parity,
    TrustGate, memory/latency measurement and offline full-system checks.
-5. Resolve preservation-safe connected test execution before any future device
-   suite; host build/lint/unit checks remain available.
+5. Keep device suites serial-scoped and Capybara-package-only. Never clear or wipe
+   device data or operate on unrelated apps.
 
 No task-specific specialist weights, labeled physical-integrity corpus,
 calibration, or integrity accuracy currently exists. Keep unavailable decisions
 as `INCONCLUSIVE`; do not substitute the UCI classifier, raw base Laya output or
 an unvalidated threshold.
+
+## Authorized iQOO identity and UI smoke (2026-10-10)
+
+- `adb devices -l` identified the connected target; serial-scoped properties
+  confirmed `vivo` / `iQOO` / `I2501`, Android 16/API 36, `arm64-v8a`.
+- `adb install -r` succeeded for the current Capybara debug APK. The focused
+  `:apk:connectedDebugAndroidTest` run passed both `ShowcaseTest` cases on
+  `I2501 - 16` (2 tests, 0 failures): home/status/setup navigation and Scan's
+  no-reference gate. The host APK build, lint, unit-test task, and instrumentation
+  APK compilation also passed.
+- No physical object was placed or captured. Speaker-route output, both speaker
+  transducers, haptic activation/onset, model inference, offline operation, and
+  arbitrary-object generalization remain unverified. The UI tests prove navigation
+  only; no physical-integrity dataset or model training resulted.

@@ -1,6 +1,9 @@
 # Device capability record
 
-**Status: no current iQOO check.** The user's pause on iQOO testing remains active. Historical SDK/ADB inventory from 2026-10-10 is recorded below; it is not a current connection check or physical validation. Do not query, install to, or capture from a device until the pause is lifted and the authorized serial is verified.
+**Status (2026-10-10):** A current ADB identity check confirmed `vivo` / `iQOO` /
+`I2501`, Android 16/API 36, `arm64-v8a`. The Capybara-only UI smoke passed; it
+did not capture an object or verify physical audio/haptic output. The historical
+capability inventory below is not current transducer validation.
 
 ## What the SDK queries (API surface, not device findings)
 
@@ -25,6 +28,14 @@ These historical API-reported values do not establish current availability, achi
 
 ## Required device pass
 
-After the pause is lifted, use the repository's authorized-device procedure and verified iQOO serial only. Record the date, model/API/ABI/memory, complete sensor inventory, actual audio routes and negotiated stream formats, preprocessing status, exposed haptic capabilities, and raw capture quality metadata here. Verify the active playback route during playback, test the real built-in microphone and speaker system, and measure haptic onset from actual sensor evidence. Keep `AudioDeviceInfo` route types distinct from proof of separate speaker drivers. Preserve failures and unavailable values; do not infer device support from marketing material, advertised API fields, or emulator results.
+For the next physical data pass, use only the verified iQOO serial and
+Capybara-owned packages. Record the date, model/API/ABI/memory, complete sensor
+inventory, actual audio routes and negotiated stream formats, preprocessing
+status, exposed haptic capabilities, and raw capture quality metadata here.
+Verify the active playback route during playback, test the real built-in
+microphone and speaker system, and measure haptic onset from actual sensor
+evidence. Keep `AudioDeviceInfo` route types distinct from proof of separate
+speaker drivers. Preserve failures and unavailable values; do not infer support
+from marketing material, advertised API fields, or emulator results.
 
 Published Android API behavior and implementation decisions are documented in `hardware-research.md` and `research.md`.

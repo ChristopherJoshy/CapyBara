@@ -75,7 +75,7 @@ cmd.exe /c gradlew.bat :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebugA
 Instrumentation compilation is not device execution. A physical procedure must
 use the verified Capybara device and package, obtain microphone permission, and
 follow `sdk/docs/experiments.md`; never describe emulator or host output as
-physical evidence. The iQOO test pause remains active: do not run ADB, install,
-capture, or take new screenshots until the user lifts it. `screenshots/` is
-currently empty; only genuine application screenshots may be added after an
-authorized device pass.
+physical evidence. The current Capybara-only iQOO UI smoke passed two tests, but
+no object capture, routing, or transducer output was tested. `screenshots/` is
+currently empty; add only genuine application screenshots from authorized
+device runs.
