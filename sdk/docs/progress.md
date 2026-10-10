@@ -225,6 +225,17 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   satisfies both verified data rights and Capybara's active phone-probe task;
   model training and physical decision validation remain blocked.
 
+## Authorized reference inspection attempt (2026-10-10)
+
+- The user authorized read-only inspection of the saved Capybara reference and
+  selected the rigid-case A–D pilot.
+- `adb -s 10BFAT1UT2000XP shell run-as dev.capybara.app ls -la no_backup/capybara/references`
+  returned `device '10BFAT1UT2000XP' not found`. `adb devices -l` listed only
+  `emulator-5554`; no command was run on the emulator. The reference remains
+  uninspected and unchanged.
+- The pilot has not run: the authorized phone is disconnected and physical
+  placement/reposition/removal steps require the user. No captures were copied.
+
 ## Next acceptance milestones
 
 1. The user collects and labels real rigid-case A–D enrollment, unchanged
