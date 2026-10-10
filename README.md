@@ -6,7 +6,8 @@ Capybara is an offline Android physical-measurement SDK and demonstration app. I
 
 ## Current verified state
 
-- Connected test device: vivo/I2501, Android 16 / API 36, `arm64-v8a`, serial `10BFAT1UT2000XP`.
+- Connected test device: iQOO I2501, Android 16 / API 36, `arm64-v8a`, serial `10BFBH1BH0001EY` (build fingerprint `iQOO/I2501i/I2501`).
+- New-phone capability inventory: Android reports 48 kHz output / 144 frames and unprocessed-source support; built-in speaker type 2 advertises 48 kHz stereo and built-in microphone type 15 advertises 48 kHz. `VibratorManager` exposes IDs 0 and 1, both present with amplitude control; resonant frequency is `NaN` and envelope effects are unsupported. These are capability reports, not achieved-rate or physical-response measurements.
 - Real `AudioRecord` microphone capture, stereo `AudioTrack` excitation request, IMU capture, finite haptic excitation, cancellation cleanup, private atomic capture storage and CPU DSP are implemented.
 - The device exposes two vibrator IDs. On API 31+, Capybara requests the same finite waveform on all exposed IDs through `CombinedVibration`; Android does not expose independent-axis semantics for them.
 - Encrypted immutable research baselines are profile-scoped and use Android
@@ -19,7 +20,7 @@ Capybara is an offline Android physical-measurement SDK and demonstration app. I
   same excitation on left and right outputs, and haptics are requested on every
   exposed vibrator ID when Android reports them. These are requests, not proof
   of physical transducer onset.
-- A prior real-device diagnostic recorded 48 kHz PCM, approximately 462 Hz accelerometer/gyroscope event rates, and CPU DSP timing. That diagnostic is not training or accuracy evidence.
+- A previous handset capture on serial `10BFAT1UT2000XP` recorded 48 kHz PCM and approximately 462 Hz accelerometer/gyroscope event rates. The new handset has not run a capture; neither result is training or accuracy evidence.
 - The isolated training environment now runs CPU PyTorch and the pinned Laya source. The licensed English Laya base checkpoint loaded locally; its host ONNX export (1,685,258,240-byte external FP32 weights) matched eager output on one generic email example. Its shipped temperature is invalid/clamped, so confidence is uncalibrated; this checkpoint is not packaged or used for physical decisions.
 - MOMENT-1-small was evaluated as a frozen encoder on the public UCI fan split and underperformed the scratch fan baseline (55.56% versus 67.63% test accuracy). Neither fan result is Capybara integrity evidence; MOMENT is not promoted.
 
@@ -71,16 +72,16 @@ Showcase UI verification also passed:
 cmd.exe /c gradlew.bat :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebugAndroidTest :apk:assembleDebug
 ```
 
-The APK unit-test task is `NO-SOURCE`; Android instrumentation was compiled but
-not executed. The updated APK installed with `adb install -r` and rendered the
-home and side-1 scan-placement screens on `10BFAT1UT2000XP`. No physical
-capture or integrity decision was performed; these checks do not validate
-physical response or accuracy.
+The APK unit-test task is `NO-SOURCE`; Android instrumentation was compiled
+but not executed. The APK installed on `10BFBH1BH0001EY`; its home, status and
+technical-details screens rendered. Status showed microphone permission needed
+and zero captures/baselines. No physical capture or integrity decision was
+performed; capability reports do not prove speaker or motor actuation.
 
 Install only the Capybara package on the verified device:
 
 ```powershell
-adb -s 10BFAT1UT2000XP install -r apk/build/outputs/apk/debug/apk-debug.apk
+adb -s 10BFBH1BH0001EY install -r apk/build/outputs/apk/debug/apk-debug.apk
 ```
 
 The runtime has no `INTERNET` permission. Do not operate on packages named Hacker Tracker or Register.

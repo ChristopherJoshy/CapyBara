@@ -1,9 +1,9 @@
 # Verified progress
 
-2026-10-09 (Asia/Calcutta). Work in progress; the complete V6 goal is not done.
+2026-10-10 (Asia/Calcutta). Work in progress; the complete V6 goal is not done.
 
 - Requested upstream cloned into the workspace. Repository was empty.
-- Connected device: I2501, Android 16 API 36, arm64-v8a, serial 10BFAT1UT2000XP.
+- Connected device: iQOO I2501, Android 16 API 36, arm64-v8a, serial `10BFBH1BH0001EY`.
 - JDK 21.0.12.1, Gradle 9.6.0, cached AGP 9.4.1, platform API37 and build-tools36.
 - `:sdk:compileDebugKotlin`, `:sdk:testDebugUnitTest`, and `assembleDebug` pass.
 - Capture uses Android's real `AudioRecord`, `AudioTrack`, SensorManager, and VibratorManager APIs. On API31+ it requests the identical finite waveform on every exposed vibrator ID through `CombinedVibration`; independent motor-axis control remains unavailable.
@@ -259,8 +259,16 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   returned `device '10BFAT1UT2000XP' not found`. `adb devices -l` listed only
   `emulator-5554`; no command was run on the emulator. The reference remains
   uninspected and unchanged.
-- The pilot has not run: the authorized phone is disconnected and physical
-  placement/reposition/removal steps require the user. No captures were copied.
+- The earlier handset was disconnected during that reference-inspection attempt; the new phone connected later. Its fresh app installation reports zero captures and zero baselines. The earlier reference remains uninspected and was not copied.
+- The physical pilot remains unrun because object setup, repositioning/removal and labeling require the user.
+
+## New handset hardware inventory and app smoke (2026-10-10)
+
+- Read-only ADB identity on `10BFBH1BH0001EY` confirms iQOO/I2501, Android 16/API 36 and `arm64-v8a`.
+- `cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug` passed; `:apk:testDebugUnitTest` was `NO-SOURCE`.
+- `adb install -r` and package-scoped launch succeeded. The home, status and technical-details views rendered. Status showed microphone permission needed, zero captures and zero baselines.
+- Android reports 48 kHz output, a stereo built-in speaker, two exposed vibrator IDs and nominal 479.85 Hz accelerometer/gyroscope maxima. Both vibrator IDs report amplitude control; physical speaker/motor onset and achieved sensor rates remain unmeasured.
+- No microphone permission was granted and no physical capture was made. The new phone is ready for the user-prepared rigid-case A–D pilot; no prior-device reference was copied.
 
 ## Next acceptance milestones
 

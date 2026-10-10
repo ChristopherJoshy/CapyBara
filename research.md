@@ -15,14 +15,41 @@ compatible Compose libraries (2026.09.00).
 Decision: reuse installed Gradle9.6, cached AGP9.4.1, Kotlin2.2.10, API37 compile
 with target36 and min29. Native code awaits measured need. Device build pending.
 
-## Actual device audit (measured ADB metadata, 2026-10-09)
+## Prior handset audit (measured ADB metadata, 2026-10-09)
 
-Connected I2501 reports Android16/API36, arm64-v8a and 15,583,752kB MemTotal.
-Sensor inventory reports lsm6dsvx accelerometer and vsen_gyro gyroscope,
-nominal maximum479.85Hz. These are advertised limits, not measured acquisition
-rates. Audio formats, processing, actuator frequencies and synchronization must
-be probed through the app. Phone marketed identity is not inferred from a blank
-marketname property. See sdk/docs/device-capabilities.md for subsequent probes.
+The earlier unit, serial `10BFAT1UT2000XP`, reported I2501, Android 16/API 36,
+arm64-v8a and 15,583,752 kB `MemTotal`. Its sensor inventory listed an
+LSM6DSVX accelerometer and vsen_gyro gyroscope with nominal maxima of 479.85 Hz.
+Those are advertised limits, not measured acquisition rates. The market-name
+field was blank, so its brand was not inferred. This is historical evidence for
+the previous unit, not the currently connected phone.
+
+## New iQOO hardware inventory (ADB and SDK capability report, 2026-10-10)
+
+The current serial `10BFBH1BH0001EY` reports manufacturer `vivo`, model `I2501`,
+Android 16/API 36 and ABI `arm64-v8a`. Its build fingerprint starts
+`iQOO/I2501i/I2501:16/`, verifying the iQOO identity.
+
+The installed Capybara technical-details view reports
+`unprocessedReported=true`, output rate 48,000 Hz and 144 output frames. The
+audio-device inventory lists a built-in speaker (type 2, ID 3) at 48 kHz with
+two channels and built-in microphone endpoints (type 15) advertising 48 kHz
+with one- and two-channel support. These are advertised formats, not proof of
+actual stream routing or transducer frequency response.
+
+Android's sensor inventory lists an LSM6DSVX accelerometer and vsen_gyro
+gyroscope, each with a nominal maximum of 479.85 Hz. `VibratorManager` exposes
+IDs 0 and 1; both report present with amplitude control, Q factor 11.0,
+resonant frequency `NaN`, unsupported envelope effects and no frequency
+profile. The existing capture path requests the same finite waveform on both
+IDs in parallel; no capture was run to verify either motor's physical onset.
+Advertised sensor rates are not achieved capture rates.
+
+The fresh app installation renders its status as microphone permission needed,
+zero captures and zero baselines. No permission was granted and no physical
+capture, speaker check or haptic check was performed on this handset. Treat
+this as capability/readiness evidence only; the rigid-case pilot still needs
+user-prepared physical conditions and labeled repeats.
 
 ## Physical-state experiment hypothesis
 

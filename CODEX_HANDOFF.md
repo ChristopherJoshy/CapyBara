@@ -20,7 +20,7 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
 ## Safety invariants
 
 - Never inspect, operate on, or alter apps named Hacker Tracker or Register, their packages, data or processes.
-- Device operations are restricted to verified serial `10BFAT1UT2000XP` and Capybara packages `dev.capybara.app`, `dev.capybara.app.test`, and `dev.capybara.sdk.test`.
+- Device operations are restricted to verified serial `10BFBH1BH0001EY` and Capybara packages `dev.capybara.app`, `dev.capybara.app.test`, and `dev.capybara.sdk.test`.
 - No simulated measurements, fabricated results, dummy models or inferred accuracy. Missing models/calibration/data must remain unavailable or `INCONCLUSIVE`.
 - Preserve the offline CPU-only V6 architecture. No `INTERNET` permission, cloud inference, camera dependency or hidden demo path.
 - Training data and credentials stay private. Never print authentication material.
@@ -29,7 +29,7 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
 ## Verified project state
 
 - Android SDK and Compose demo are present. The SDK uses real `AudioRecord`, `AudioTrack`, `SensorManager` and `VibratorManager` APIs, CPU DSP, cancellation cleanup, private atomic capture storage and Android Keystore-protected baselines.
-- The connected iQOO is I2501 / Android 16 API 36 / `arm64-v8a`, serial `10BFAT1UT2000XP`. Two vibrator IDs are exposed; the app requests the same finite waveform on both. This does not establish independent actuator axes, physical onset or speaker activation.
+- The current verified device is iQOO I2501 / Android 16 API 36 / `arm64-v8a`, serial `10BFBH1BH0001EY`. Android exposes vibrator IDs 0 and 1; the app requests the same finite waveform on both. Capability reporting does not establish independent axes or physical onset/speaker activation.
 - The current showcase uses two generic contact sides (`SIDE_1`, `SIDE_2`).
   Enrollment names the object and saves the approved raw captures plus an
   Android Keystore AES-GCM encrypted `RESEARCH_BASELINE_UNCALIBRATED` reference
@@ -49,14 +49,11 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
   evidence through one reported, zero-padded tail window; a synthetic last-sample
   regression and full host/lint/assembly checks passed. This diagnostic remains
   uncalibrated and is not integrity evidence.
-- ADB install/launch on the verified serial resumed `dev.capybara.app` and
-  rendered its home UI. A scoped read-only app-data probe found no
-  `no_backup/capybara` capture directory, but the home list displayed a saved
-  research reference. Its underlying captures, labels and provenance were not
-  inspected or verified; do not use or export it without user approval.
-- The installed home and side-1 placement screens were visually inspected; no
-  physical capture/review was run. Physical actuator onset, offline scan and
-  verification remain unverified.
+- On the previous serial `10BFAT1UT2000XP`, the home UI rendered and a scoped read-only probe found no capture directory. The home listed a saved research reference, but its captures, labels and provenance remain uninspected; do not use or export it without user approval. That unit is no longer connected.
+- The new serial `10BFBH1BH0001EY` had no Capybara APK before this milestone. The APK is now installed; home, status and technical-details screens rendered. Status reports microphone permission needed, zero captures and zero baselines. No capture was run, and speaker/motor response remains unverified.
+- On the previous serial `10BFAT1UT2000XP`, the installed home and side-1
+  placement screens were visually inspected; no physical capture/review ran.
+  Physical actuator onset, offline scan and verification remain unverified.
 - `a6cf03d` renames the home action to `Scan`, adds startup/capture/result motion,
   and calls the capture-set hash a provenance digest. The active pulse is gated
   by real SDK busy state; the success check requires encrypted reference save,
