@@ -241,6 +241,12 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   than specimen-held-out evaluation; it was not downloaded.
 - A surfaced TU Wien record was verified as manufacturing work-step audio, not
   the claimed composite tap-test dataset, and was discarded.
+- LMSD is CC BY 4.0 but contains averaged FRFs from one CFRP plate, measured
+  with an impact hammer and seven accelerometers; its added-mass cases are
+  damage surrogates, not phone audio/IMU captures or object-held-out data.
+- The CC0 4TU CFRP acoustic-emission dataset has contact-coupled 100–900 kHz
+  sensors sampling at 2 MHz during compression tests, outside Capybara's phone
+  path.
 - No candidate satisfies Capybara's active phone-probe and physical-integrity
   requirements. No data or model was downloaded or trained; task-specific
   training remains blocked on a suitable licensed corpus or labeled iQOO captures.

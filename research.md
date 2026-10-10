@@ -159,6 +159,17 @@ Closest physical-audio leads audited 2026-10-10; none is currently usable:
   randomly partitions samples rather than specimens. The repository README links
   a Baidu download but states no dataset license. The paper's arXiv license does
   not establish dataset reuse rights; do not download or train on it.
+- [LMSD 2021 plate-damage data](https://doi.org/10.48804/GDE9TW) is CC BY 4.0
+  and contains measured frequency-response functions from one CFRP plate. An
+  impact hammer excites the plate and seven mounted accelerometers receive its
+  response; six added-mass cases are damage surrogates. The files are averaged
+  8,192-bin FRFs through 1,600 Hz, not phone audio/IMU time series or
+  object-separated measurements, so they cannot train a Capybara specialist.
+- [Acoustic Emission monitoring in CFRP compression tests](https://doi.org/10.4121/21621381.v1)
+  is CC0 and provides full waveforms plus damage-mode labels from CFRP compression
+  and impact tests. Its contact-coupled piezoelectric sensors operate at
+  100–900 kHz and record at 2 MHz; this is outside the phone microphone/IMU and
+  active-probe path. It is not V6 training evidence.
 - The [TU Wien MSDv1 record](https://researchdata.tuwien.ac.at/records/hv20e-zzb35)
   is a smartphone/laptop manufacturing work-step sound dataset, not the composite
   tap-test defect dataset suggested by a search result; it was discarded.
