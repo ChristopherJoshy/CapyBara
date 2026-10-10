@@ -141,11 +141,12 @@ obfuscated keys, text, booleans, null, and valid numeric features. This cannot
 prove that a number is semantically independent of an annotation; review every
 feature producer and never treat schema validation as proof of independence.
 
-## 2026-10-10: training import must verify embedded capture digests
+## 2026-10-10: training import must enforce capture format and embedded digests
 
-`prepare.capture` included raw audio and IMU hashes in the dataset manifest but
-did not compare them with `audioSha256` and `imuSha256` stored in the source
-capture metadata. A same-length edit could pass the PCM-size check while the
-provenance record remained stale. The preparer now verifies both embedded hashes;
-regression coverage flips one byte in each file and confirms rejection. These
-unkeyed hashes detect inconsistency, not an attacker rewriting files and hashes.
+`prepare.capture` hashed raw audio and IMU into the dataset manifest but did not
+compare them with `audioSha256` and `imuSha256` in source metadata. It also ignored
+`pcmEncoding`, so same-sized bytes could be accepted under an unsupported format.
+The preparer now checks both embedded digests and requires
+`signed_pcm16_little_endian_mono`. Regressions flip one byte in each artifact and
+change the encoding label; all are rejected. These unkeyed hashes detect file
+inconsistency, not an attacker rewriting both artifacts and metadata.

@@ -86,6 +86,8 @@ def capture(root, relative):
     meta = read_json(path)
     if meta.get("schemaVersion") != 1:
         raise ValueError("Unsupported capture schema")
+    if meta.get("pcmEncoding") != "signed_pcm16_little_endian_mono":
+        raise ValueError("Unsupported capture PCM encoding")
     label = meta.get("label", {})
     for name in ("objectId", "sessionId", "condition", "position", "profile"):
         required_text(label.get(name), "capture label." + name)

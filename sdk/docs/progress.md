@@ -368,17 +368,17 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 - `sdk/training/test_training.py` passed all 10 tests, including the capture-pair
   validation path. No physical data was used.
 
-## Training capture digest verification (2026-10-10)
+## Training capture format and digest verification (2026-10-10)
 
 - The preparer hashed PCM/IMU files for its manifest but did not compare them
-  with `audioSha256` and `imuSha256` embedded by `CaptureStore`. Same-length file
-  edits could therefore enter the dataset under stale capture metadata.
-- `prepare.capture` now verifies both embedded digests before accepting provenance.
-  The schema regression mutates one byte in each artifact without changing length
-  and confirms the capture is rejected; all 10 training tests pass.
-- This detects file/metadata inconsistency, not a malicious actor able to rewrite
-  both the artifact and its unkeyed metadata digest.
-- Commit `c25035d` was pushed to `codex/v6-handoff`.
+  with `audioSha256` and `imuSha256` embedded by `CaptureStore`. It also ignored
+  `pcmEncoding`, allowing bytes from a same-sized unsupported encoding to pass.
+- `prepare.capture` now requires the declared signed PCM16 little-endian mono
+  format and verifies both embedded digests. Regressions mutate one byte in each
+  artifact and change the encoding; all are rejected. All 10 training tests pass.
+- Embedded hashes detect file/metadata inconsistency, not a malicious actor able
+  to rewrite both the artifact and its unkeyed metadata digest.
+- Digest enforcement was pushed as `c25035d`; format validation is in this slice.
 
 ## Next acceptance milestones
 

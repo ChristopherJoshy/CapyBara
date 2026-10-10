@@ -72,8 +72,9 @@ primitive producer has not demonstrated SpatialNet evidence.
 & $trainingPython sdk/training/prepare.py sdk/captures/labels.jsonl --capture-root sdk/captures --out sdk/training/artifacts/dataset-v1
 ```
 
-Preparation verifies embedded audio/IMU digests and PCM byte counts, labels,
-timestamps, matching object, profile and position, reference/evidence identity,
+Preparation verifies embedded audio/IMU digests, the declared mono PCM16
+little-endian encoding, PCM byte counts, labels, timestamps, matching object,
+profile and position, reference/evidence identity,
 obvious annotation/identity-key leakage (recursively, including common
 snake_case, camelCase and acronym spellings), and artifacts confined to the capture
 root. This lexical guard cannot prove semantic independence; review every evidence

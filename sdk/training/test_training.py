@@ -95,7 +95,8 @@ class TrainingSafetyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir=self.artifacts) as directory:
             root = Path(directory)
             meta = {"schemaVersion": 1, "captureId": "fixture", "sampleRate": 48000,
-                    "sampleCount": 2, "startedBootNanos": 1, "endedBootNanos": 2,
+                    "sampleCount": 2, "pcmEncoding": "signed_pcm16_little_endian_mono",
+                    "startedBootNanos": 1, "endedBootNanos": 2,
                     "label": {"objectId": "fixture", "sessionId": "fixture", "condition": "test",
                               "profile": "test", "position": "A"}}
             (root / "metadata.json").write_text(json.dumps(meta))
@@ -114,7 +115,8 @@ class TrainingSafetyTests(unittest.TestCase):
                     folder = root / cid
                     folder.mkdir()
                     meta = {"schemaVersion": 1, "captureId": cid, "sampleRate": 48000,
-                            "sampleCount": 1, "startedBootNanos": 1, "endedBootNanos": 2,
+                            "sampleCount": 1, "pcmEncoding": "signed_pcm16_little_endian_mono",
+                            "startedBootNanos": 1, "endedBootNanos": 2,
                             "label": {"objectId": str(group), "sessionId": str(group),
                                       "condition": "schema-fixture", "profile": "test", "position": "A"}}
                     audio_path = folder / "audio.pcm"
@@ -147,6 +149,14 @@ class TrainingSafetyTests(unittest.TestCase):
                 with self.subTest(artifact=name), self.assertRaisesRegex(ValueError, message):
                     capture(root, "0current/metadata.json")
                 artifact.write_bytes(original)
+            metadata_path = root / "0current" / "metadata.json"
+            original_metadata = metadata_path.read_text()
+            metadata = json.loads(original_metadata)
+            metadata["pcmEncoding"] = "float32"
+            metadata_path.write_text(json.dumps(metadata))
+            with self.assertRaisesRegex(ValueError, "PCM encoding"):
+                capture(root, "0current/metadata.json")
+            metadata_path.write_text(original_metadata)
             index = root / "annotations.jsonl"
             index.write_text("\n".join(json.dumps(item) for item in annotations))
             out = root / "prepared"
