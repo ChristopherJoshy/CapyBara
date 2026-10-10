@@ -104,12 +104,29 @@ quantized graph after task-specific held-out accuracy/calibration evidence exist
 
 ## Evidence, calibration and TrustGate
 
-See [training workflow](../training/README.md) for schemas and commands. Physical
-evidence must come from genuine captured signals and genuinely trained EchoNet,
-VibraNet, PhysFusion, StateNet and SpatialNet. Primitive physics diagnostics are
-useful for feasibility analysis but do not establish final V6 model evidence.
-Record every source capture for four-position aggregation; diagnostic or human
-annotation fields must never become predictive features.
+See [training workflow](../training/README.md) for schemas and commands.
+
+The public `Capybara.evaluate(referenceId, capturePaths)` API reads the authenticated
+uncalibrated baseline, verifies its sealed capture metadata against the private
+capture store, checks current capture hashes, requires current captures to retain
+the selected reference's object label, validates complete registered positions
+and disjoint enrollment/scan sessions, and derives CPU `physics-v1` features for
+both reference and current signals. The label match is an annotation-consistency
+check, not proof of physical identity.
+`IntegrityAssessment.layaEvidenceStateJson` contains the profile and per-position
+reference/current numeric features plus their deltas. It excludes object,
+session, condition, capture and annotation labels. Non-finite measurements are
+encoded as JSON null, not replaced with zero. This matches the training
+preparation state shape only; it is not tokenized, passed to the upstream Laya
+runtime, or an inference result. The Android Laya runtime is not implemented.
+
+The current TrustGate deliberately returns `INCONCLUSIVE`, with blockers for the
+uncalibrated reference, unavailable EchoNet/VibraNet/PhysFusion/StateNet/
+SpatialNet, absent task-trained Capybara-Laya weights, and missing calibration.
+Physics diagnostics do not establish final V6 model evidence. Training requires
+genuine captured signals and specialist outputs; record every source capture for
+four-position aggregation and keep diagnostic or annotation fields out of
+predictive features.
 
 Train/calibration/test separation uses connected object/session/run/reference
 components. Upstream's automatic item-random calibration split is unsuitable for
@@ -122,9 +139,10 @@ scale. Confidence thresholds require real held-out validation.
 
 TrustGate must independently refuse missing models, incompatible versions,
 unsupported hardware, poor quality, OOD evidence, evidence truncation and
-uncalibrated confidence. An upstream Laya prediction never authorizes an automatic
+uncalibrated confidence. The current implementation enforces missing-artifact
+and uncalibrated-reference blockers only; the remaining gates need trained,
+validated evidence. An upstream Laya prediction never authorizes an automatic
 MATCH. Model-level metrics do not establish package-integrity accuracy.
-
 ## License and outstanding verification
 
 Laya source and published Laya weights declare Apache-2.0; ModernBERT's model,

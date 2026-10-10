@@ -16,6 +16,9 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
 - Use licensed pretrained weights where they fit the real sensor modality and task. The user explicitly selected Laya for the final decision stage; preserve its pinned source/checkpoint lineage. MOMENT was tested and rejected for the UCI fan transfer.
 - Kaggle CLI 2.2.4 authenticated successfully; quota reported 30 GPU-hours and 20 TPU-hours remaining but no accelerator allocation was tested. Searching the exact licensed Mendeley DOI found no Kaggle mirror. No cloud job was launched because the available public datasets do not match physical phone-to-object integrity labels. Do not upload private captures or credentials.
 - Commit and push each **verified coherent slice**. Stage only intended files; never push captures, downloaded data, weights, virtual environments or credentials. GitHub authentication is valid and the current branch is `codex/v6-handoff`.
+- The user has now paused all iQOO testing. Do not install, launch, capture, or
+  otherwise test on the iQOO until the user changes this instruction, even if
+  the authorized serial reconnects. Host-only work may continue.
 
 ## Safety invariants
 
@@ -30,6 +33,8 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
 
 - Android SDK and Compose demo are present. The SDK uses real `AudioRecord`, `AudioTrack`, `SensorManager` and `VibratorManager` APIs, CPU DSP, cancellation cleanup, private atomic capture storage and Android Keystore-protected baselines.
 - The current verified device is iQOO I2501 / Android 16 API 36 / `arm64-v8a`, serial `10BFBH1BH0001EY`. Android exposes vibrator IDs 0 and 1; the app requests the same finite waveform on both. Capability reporting does not establish independent axes or physical onset/speaker activation.
+- Latest `adb devices -l` did not show the authorized iQOO serial; it showed
+  `5XVSGE8HJBIF55T8` (CPH2781IN) and `emulator-5554`. Do not operate either.
 - The current showcase uses two generic contact sides (`SIDE_1`, `SIDE_2`).
   Enrollment names the object and saves the approved raw captures plus an
   Android Keystore AES-GCM encrypted `RESEARCH_BASELINE_UNCALIBRATED` reference
@@ -68,6 +73,16 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
   task-specific Capybara-Laya training, Android CPU parity, calibration,
   TrustGate and full offline MATCH/CHANGED behavior remain incomplete.
 - The pinned Laya 0.4.1 base checkpoint loaded on host CPU; the official exporter created a graph plus 1,685,258,240 bytes of external FP32 weights. ONNX Runtime CPU matched eager CPU on one generic upstream email example. Its base confidence is uncalibrated; no graph or model is in the APK.
+- `Capybara.evaluate` now checks that user-labeled current captures match the
+  selected reference's object label (annotation consistency only). Host unit
+  coverage exercises the guard; instrumentation also has mismatched-object and
+  metadata-tampering paths. No real Laya inference is wired: upstream `laya-java`
+  explicitly does not implement Android, and the only available graph is the
+  untrained base FP32 export. Do not add it as a decision path.
+- Latest host-only check passed the SDK unit test, SDK/APK lint, instrumentation
+  APK compilation and APK assembly. The instrumentation did not run. The `sdk/captures/`
+  directory is absent; no real training examples exist. The user paused iQOO
+  testing, so do no device work until that instruction changes.
 
 ## Public data and trained baseline
 

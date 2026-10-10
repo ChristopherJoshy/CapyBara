@@ -104,3 +104,16 @@ A search result suggested a TU Wien composite tap-test dataset, but the official
 record is MSDv1 manufacturing work-step audio, not defect data. It was rejected
 before download. Open the primary data record and check its labels before treating
 a search snippet as a candidate.
+
+## 2026-10-10: scan labels must match the selected research reference
+
+Tracing `MainActivity` into `Capybara.evaluate` found that Scan generated a
+random `candidate-*` object label even after the user selected a named reference.
+The SDK now rejects a current capture whose object label differs from that
+reference, so every scan would have failed evaluation before returning even its
+research-only `INCONCLUSIVE` assessment. The selection handler now copies the
+chosen reference's object label into the capture state; the scan still uses a
+fresh session. Added SDK tests for the label guard and an app test for the
+reference-selection gate. Host unit/build/lint checks passed; instrumentation was
+compiled but not run, and no iQOO test was performed. Treat the label as
+annotation consistency, never physical identity evidence.

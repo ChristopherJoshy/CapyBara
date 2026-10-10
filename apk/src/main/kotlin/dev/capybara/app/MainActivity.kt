@@ -97,7 +97,7 @@ class MainActivity : ComponentActivity() {
                 val capturePaths = withContext(Dispatchers.IO) { sdk.listCaptures() }
                 savedCount = capturePaths.size
                 bundle = withContext(Dispatchers.IO) { restoredPaths.map { sdk.getCaptureLabel(it) to it } }
-                baselines = withContext(Dispatchers.IO) { SignatureVault(this@MainActivity).listResearchBaselines() }
+                baselines = withContext(Dispatchers.IO) { sdk.listResearchBaselines() }
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) { problem = "Saved data could not be read."; log("Saved data read failed: ${error.message}") }
         }
@@ -145,12 +145,13 @@ class MainActivity : ComponentActivity() {
         )
         var showcaseMode by remember { mutableStateOf<String?>(null) }
         var showcaseName by remember { mutableStateOf("") }
-        var showcaseCaptureId by remember { mutableStateOf("") }
         var showcaseSession by remember { mutableStateOf("") }
         var showcaseStep by remember { mutableStateOf("name") }
         var showcasePositionIndex by remember { mutableIntStateOf(0) }
         var showcaseReferenceSaved by remember { mutableStateOf(false) }
         var showcaseEvidence by remember { mutableStateOf<List<Pair<String, PhysicsEvidence>>>(emptyList()) }
+        var showcaseReferenceId by remember { mutableStateOf<String?>(null) }
+        var showcaseAssessment by remember { mutableStateOf<IntegrityAssessment?>(null) }
         val researchProfile = remember { sdk.getProfile(ProfileEngine.RIGID_CASE_ID) }
         val positions = researchProfile.positions
         val showcasePositions = remember { sdk.getProfile(ProfileEngine.SHOWCASE_OBJECT_ID).positions }
@@ -162,11 +163,12 @@ class MainActivity : ComponentActivity() {
         fun openShowcase(mode: String) {
             showcaseMode = mode
             showcaseName = ""
-            showcaseCaptureId = if (mode == "scan") "candidate-${java.util.UUID.randomUUID()}" else ""
             showcaseSession = ""
             showcasePositionIndex = 0
             showcaseReferenceSaved = false
-            showcaseStep = if (mode == "scan") "capture" else "name"
+            showcaseStep = if (mode == "scan") "reference" else "name"
+            showcaseReferenceId = null
+            showcaseAssessment = null
             showcaseEvidence = emptyList()
             showcasePaths = emptyList()
             showcaseProvenanceDigest = null
@@ -177,12 +179,13 @@ class MainActivity : ComponentActivity() {
 
         fun startShowcasePosition() {
             val mode = showcaseMode ?: return
-            if (mode == "enroll" && showcaseName.isBlank()) {
-                problem = "Enter an object name before capturing."
+            if (showcaseName.isBlank()) {
+                problem = if (mode == "enroll") "Enter an object name before capturing."
+                    else "Select a saved reference before capturing."
                 return
             }
-            if (mode == "enroll") showcaseName = showcaseName.trim()
-            val captureObjectId = if (mode == "enroll") showcaseName else showcaseCaptureId
+            showcaseName = showcaseName.trim()
+            val captureObjectId = showcaseName
             if (!microphoneGranted) {
                 permission.launch(Manifest.permission.RECORD_AUDIO)
                 return
@@ -326,6 +329,28 @@ class MainActivity : ComponentActivity() {
                             }, enabled = !busy, contentPadding = PaddingValues(0.dp)) { Text("Back") }
                             Text(if (showcaseMode == "enroll") "Enroll object" else "Scan object", fontFamily = FontFamily.Serif, fontSize = 34.sp)
                             when (showcaseStep) {
+                                "reference" -> {
+                                    val references = baselines.filter { it.profile == ProfileEngine.SHOWCASE_OBJECT_ID }
+                                    Text("Choose the saved two-side reference to compare.", color = Muted, lineHeight = 21.sp)
+                                    if (references.isEmpty()) {
+                                        Text("No complete research references are available for this scan profile.", color = Sand)
+                                        Button(onClick = { openShowcase("enroll") }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                                            Text("Enroll an object")
+                                        }
+                                    } else {
+                                        references.forEach { reference ->
+                                            Button(
+                                                onClick = {
+                                                    showcaseReferenceId = reference.id
+                                                    showcaseName = reference.objectId
+                                                    showcaseStep = "capture"
+                                                },
+                                                enabled = !busy,
+                                                modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+                                            ) { Text("${reference.objectId} · ${reference.id.take(8)}") }
+                                        }
+                                    }
+                                }
                                 "name" -> {
                                     Text(
                                         "Name the object, then capture two real sides. Keep the phone flat and use the same contact pressure on both sides.",
@@ -377,7 +402,8 @@ class MainActivity : ComponentActivity() {
                                         Button(onClick = {
                                             approveShowcaseCapture { approvedEvidence, path, baselineSaved ->
                                                 showcaseEvidence = showcaseEvidence + ("Side ${showcasePositionIndex + 1}" to approvedEvidence)
-                                                showcasePaths = showcasePaths + path
+                                                val approvedPaths = showcasePaths + path
+                                                showcasePaths = approvedPaths
                                                 showcaseReferenceSaved = baselineSaved
                                                 pendingShowcaseScan = null
                                                 pendingShowcaseEvidence = null
@@ -385,8 +411,34 @@ class MainActivity : ComponentActivity() {
                                                     showcasePositionIndex++
                                                     showcaseStep = "rotate"
                                                 } else {
-                                                    showcaseProvenanceDigest = captureProvenanceDigest(showcasePaths)
-                                                    showcaseStep = "result"
+                                                    showcaseProvenanceDigest = captureProvenanceDigest(approvedPaths)
+                                                    if (showcaseMode == "scan") {
+                                                        val referenceId = showcaseReferenceId
+                                                        if (referenceId == null) {
+                                                            showcaseStep = "evaluation_error"
+                                                            problem = "No research reference was selected; no decision was produced."
+                                                        } else {
+                                                            showcaseStep = "evaluating"
+                                                            stage = "Preparing SDK comparison evidence"
+                                                            log(stage)
+                                                            lifecycleScope.launch {
+                                                                try {
+                                                                    showcaseAssessment = sdk.evaluate(referenceId, approvedPaths)
+                                                                    showcaseStep = "result"
+                                                                    log("SDK decision: ${showcaseAssessment?.decision}")
+                                                                } catch (cancelled: CancellationException) {
+                                                                    throw cancelled
+                                                                } catch (error: Exception) {
+                                                                    showcaseAssessment = null
+                                                                    showcaseStep = "evaluation_error"
+                                                                    problem = "The SDK could not validate or compare the saved captures. No decision was produced."
+                                                                    log("SDK comparison failed: ${error.message}")
+                                                                }
+                                                            }
+                                                        }
+                                                    } else {
+                                                        showcaseStep = "result"
+                                                    }
                                                 }
                                             }
                                         }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
@@ -414,6 +466,18 @@ class MainActivity : ComponentActivity() {
                                     }
                                     ObjectGuide(showcasePositionIndex)
                                 }
+                                "evaluating" -> {
+                                    Text("Preparing the measured comparison", color = Cyan, fontSize = 20.sp)
+                                    Text("The SDK is validating saved capture provenance and deriving reference/current physics evidence. No model decision is running.", color = Muted, lineHeight = 21.sp)
+                                }
+                                "evaluation_error" -> {
+                                    Text("No integrity decision", color = Copper, fontFamily = FontFamily.Serif, fontSize = 28.sp)
+                                    Text(problem ?: "The SDK could not validate the saved evidence.", color = Sand, lineHeight = 21.sp)
+                                    Button(onClick = {
+                                        showcaseMode = null
+                                        showcaseStep = "name"
+                                    }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text("Done") }
+                                }
                                 "result" -> AnimatedVisibility(
                                     visible = true,
                                     enter = fadeIn(animationSpec = tween(420)) +
@@ -422,19 +486,31 @@ class MainActivity : ComponentActivity() {
                                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                         ResearchResultMark(
                                             saved = showcaseMode != "scan" && showcaseReferenceSaved,
-                                            inconclusive = showcaseMode == "scan",
+                                            inconclusive = showcaseMode == "scan" &&
+                                                showcaseAssessment?.decision == IntegrityDecision.INCONCLUSIVE,
                                         )
                                         if (showcaseMode == "scan") {
-                                            Text("INCONCLUSIVE", color = Copper, fontFamily = FontFamily.Serif, fontSize = 32.sp)
-                                            Text("The physical response was captured, but no validated identity decision is available.", color = Sand, fontSize = 18.sp)
-                                            Text(
-                                                if (availableNames.isEmpty()) {
-                                                    "Two measured sides were saved as private research data. Enroll an object first to create a comparison reference."
-                                                } else {
-                                                    "${availableNames.size} saved object(s) exist, but trained specialists and calibration are unavailable; this scan was not identified."
-                                                },
-                                                color = Muted, lineHeight = 21.sp
-                                            )
+                                            val assessment = showcaseAssessment
+                                            if (assessment == null) {
+                                                Text("No SDK assessment was returned.", color = Sand, fontSize = 18.sp)
+                                            } else {
+                                                Text(assessment.decision.name, color = Copper, fontFamily = FontFamily.Serif, fontSize = 32.sp)
+                                                Text(
+                                                    "The SDK derived current/reference features from ${assessment.positions.size} approved positions. This research reference is uncalibrated.",
+                                                    color = Sand, fontSize = 18.sp,
+                                                )
+                                                assessment.positions.forEach { comparison ->
+                                                    Text(
+                                                        "${comparison.position} · reference RMS ${format(comparison.reference.audioRms)} → current RMS ${format(comparison.current.audioRms)} · Δ ${format(comparison.current.audioRms - comparison.reference.audioRms)}",
+                                                        color = Sand, fontSize = 14.sp,
+                                                    )
+                                                }
+                                                Text(
+                                                    assessment.blockingReasons.joinToString(" · ") { it.replace('_', ' ').lowercase(Locale.ROOT) },
+                                                    color = Muted, lineHeight = 21.sp,
+                                                )
+                                                Text("Evidence pipeline ${assessment.pipelineVersion}; no confidence is reported.", color = Muted, lineHeight = 21.sp)
+                                            }
                                         } else if (showcaseReferenceSaved) {
                                             Text("Object added", color = Copper, fontFamily = FontFamily.Serif, fontSize = 32.sp)
                                             Text("$showcaseName has a two-side research reference.", color = Sand, fontSize = 18.sp)
@@ -445,7 +521,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                         showcaseProvenanceDigest?.let { Text("Capture provenance digest: ${it.take(24)}…", color = Muted, fontSize = 12.sp) }
                                         showcaseEvidence.forEach { (position, measured) -> ShowcaseEvidenceCard(position, measured) }
-                                        Text("Trained specialists, a Capybara Laya model, and calibration are unavailable. No identity decision or confidence is reported.", color = Muted, lineHeight = 21.sp)
+                                        Text("Evidence remains research-only. No calibrated integrity claim is available.", color = Muted, lineHeight = 21.sp)
                                         Button(onClick = {
                                             showcaseMode = null
                                             showcaseStep = "name"
@@ -634,7 +710,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private suspend fun createResearchBaseline(paths: List<String>): ResearchBaseline = withContext(Dispatchers.IO) {
-        SignatureVault(this@MainActivity).saveResearchBaseline(paths)
+        sdk.saveResearchBaseline(paths)
     }
 }
 

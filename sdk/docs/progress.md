@@ -288,6 +288,45 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   The user-prepared rigid-case A–D pilot remains pending.
 - Commit `2287498` was pushed to `codex/v6-handoff`.
 
+## Evidence-to-Laya integration slice (2026-10-10)
+
+- Added `Capybara.evaluate(referenceId, capturePaths)`. It authenticates the
+  Keystore-protected research reference, validates complete registered positions,
+  rejects reused capture IDs or sessions, reloads stored PCM/IMU, and verifies
+  stored metadata plus SHA-256 hashes before feature derivation.
+- The Evidence Engine now emits per-position `physics-v1` reference/current
+  descriptors and deltas without object/session/condition/annotation labels.
+  This is training-state-shaped evidence, not a tokenizer request or model
+  output. Non-finite values remain JSON null.
+- TrustGate is fail-closed: this path always returns `INCONCLUSIVE` with explicit
+  missing-specialist, missing-Laya, uncalibrated-reference and calibration
+  blockers. No MATCH/CHANGED threshold or confidence was added.
+- Added Android regression coverage for stored feature comparison, reference
+  metadata tampering and rejecting captures labeled as a different object.
+- `Capybara.evaluate` requires current capture object labels to match the
+  authenticated reference label. This prevents accidental cross-reference
+  comparisons; it does not prove physical identity. A host unit test covers the
+  shared label guard.
+- Tracing the app caller revealed Scan assigned a fresh random candidate object
+  label after reference selection, which the SDK correctly rejects. Scan now
+  captures under the selected reference's label while retaining its new session;
+  the app test checks that reference selection is required before capture.
+- Host-only verification passed:
+  `cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug :sdk:assembleDebugAndroidTest :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug :apk:assembleDebugAndroidTest`.
+  SDK unit regression, SDK/APK lint, SDK instrumentation compilation and APK
+  assembly passed. Instrumentation was not executed; no iQOO tests were run.
+- `sdk/captures/` does not exist. No real labeled captures, trained specialist
+  evidence or calibrated task checkpoint are available, so host integration
+  cannot safely call Laya or claim a decision. Upstream `laya-java` also states
+  Android is not implemented; the only exported graph is an untrained 1.69 GB
+  FP32 base artifact. See `sdk/docs/laya-integration.md`.
+- `adb devices -l` showed serial `5XVSGE8HJBIF55T8` (CPH2781IN) and
+  `emulator-5554`; neither is the authorized iQOO serial
+  `10BFBH1BH0001EY`. No device or emulator test was run.
+- The user instructed that no iQOO testing be done for now. Respect this pause
+  even if the authorized phone reconnects; do not test it unless the user changes
+  the instruction.
+
 ## Next acceptance milestones
 
 1. The user collects and labels real rigid-case A–D enrollment, unchanged

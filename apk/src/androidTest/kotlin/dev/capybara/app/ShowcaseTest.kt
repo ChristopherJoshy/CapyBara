@@ -14,12 +14,11 @@ import java.io.File
 class ShowcaseTest {
     @get:Rule val rule = createAndroidComposeRule<MainActivity>()
 
-    @Test fun scanStartsWithTwoSidePlacementAndNoNamePrompt() {
+    @Test fun scanRequiresAReferenceBeforeCapture() {
         rule.onNodeWithText("Scan").performClick()
-        rule.onNodeWithText("Place the phone on the object.", substring = true).assertIsDisplayed()
-        rule.onNodeWithText("Side 1 of 2", substring = true).assertIsDisplayed()
-        rule.onNodeWithText("Capture side 1", substring = true).assertIsDisplayed()
+        rule.onNodeWithText("Choose the saved two-side reference to compare.").assertIsDisplayed()
         rule.onNodeWithText("Object name").assertDoesNotExist()
+        rule.onNodeWithText("Capture side 1", substring = true).assertDoesNotExist()
         snapshot("scan-start")
     }
 

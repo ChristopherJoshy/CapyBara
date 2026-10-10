@@ -17,7 +17,7 @@ import javax.crypto.spec.GCMParameterSpec
 data class ResearchBaseline(val id: String, val objectId: String, val profile: String, val createdAtMillis: Long)
 
 /** Immutable measured baselines. They do not imply calibrated enrollment or integrity. */
-class SignatureVault(context: Context) {
+internal class SignatureVault(context: Context) {
     private val captureRoot = File(context.noBackupFilesDir, "capybara/captures").canonicalFile
     private val root = File(context.noBackupFilesDir, "capybara/references")
 

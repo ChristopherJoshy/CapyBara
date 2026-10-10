@@ -6,13 +6,14 @@ Capybara is an offline Android physical-measurement SDK and demonstration app. I
 
 ## Current verified state
 
-- Connected test device: iQOO I2501, Android 16 / API 36, `arm64-v8a`, serial `10BFBH1BH0001EY` (build fingerprint `iQOO/I2501i/I2501`).
+- Last verified iQOO: I2501, Android 16 / API 36, `arm64-v8a`, serial `10BFBH1BH0001EY` (build fingerprint `iQOO/I2501i/I2501`). Current `adb devices -l` does not list that serial; it lists `5XVSGE8HJBIF55T8` (CPH2781IN) and `emulator-5554`. Neither was used for Capybara testing.
 - New-phone capability inventory: Android reports 48 kHz output / 144 frames and unprocessed-source support; built-in speaker type 2 advertises 48 kHz stereo and built-in microphone type 15 advertises 48 kHz. `VibratorManager` exposes IDs 0 and 1, both present with amplitude control; resonant frequency is `NaN` and envelope effects are unsupported. These are capability reports, not achieved-rate or physical-response measurements.
 - Real `AudioRecord` microphone capture, stereo `AudioTrack` excitation request, IMU capture, finite haptic excitation, cancellation cleanup, private atomic capture storage and CPU DSP are implemented.
 - The device exposes two vibrator IDs. On API 31+, Capybara requests the same finite waveform on all exposed IDs through `CombinedVibration`; Android does not expose independent-axis semantics for them.
 - Encrypted immutable research baselines are profile-scoped and use Android
   Keystore AES-GCM: four positions for the controlled `rigid_case` protocol and
   two sides for the generic `showcase_object` flow. Both remain uncalibrated.
+- `Capybara.evaluate(referenceId, paths)` authenticates the encrypted reference, checks sealed capture metadata and PCM/IMU hashes, requires the current capture's user-entered object label to match the selected reference label (not proof of physical identity), derives per-position reference/current physics features and deltas on CPU, and returns explicit TrustGate blockers. Its current result remains `INCONCLUSIVE`; it does not run Laya inference.
 - The profile catalog separates `rigid_case` A–D research capture from the
   `showcase_object` SIDE_1/SIDE_2 acquisition flow. The latter accepts any stable
   box/object as raw input; this does not establish cross-object generalization.
@@ -27,11 +28,11 @@ Capybara is an offline Android physical-measurement SDK and demonstration app. I
 ## What is not yet claimed
 
 No task-specific V6 specialist weights, labeled physical-integrity dataset,
-calibration, trained Capybara-Laya checkpoint, Android ONNX parity, TrustGate
-calibration, integrity accuracy, or full offline MATCH/CHANGED decision is
-currently verified. The base Laya host smoke test is not physical evidence. A
-separate UCI fan-vibration candidate was trained on public labels, but it is not
-a Capybara model and is not integrated. Missing prerequisites produce
+calibration, trained Capybara-Laya checkpoint, Android ONNX parity, calibrated
+TrustGate acceptance, integrity accuracy, or full offline MATCH/CHANGED decision
+is currently verified. The base Laya host smoke test is not physical evidence.
+A separate UCI fan classifier was trained on public labels, but it is not a
+Capybara model and is not integrated. Missing prerequisites produce
 unavailable/INCONCLUSIVE behavior; the app never substitutes a threshold
 classifier or fabricated result.
 
@@ -39,10 +40,11 @@ The showcase accepts any stable box or object through two real contact-side
 captures. Enrollment asks for a name, captures and reviews side 1, asks the user
 to turn the phone, then captures and reviews side 2. Only a complete approved
 pair creates an encrypted uncalibrated research reference and provenance digest;
-partial/rejected captures are not listed as enrolled objects. Scan uses the same
-two-side approve/retry/reject flow without a name and remains `INCONCLUSIVE`
-until validated comparison models and calibration exist. The digest is not an
-identity signature.
+partial/rejected captures are not listed as enrolled objects. Scan requires an
+explicit saved reference, then the SDK derives actual per-position current and
+reference features. TrustGate remains `INCONCLUSIVE` because trained specialists,
+Capybara-Laya inference and calibration are unavailable; no confidence is shown.
+The digest is not an identity signature.
 
 ## Repository
 
@@ -63,10 +65,10 @@ cmd.exe /c gradlew.bat testDebugUnitTest assembleDebug
 Full SDK/DSP host verification passed:
 
 ```powershell
-cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug
+cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug :sdk:assembleDebugAndroidTest :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebug :apk:assembleDebugAndroidTest
 ```
 
-Showcase UI verification also passed:
+Showcase UI and instrumentation APK compilation:
 
 ```powershell
 cmd.exe /c gradlew.bat :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebugAndroidTest :apk:assembleDebug
@@ -80,6 +82,8 @@ and was rejected; Status afterward reported microphone permission granted,
 zero persisted captures/baselines and `Ready`. No accepted object-labeled data,
 physical pilot or integrity decision resulted; capability reports do not prove
 speaker or motor actuation.
+
+No device tests were performed in this continuation; the user paused iQOO testing.
 
 Install only the Capybara package on the verified device:
 
