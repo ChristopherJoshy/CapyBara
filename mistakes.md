@@ -140,3 +140,12 @@ and restricts evidence values to finite numbers or `null`. Training tests cover
 obfuscated keys, text, booleans, null, and valid numeric features. This cannot
 prove that a number is semantically independent of an annotation; review every
 feature producer and never treat schema validation as proof of independence.
+
+## 2026-10-10: training import must verify embedded capture digests
+
+`prepare.capture` included raw audio and IMU hashes in the dataset manifest but
+did not compare them with `audioSha256` and `imuSha256` stored in the source
+capture metadata. A same-length edit could pass the PCM-size check while the
+provenance record remained stale. The preparer now verifies both embedded hashes;
+regression coverage flips one byte in each file and confirms rejection. These
+unkeyed hashes detect inconsistency, not an attacker rewriting files and hashes.

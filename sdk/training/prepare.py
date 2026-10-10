@@ -101,7 +101,12 @@ def capture(root, relative):
     imu = safe_path(root, str(path.parent.relative_to(root) / "imu.csv"))
     if pcm.stat().st_size != 2 * meta["sampleCount"]:
         raise ValueError("PCM16 byte count does not match metadata")
-    return meta, {str(p.relative_to(root)): digest(p) for p in (path, pcm, imu)}
+    files = {str(item.relative_to(root)): digest(item) for item in (path, pcm, imu)}
+    if meta.get("audioSha256") != files[str(pcm.relative_to(root))]:
+        raise ValueError("Audio PCM digest does not match capture metadata")
+    if meta.get("imuSha256") != files[str(imu.relative_to(root))]:
+        raise ValueError("IMU digest does not match capture metadata")
+    return meta, files
 
 
 def validate_row(row, root):

@@ -368,6 +368,17 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 - `sdk/training/test_training.py` passed all 10 tests, including the capture-pair
   validation path. No physical data was used.
 
+## Training capture digest verification (2026-10-10)
+
+- The preparer hashed PCM/IMU files for its manifest but did not compare them
+  with `audioSha256` and `imuSha256` embedded by `CaptureStore`. Same-length file
+  edits could therefore enter the dataset under stale capture metadata.
+- `prepare.capture` now verifies both embedded digests before accepting provenance.
+  The schema regression mutates one byte in each artifact without changing length
+  and confirms the capture is rejected; all 10 training tests pass.
+- This detects file/metadata inconsistency, not a malicious actor able to rewrite
+  both the artifact and its unkeyed metadata digest.
+
 ## Next acceptance milestones
 
 1. The user collects and labels real rigid-case A–D enrollment, unchanged

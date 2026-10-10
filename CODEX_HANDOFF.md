@@ -147,6 +147,9 @@ Reproduce the scratch baseline with:
   or booleans from carrying labels under innocent keys. `sdk/training/test_training.py`
   passed all 10 tests; leakage regressions exercise capture-pair admission as
   well as the value/key guard. This schema guard cannot prove semantic independence.
+- `prepare.capture` now requires the source capture's `audioSha256` and
+  `imuSha256` to match the actual files. Training tests passed, including
+  same-length audio/IMU tamper cases using schema-only fixtures.
 - The licensed KAIST data and these adjacent datasets were not downloaded or used for task-model training; using their unrelated labels would not create Capybara specialists.
 
 ## Immediate continuation order

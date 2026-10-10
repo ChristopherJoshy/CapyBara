@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from prepare import (QUESTIONS, capture, check_split, connected_groups, safe_path,
-                     validate_row, check_values, prepare, load_prepared)
+                     validate_row, check_values, prepare, load_prepared, digest)
 from run_laya import SPECIALISTS, validate_training
 
 
@@ -117,9 +117,13 @@ class TrainingSafetyTests(unittest.TestCase):
                             "sampleCount": 1, "startedBootNanos": 1, "endedBootNanos": 2,
                             "label": {"objectId": str(group), "sessionId": str(group),
                                       "condition": "schema-fixture", "profile": "test", "position": "A"}}
+                    audio_path = folder / "audio.pcm"
+                    audio_path.write_bytes(b"\0\0")
+                    imu_path = folder / "imu.csv"
+                    imu_path.write_text("type,timestampNanos,x,y,z\n")
+                    meta["audioSha256"] = digest(audio_path)
+                    meta["imuSha256"] = digest(imu_path)
                     (folder / "metadata.json").write_text(json.dumps(meta))
-                    (folder / "audio.pcm").write_bytes(b"\0\0")
-                    (folder / "imu.csv").write_text("type,timestampNanos,x,y,z\n")
                 evidence = {"captureId": str(group) + "current", "referenceCaptureId": str(group) + "reference",
                             "pipelineVersion": "physics-v1", "values": {"schemaFixture": group}}
                 (root / (str(group) + "current") / "evidence.json").write_text(json.dumps(evidence))
@@ -136,6 +140,13 @@ class TrainingSafetyTests(unittest.TestCase):
                 with self.subTest(values=values), self.assertRaises(ValueError):
                     validate_row(annotations[0], root)
             evidence_path.write_text(original_evidence)
+            for name, message in (("audio.pcm", "Audio PCM digest"), ("imu.csv", "IMU digest")):
+                artifact = root / "0current" / name
+                original = artifact.read_bytes()
+                artifact.write_bytes(bytes((original[0] ^ 1,)) + original[1:])
+                with self.subTest(artifact=name), self.assertRaisesRegex(ValueError, message):
+                    capture(root, "0current/metadata.json")
+                artifact.write_bytes(original)
             index = root / "annotations.jsonl"
             index.write_text("\n".join(json.dumps(item) for item in annotations))
             out = root / "prepared"
