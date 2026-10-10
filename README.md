@@ -59,6 +59,67 @@ The digest is not an identity signature.
 - `sdk/training/` — real-data schema validation, pinned Laya preparation, training and export/parity workflow. It refuses incomplete or fabricated inputs.
 - `CODEX_HANDOFF.md` — verified continuation state and next Codex actions.
 
+## SDK integration
+
+The SDK is currently a local Gradle module, not a published Maven artifact:
+
+```kotlin
+dependencies {
+    implementation(project(":sdk"))
+}
+```
+
+The consumer must target API 29 or newer and request `RECORD_AUDIO` at runtime.
+The library manifest declares `RECORD_AUDIO`, `VIBRATE`, and
+`HIGH_SAMPLING_RATE_SENSORS`; Android users must grant microphone access before
+capture. Call capture from a lifecycle-aware coroutine and save files on an IO
+dispatcher:
+
+```kotlin
+import android.content.Context
+import dev.capybara.sdk.Capybara
+import dev.capybara.sdk.CaptureLabel
+import dev.capybara.sdk.ProfileEngine
+import dev.capybara.sdk.ResearchBaseline
+import dev.capybara.sdk.Scan
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.util.UUID
+
+suspend fun recordShowcaseReference(
+    context: Context,
+    objectName: String,
+    approveCapture: suspend (String, Scan) -> Boolean,
+): ResearchBaseline? {
+    val capybara = Capybara(context)
+    val profile = capybara.getProfile(ProfileEngine.SHOWCASE_OBJECT_ID)
+    val sessionId = UUID.randomUUID().toString()
+    val paths = mutableListOf<String>()
+
+    for (position in profile.positions) {
+        val scan = capybara.capture(
+            CaptureLabel(objectName, sessionId, "initial", position, profile.id)
+        )
+        if (!approveCapture(position, scan)) return null
+        paths += withContext(Dispatchers.IO) { capybara.saveCapture(scan) }
+    }
+
+    return withContext(Dispatchers.IO) { capybara.saveResearchBaseline(paths) }
+}
+```
+
+This SDK-level example leaves turn prompts and retry controls to the caller.
+`approveCapture` must await a real user decision; rejecting aborts the run
+without creating a reference, while earlier saved captures remain private
+research data. Call `saveResearchBaseline` only after all profile positions are
+approved. For each verification, use a distinct session ID and capture every
+registered position, then call
+`capybara.evaluate(reference.id, currentCapturePaths)`. The current decision is
+`INCONCLUSIVE` without trained specialists and calibration; this API does not
+claim a physical identity fingerprint or calibrated verification.
+See [`sdk/docs/experiments.md`](sdk/docs/experiments.md) and
+[`sdk/training/README.md`](sdk/training/README.md) for data and evaluation rules.
+
 ## Build
 
 ```powershell
