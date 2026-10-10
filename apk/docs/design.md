@@ -7,9 +7,10 @@ mission statement; evidence and controls are quiet and aligned.
 
 The judge-facing home is intentionally sparse. No visible V6 label or model-training
 explanation appears on the main screens. A hamburger-only modal sidebar contains
-Status, Logs, Capture setup and scientific details. Missing checkpoints, calibration
-and unavailable verification remain truthfully reported in Status; verification
-stays disabled. Logs contain only actual Capybara operations, never other apps' logs.
+Status, Logs, Capture setup, and scientific details.
+Missing specialist checkpoints and calibration are shown truthfully in Status.
+Calibrated verification is unavailable; Scan remains a research
+capture/comparison flow and ends `INCONCLUSIVE`.
 The showcase supports any stable box or object with two real contact-side
 captures. Enrollment asks for a name, captures side 1, prompts the user to turn
 the phone, captures side 2, and reviews both responses. Only a complete approved
@@ -45,3 +46,36 @@ Motion uses Compose value-based animations
 ([official guide](https://developer.android.com/develop/ui/compose/animation/value-based))
 and respects the resolved Compose Animation 1.12.1 Animator duration-scale
 support ([release notes](https://developer.android.com/jetpack/androidx/releases/compose-animation)).
+
+## Navigation and runtime behavior
+
+- Home opens **Enroll object** or **Scan**. Enrollment asks for a name, captures
+  and reviews side 1, prompts the user to turn the object, then captures and
+  reviews side 2. Scan first requires a saved two-side research reference and
+  uses the same real capture/review flow without asking for a new name.
+- Each captured side can be approved, retried, or rejected. Only approval moves
+  the flow forward; only two approved sides create an encrypted research
+  reference. A completed capture is not a calibrated physical fingerprint.
+- The hamburger menu contains Status, Logs, and Capture setup. Status shows
+  actual capability reports and model/calibration blockers; technical details
+  expose recorded capture metadata. Logs are limited to Capybara operations.
+- The app requests `RECORD_AUDIO` at the first capture that needs it. The SDK
+  declares `VIBRATE` and `HIGH_SAMPLING_RATE_SENSORS`; microphone permission is
+  runtime-gated. The APK requires microphone hardware and declares no camera or
+  internet dependency.
+
+## Test procedure and evidence boundary
+
+Host checks use the checked-in wrapper:
+
+```powershell
+cmd.exe /c gradlew.bat :apk:testDebugUnitTest :apk:lintDebug :apk:assembleDebugAndroidTest :apk:assembleDebug
+```
+
+Instrumentation compilation is not device execution. A physical procedure must
+use the verified Capybara device and package, obtain microphone permission, and
+follow `sdk/docs/experiments.md`; never describe emulator or host output as
+physical evidence. The iQOO test pause remains active: do not run ADB, install,
+capture, or take new screenshots until the user lifts it. `screenshots/` is
+currently empty; only genuine application screenshots may be added after an
+authorized device pass.

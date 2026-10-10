@@ -55,6 +55,7 @@ The digest is not an identity signature.
 
 - `sdk/` — Android library, acquisition, DSP, storage, training and evaluation.
 - `apk/` — Compose demonstration app consuming `sdk/`.
+- `apk/docs/design.md` — verified screen flow, permissions, motion, test procedure and screenshot policy.
 - `sdk/docs/` — architecture, device capability, sensing, experiments, model and progress records.
 - `sdk/training/` — real-data schema validation, pinned Laya preparation, training and export/parity workflow. It refuses incomplete or fabricated inputs.
 - `CODEX_HANDOFF.md` — verified continuation state and next Codex actions.
