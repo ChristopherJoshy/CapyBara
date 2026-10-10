@@ -127,6 +127,15 @@ class TrainingSafetyTests(unittest.TestCase):
                                     "reference": str(group) + "reference/metadata.json",
                                     "evidence": str(group) + "current/evidence.json", "runId": str(group),
                                     "label": "MATCH", "annotator": "schema-test", "labelledAtUtc": "2026-10-09T00:00:00Z"})
+            evidence_path = root / "0current" / "evidence.json"
+            original_evidence = evidence_path.read_text()
+            evidence = json.loads(original_evidence)
+            for values in ({"quality": "CHANGED"}, {"expectedLabel": 1}):
+                evidence["values"] = values
+                evidence_path.write_text(json.dumps(evidence))
+                with self.subTest(values=values), self.assertRaises(ValueError):
+                    validate_row(annotations[0], root)
+            evidence_path.write_text(original_evidence)
             index = root / "annotations.jsonl"
             index.write_text("\n".join(json.dumps(item) for item in annotations))
             out = root / "prepared"

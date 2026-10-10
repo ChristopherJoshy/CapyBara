@@ -365,7 +365,8 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   only finite numbers or `null` as evidence values. Regression coverage preserves
   real numeric features and null missing values; this lexical/value-type gate
   cannot prove semantic independence.
-- `sdk/training/test_training.py` passed all 10 tests. No physical data was used.
+- `sdk/training/test_training.py` passed all 10 tests, including the capture-pair
+  validation path. No physical data was used.
 
 ## Next acceptance milestones
 

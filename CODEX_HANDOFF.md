@@ -143,9 +143,10 @@ Reproduce the scratch baseline with:
 - `:sdk:assembleDebug :apk:assembleDebug :apk:lintDebug` passed afterward, confirming
   the app still builds against the updated SDK.
 - `sdk/training/prepare.py` now rejects common nested annotation/identity key
-  variants and restricts evidence to finite numbers or `null`; text/booleans
-  cannot hide labels under innocuous keys. `sdk/training/test_training.py` passed
-  all 10 tests. This schema guard cannot prove semantic independence.
+  variants and restricts evidence to finite numbers or `null`, preventing text
+  or booleans from carrying labels under innocent keys. `sdk/training/test_training.py`
+  passed all 10 tests; leakage regressions exercise capture-pair admission as
+  well as the value/key guard. This schema guard cannot prove semantic independence.
 - The licensed KAIST data and these adjacent datasets were not downloaded or used for task-model training; using their unrelated labels would not create Capybara specialists.
 
 ## Immediate continuation order
