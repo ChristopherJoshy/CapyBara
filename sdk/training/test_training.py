@@ -117,6 +117,7 @@ class TrainingSafetyTests(unittest.TestCase):
                     meta = {"schemaVersion": 1, "captureId": cid, "sampleRate": 48000,
                             "sampleCount": 1, "pcmEncoding": "signed_pcm16_little_endian_mono",
                             "startedBootNanos": 1, "endedBootNanos": 2,
+                            "metadata": {"audioSampleCount": "1", "audioExpectedSamples": "1"},
                             "label": {"objectId": str(group), "sessionId": str(group),
                                       "condition": "schema-fixture", "profile": "test", "position": "A"}}
                     audio_path = folder / "audio.pcm"
@@ -142,6 +143,25 @@ class TrainingSafetyTests(unittest.TestCase):
                 with self.subTest(values=values), self.assertRaises(ValueError):
                     validate_row(annotations[0], root)
             evidence_path.write_text(original_evidence)
+            current_meta_path = root / "0current" / "metadata.json"
+            current_meta = json.loads(current_meta_path.read_text())
+            current_meta["metadata"]["audioExpectedSamples"] = "2"
+            current_meta_path.write_text(json.dumps(current_meta))
+            with self.assertRaisesRegex(ValueError, "must be labeled INCONCLUSIVE"):
+                validate_row(annotations[0], root)
+            annotations[0]["label"] = "INCONCLUSIVE"
+            self.assertEqual(validate_row(annotations[0], root)["expected"]["integrity"], "INCONCLUSIVE")
+            annotations[0]["label"] = "MATCH"
+            current_meta["metadata"]["audioExpectedSamples"] = "1"
+            current_meta_path.write_text(json.dumps(current_meta))
+            reference_meta_path = root / "0reference" / "metadata.json"
+            reference_meta = json.loads(reference_meta_path.read_text())
+            reference_meta["metadata"]["audioSampleCount"] = "0"
+            reference_meta_path.write_text(json.dumps(reference_meta))
+            with self.assertRaisesRegex(ValueError, "Reference capture audio is incomplete"):
+                validate_row(annotations[0], root)
+            reference_meta["metadata"]["audioSampleCount"] = "1"
+            reference_meta_path.write_text(json.dumps(reference_meta))
             for name, message in (("audio.pcm", "Audio PCM digest"), ("imu.csv", "IMU digest")):
                 artifact = root / "0current" / name
                 original = artifact.read_bytes()

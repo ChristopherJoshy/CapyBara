@@ -150,3 +150,13 @@ The preparer now checks both embedded digests and requires
 `signed_pcm16_little_endian_mono`. Regressions flip one byte in each artifact and
 change the encoding label; all are rejected. These unkeyed hashes detect file
 inconsistency, not an attacker rewriting both artifacts and metadata.
+
+## 2026-10-10: training labels must respect audio completeness
+
+`SignatureVault` rejected enrollment baselines unless stored, expected, and
+reported audio sample counts matched, but the independent training preparer did
+not apply that invariant. A partial reference or a partial current capture labeled
+`MATCH`/`CHANGED` could enter training. The preparer now requires complete audio
+for references and permits an incomplete current capture only as `INCONCLUSIVE`;
+schema regressions cover both boundaries. Keep the Python admission rule aligned
+with `hasCompleteAudioCapture` when that SDK invariant changes.

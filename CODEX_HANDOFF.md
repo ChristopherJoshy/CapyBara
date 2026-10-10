@@ -152,6 +152,10 @@ Reproduce the scratch baseline with:
   including unsupported-encoding and same-length audio/IMU tamper cases using
   schema-only fixtures. Digest enforcement was pushed as `c25035d`.
 - PCM format enforcement was pushed as `09a73c4`.
+- Training admission now mirrors `SignatureVault` sample completeness: references
+  require stored/expected/reported counts to match, and incomplete current audio
+  is allowed only as `INCONCLUSIVE`. Regression tests pass; no physical captures
+  were used.
 - The licensed KAIST data and these adjacent datasets were not downloaded or used for task-model training; using their unrelated labels would not create Capybara specialists.
 
 ## Immediate continuation order

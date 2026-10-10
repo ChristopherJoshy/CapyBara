@@ -381,6 +381,14 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 - Digest enforcement was pushed as `c25035d`; format validation is in this slice.
 - Format validation was pushed as `09a73c4`.
 
+## Training incomplete-audio label guard (2026-10-10)
+
+- Dataset preparation now applies the same stored/expected/reported sample-count
+  invariant as `SignatureVault`: incomplete reference captures are rejected, and
+  an incomplete current capture is admitted only with an `INCONCLUSIVE` label.
+- All 10 training tests pass, including complete, partial-current, and partial-
+  reference schema fixtures. No physical data was used.
+
 ## Next acceptance milestones
 
 1. The user collects and labels real rigid-case A–D enrollment, unchanged

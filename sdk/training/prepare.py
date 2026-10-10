@@ -109,6 +109,16 @@ def capture(root, relative):
     if meta.get("imuSha256") != files[str(imu.relative_to(root))]:
         raise ValueError("IMU digest does not match capture metadata")
     return meta, files
+def complete_audio(meta):
+    measurement = meta.get("metadata")
+    if not isinstance(measurement, dict):
+        return False
+    expected, reported = measurement.get("audioExpectedSamples"), measurement.get("audioSampleCount")
+    if not all(isinstance(value, str) and value.isascii() and value.isdecimal()
+               for value in (expected, reported)):
+        return False
+    expected, reported = int(expected), int(reported)
+    return expected > 0 and meta["sampleCount"] == expected == reported
 
 
 def validate_row(row, root):
@@ -121,6 +131,10 @@ def validate_row(row, root):
         raise ValueError("Label timestamp must include a timezone")
     current, hashes = capture(root, row.get("capture"))
     reference, ref_hashes = capture(root, row.get("reference"))
+    if not complete_audio(reference):
+        raise ValueError("Reference capture audio is incomplete")
+    if not complete_audio(current) and row["label"] != "INCONCLUSIVE":
+        raise ValueError("Incomplete current audio must be labeled INCONCLUSIVE")
     hashes.update(ref_hashes)
     if current["captureId"] == reference["captureId"]:
         raise ValueError("Verification must use a separate capture from enrollment")

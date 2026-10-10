@@ -73,8 +73,10 @@ primitive producer has not demonstrated SpatialNet evidence.
 ```
 
 Preparation verifies embedded audio/IMU digests, the declared mono PCM16
-little-endian encoding, PCM byte counts, labels, timestamps, matching object,
-profile and position, reference/evidence identity,
+little-endian encoding, PCM byte counts, and SignatureVault's complete-audio
+invariant: references must match stored, expected, and reported sample counts;
+an incomplete current capture can only carry the `INCONCLUSIVE` label. It also
+checks labels, timestamps, matching object, profile and position, reference/evidence identity,
 obvious annotation/identity-key leakage (recursively, including common
 snake_case, camelCase and acronym spellings), and artifacts confined to the capture
 root. This lexical guard cannot prove semantic independence; review every evidence
