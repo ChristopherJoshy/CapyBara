@@ -3,7 +3,9 @@
 2026-10-10 (Asia/Calcutta). Work in progress; the complete V6 goal is not done.
 
 - Requested upstream cloned into the workspace. Repository was empty.
-- Connected device: iQOO I2501, Android 16 API 36, arm64-v8a, serial `10BFBH1BH0001EY`.
+- Last verified connected device (2026-10-10): iQOO I2501, Android 16 API 36,
+  arm64-v8a, serial `10BFBH1BH0001EY`. No current connectivity check during
+  the user's iQOO testing pause.
 - JDK 21.0.12.1, Gradle 9.6.0, cached AGP 9.4.1, platform API37 and build-tools36.
 - `:sdk:compileDebugKotlin`, `:sdk:testDebugUnitTest`, and `assembleDebug` pass.
 - Capture uses Android's real `AudioRecord`, `AudioTrack`, SensorManager, and VibratorManager APIs. On API31+ it requests the identical finite waveform on every exposed vibrator ID through `CombinedVibration`; independent motor-axis control remains unavailable.

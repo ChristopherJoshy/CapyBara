@@ -4,12 +4,12 @@
 
 Capybara is an offline Android physical-measurement SDK and demonstration app. It uses the phone's real audio output, microphone, vibration actuators, accelerometer and gyroscope to record how a contacted object responds. Raw measurements remain private on the device and retain timing, routing, excitation-request and quality provenance.
 
-## Current verified state
+## Last verified implementation and evidence
 
-- Last verified iQOO: I2501, Android 16 / API 36, `arm64-v8a`, serial `10BFBH1BH0001EY` (build fingerprint `iQOO/I2501i/I2501`). Current `adb devices -l` does not list that serial; it lists `5XVSGE8HJBIF55T8` (CPH2781IN) and `emulator-5554`. Neither was used for Capybara testing.
-- New-phone capability inventory: Android reports 48 kHz output / 144 frames and unprocessed-source support; built-in speaker type 2 advertises 48 kHz stereo and built-in microphone type 15 advertises 48 kHz. `VibratorManager` exposes IDs 0 and 1, both present with amplitude control; resonant frequency is `NaN` and envelope effects are unsupported. These are capability reports, not achieved-rate or physical-response measurements.
+- Last successful iQOO identity report (2026-10-10): I2501, Android 16 / API 36, `arm64-v8a`, serial `10BFBH1BH0001EY` (build fingerprint `iQOO/I2501i/I2501`). A later recorded ADB listing showed only `5XVSGE8HJBIF55T8` (CPH2781IN) and `emulator-5554`; neither was used for Capybara testing. Current device connectivity is unknown because iQOO testing is paused.
+- Historical capability report (2026-10-10): Android advertised 48 kHz output / 144 frames and unprocessed-source support; built-in speaker type 2 advertised 48 kHz stereo and built-in microphone type 15 advertised 48 kHz. `VibratorManager` exposed IDs 0 and 1, both present with amplitude control; resonant frequency was `NaN` and envelope effects unsupported. These reports do not establish current availability, achieved rates, routing or physical response.
 - Real `AudioRecord` microphone capture, stereo `AudioTrack` excitation request, IMU capture, finite haptic excitation, cancellation cleanup, private atomic capture storage and CPU DSP are implemented.
-- The device exposes two vibrator IDs. On API 31+, Capybara requests the same finite waveform on all exposed IDs through `CombinedVibration`; Android does not expose independent-axis semantics for them.
+- The 2026-10-10 inventory reported two vibrator IDs. On API 31+, Capybara requests the same finite waveform on every exposed ID through `CombinedVibration`; Android does not expose independent-axis semantics for them.
 - Encrypted immutable research baselines are profile-scoped and use Android
   Keystore AES-GCM: four positions for the controlled `rigid_case` protocol and
   two sides for the generic `showcase_object` flow. Both remain uncalibrated.
@@ -24,7 +24,7 @@ Capybara is an offline Android physical-measurement SDK and demonstration app. I
   same excitation on left and right outputs, and haptics are requested on every
   exposed vibrator ID when Android reports them. These are requests, not proof
   of physical transducer onset.
-- A previous handset capture on serial `10BFAT1UT2000XP` recorded 48 kHz PCM and approximately 462 Hz accelerometer/gyroscope event rates. On the new handset, one unlabelled acquisition reached review and was rejected; Status afterward showed zero persisted captures and baselines. Neither run is training or accuracy evidence.
+- A historical capture on serial `10BFAT1UT2000XP` recorded 48 kHz PCM and approximately 462 Hz accelerometer/gyroscope event rates. The 2026-10-10 iQOO smoke acquisition was unlabelled, reached review and was rejected; Status afterward showed zero persisted captures and baselines. Neither run is training or accuracy evidence.
 - The isolated training environment now runs CPU PyTorch and the pinned Laya source. The licensed English Laya base checkpoint loaded locally; its host ONNX export (1,685,258,240-byte external FP32 weights) matched eager output on one generic email example. Its shipped temperature is invalid/clamped, so confidence is uncalibrated; this checkpoint is not packaged or used for physical decisions.
 - MOMENT-1-small was evaluated as a frozen encoder on the public UCI fan split and underperformed the scratch fan baseline (55.56% versus 67.63% test accuracy). Neither fan result is Capybara integrity evidence; MOMENT is not promoted.
 
@@ -92,22 +92,17 @@ Downstream SDK/APK integration build and APK lint also passed:
 cmd.exe /c gradlew.bat :sdk:assembleDebug :apk:assembleDebug :apk:lintDebug
 ```
 
-The APK unit-test task is `NO-SOURCE`; Android instrumentation was compiled
-but not executed. The APK was installed on `10BFBH1BH0001EY`; its home, status,
-technical-details and Scan placement screens rendered. The final Scan view
-showed the complete capture action. One unlabelled acquisition reached review
-and was rejected; Status afterward reported microphone permission granted,
-zero persisted captures/baselines and `Ready`. No accepted object-labeled data,
-physical pilot or integrity decision resulted; capability reports do not prove
-speaker or motor actuation.
+Historical device smoke (2026-10-10; not a current test): the APK was installed
+on `10BFBH1BH0001EY`; its home, status, technical-details and Scan placement
+screens rendered. One unlabelled acquisition reached review and was rejected;
+Status afterward reported microphone permission granted, zero persisted
+captures/baselines and `Ready`. No accepted object-labeled data, physical pilot
+or integrity decision resulted; capability reports do not prove speaker or
+motor actuation.
 
 No device tests were performed for the partial-capture guard; the user paused iQOO testing.
 
-Install only the Capybara package on the verified device:
-
-```powershell
-adb -s 10BFBH1BH0001EY install -r apk/build/outputs/apk/debug/apk-debug.apk
-```
+No device interaction is permitted during the active iQOO testing pause.
 
 The runtime has no `INTERNET` permission. Do not operate on packages named Hacker Tracker or Register.
 

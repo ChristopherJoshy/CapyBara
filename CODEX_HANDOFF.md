@@ -32,9 +32,13 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
 ## Verified project state
 
 - Android SDK and Compose demo are present. The SDK uses real `AudioRecord`, `AudioTrack`, `SensorManager` and `VibratorManager` APIs, CPU DSP, cancellation cleanup, private atomic capture storage and Android Keystore-protected baselines.
-- The current verified device is iQOO I2501 / Android 16 API 36 / `arm64-v8a`, serial `10BFBH1BH0001EY`. Android exposes vibrator IDs 0 and 1; the app requests the same finite waveform on both. Capability reporting does not establish independent axes or physical onset/speaker activation.
-- Latest `adb devices -l` did not show the authorized iQOO serial; it showed
-  `5XVSGE8HJBIF55T8` (CPH2781IN) and `emulator-5554`. Do not operate either.
+- Last successful iQOO identity/capability report is historical (2026-10-10):
+  I2501 / Android 16 API 36 / `arm64-v8a`, serial `10BFBH1BH0001EY`; Android
+  reported vibrator IDs 0 and 1. Capability advertising does not establish
+  achieved rates, current connectivity, independent axes or physical onset.
+- A later recorded `adb devices -l` listing showed only `5XVSGE8HJBIF55T8`
+  (CPH2781IN) and `emulator-5554`; neither is authorized. Current device
+  connectivity is unknown. Do not query devices during the user's pause.
 - The current showcase uses two generic contact sides (`SIDE_1`, `SIDE_2`).
   Enrollment names the object and saves the approved raw captures plus an
   Android Keystore AES-GCM encrypted `RESEARCH_BASELINE_UNCALIBRATED` reference
