@@ -175,6 +175,12 @@ Reproduce the scratch baseline with:
   user's pause. Hardware values remain a human/device prerequisite.
 - The licensed KAIST data and these adjacent datasets were not downloaded or used for task-model training; using their unrelated labels would not create Capybara specialists.
 
+- Kaggle CLI 2.2.4 is installed. A safe credential-status check found configured
+  credentials, and read-only `kaggle kernels list --mine` succeeded; output and
+  account identity were suppressed. No `sdk/captures/`, prepared dataset, or
+  specialist manifest exists, so no training job was launched and GPU availability
+  remains unverified.
+
 ## Immediate continuation order
 
 1. Keep the rebuilt Capybara APK installed and preserve its private data.

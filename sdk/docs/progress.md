@@ -418,6 +418,15 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   actual iQOO observations. All iQOO-specific values remain explicitly unmeasured.
 - No ADB or device command was run because the user's pause remains active.
 
+## Kaggle readiness check (2026-10-10)
+
+- Kaggle CLI 2.2.4 is installed; `kernels` exposes `push`, `status`, `logs`,
+  and `output`. Credentials are configured and a read-only `kernels list --mine`
+  request succeeded; account details and credential values were suppressed.
+- `sdk/captures/`, the prepared dataset, and the specialist manifest are absent.
+  No notebook was launched and no GPU availability was asserted; no valid
+  task-specific training input exists.
+
 ## Next acceptance milestones
 
 1. After the user's iQOO pause is lifted, collect and label real rigid-case A–D
