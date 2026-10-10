@@ -88,11 +88,28 @@ timing. This bound covers clock-read uncertainty, not unknown hardware latency.
 Positive RMS or spectral energy cannot establish good contact or object/self
 response separation; these remain unavailable without experimental calibration.
 
+## Route and haptic excitation guards
+
+`CaptureEngine` records the actual `AudioRouting.getRoutedDevice()` types while
+input/output streams are active; an accepted preferred-device request is not
+treated as the routed device. Android only guarantees this query while the
+stream is recording or playing ([AudioRouting API](https://developer.android.com/reference/android/media/AudioRouting#getRoutedDevice())).
+`PhysicsEngine` reports a limitation unless both the built-in microphone and
+built-in speaker system routes were observed. This identifies Android's route
+type, not individual speaker transducers or proof that both physical speakers
+emitted the signal.
+
+`haptic_finite_waveform` is an excitation request marker, not measured actuation.
+No request and the current `hapticPhysicalOnset=unavailable` each produce a
+limitation. The actual motor response has not been verified on the iQOO during
+the current device-test pause; contact and haptic onset remain uncalibrated.
+
 ## Validation scope
 
 `PhysicsEngineTest` uses clearly named synthetic fixtures to check tone energy,
 frequency-band placement, DC removal, Nyquist normalization, baseline indexing,
-PCM rails, gravity centering, timestamp-derived rate and invalid evidence.
-These tests establish arithmetic behavior only. Real-device synchronization,
-signal separability, repeatability and object/session-held-out integrity accuracy
-still require physical measurements and calibration.
+PCM rails, gravity centering, timestamp-derived rate, invalid evidence and
+route/haptic policy guards. These tests establish arithmetic and admission-policy
+behavior only. Real-device synchronization, signal separability, repeatability
+and object/session-held-out integrity accuracy still require physical measurements
+and calibration.

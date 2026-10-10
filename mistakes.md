@@ -170,3 +170,14 @@ SHA256, and rejects dataset rows whose `modelVersions` disagree. Checkpoint conf
 and train/export reports persist the mapping; export checks checkpoint and report
 lineage against supplied bytes. Tests mutate an artifact and checkpoint mapping.
 This binds evidence to bytes; it does not prove valid training or physical data.
+
+## 2026-10-10: requested audio routes are not actual routes
+
+Capture selected preferred microphone/speaker devices and stored route-change
+events, but `PhysicsEngine` never rejected an unconfirmed or external route.
+`AudioRouting.getRoutedDevice()` is valid only while the stream is active, so
+querying it after playback would also be unreliable. `CaptureEngine` now records
+device types during active routing callbacks; physics evidence marks non-built-in
+or missing mic/speaker routes, missing haptic requests, and unmeasured haptic
+onset as limitations. A JVM regression covers those gates. Gradle unit tests and
+lint pass; actual iQOO routes and haptic onset remain unverified.

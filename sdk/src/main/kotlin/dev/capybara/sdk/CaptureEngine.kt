@@ -115,6 +115,10 @@ internal class CaptureEngine(private val context: Context) {
 
         fun observeRoute(kind: String, audio: AudioRouting) = synchronized(auditLock) {
             val device = audio.routedDevice
+            if (device != null) {
+                val direction = if (kind == "input") "Input" else "Output"
+                metadata["audio${direction}RoutedDeviceTypeObserved"] = device.type.toString()
+            }
             val id = device?.id ?: -1
             if (previousRoutes[kind] != id) {
                 if (previousRoutes[kind]?.let { it >= 0 } == true) routeChanged = true
@@ -343,7 +347,6 @@ internal class CaptureEngine(private val context: Context) {
             metadata["bootMinusMonotonicNanosEnd"] = (endBoot - (endMonoBefore + (endMonoAfter - endMonoBefore) / 2)).toString()
             metadata["clockMappingEndBracketNanos"] = (endMonoAfter - endMonoBefore).toString()
             metadata["clockMappingOffsetChangeNanos"] = (metadata.getValue("bootMinusMonotonicNanosEnd").toLong() - metadata.getValue("bootMinusMonotonicNanos").toLong()).toString()
-            observeConfiguration(recorder.activeRecordingConfiguration)
             observeRoute("input", recorder)
             effects.forEach { (name, effect) ->
                 metadata["effect_${name}_enabledFinal"] = try { effect.enabled.toString() }

@@ -391,3 +391,32 @@ trained/calibrated comparison remains `INCONCLUSIVE`, with no match/not-found
 animation. The UI installed and rendered on iQOO; this pass did not exercise a
 physical capture, so the active pulse and result animation were not observed on
 hardware.
+
+## Audio route and excitation provenance (official Android API, 2026-10-10)
+
+Question: does a preferred audio device prove which route actually carried
+Capybara's excitation, and can current captures establish that the haptic motor
+physically activated?
+
+Sources: Android [AudioRouting API](https://developer.android.com/reference/android/media/AudioRouting#getRoutedDevice()),
+updated 2026-08-03, says `getRoutedDevice()` identifies current AudioTrack/AudioRecord
+routing, is valid only while playback/recording is active, and may return null
+otherwise; `setPreferredDevice()` only specifies a preferred route. Android
+[AudioDeviceInfo API](https://developer.android.com/reference/android/media/AudioDeviceInfo#TYPE_BUILTIN_SPEAKER)
+defines built-in microphone and speaker-system route types. These APIs are
+available above the SDK's minSdk 29.
+
+Finding and decision: `CaptureEngine` already requested the built-in mic/speaker
+and recorded route events, but `PhysicsEngine` did not require a confirmed route.
+It now records routed device types while streams are active and reports a
+measurement limitation unless both microphone and built-in speaker routes are
+confirmed. It also records a limitation when no haptic waveform request exists
+and whenever physical haptic onset is unmeasured. A framework speaker-system
+route does not prove that two physical transducers emitted sound; this requires
+hardware evidence.
+
+Capybara verification: `:sdk:testDebugUnitTest :sdk:lintDebug` passed after the
+change. No iQOO routing or haptic response was measured; the user's device-test
+pause remains active. The current acquisition's `hapticPhysicalOnset` remains
+`unavailable`, so these captures are not demonstrated as verified multimodal
+excitation.

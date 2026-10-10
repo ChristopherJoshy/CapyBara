@@ -161,6 +161,10 @@ Reproduce the scratch baseline with:
   `modelVersions`. Checkpoint config and training/export reports persist the
   mapping; export checks it. All 12 tests pass, including artifact mutation and
   checkpoint mismatch. Byte identity only; no Capybara model was trained.
+- `PhysicsEngine` now marks missing/non-built-in audio routes, absent haptic
+  requests, and unmeasured physical haptic onset as measurement limitations.
+  Route types are captured only while streams are active, per Android's
+  `AudioRouting` contract. SDK unit tests and lint passed; no iQOO run occurred.
 - The licensed KAIST data and these adjacent datasets were not downloaded or used for task-model training; using their unrelated labels would not create Capybara specialists.
 
 ## Immediate continuation order

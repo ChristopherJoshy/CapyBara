@@ -1,5 +1,7 @@
 package dev.capybara.sdk
 
+import android.media.AudioDeviceInfo
+
 import kotlin.math.PI
 import kotlin.math.sin
 import org.junit.Assert.*
@@ -42,6 +44,33 @@ class PhysicsEngineTest {
         assertEquals(0.25, evidence.noiseRms, 0.0)
         assertEquals(1.0, evidence.peak, 0.0)
         assertEquals(2, evidence.clippedSamples)
+    }
+
+    @Test fun unsupportedRoutesAndUnverifiedHapticsRemainLimitations() {
+        val acousticOnly = scan(ShortArray(1024)).copy(
+            excitations = listOf(ExcitationEvent("acoustic_chirp", 1L))
+        )
+        val missing = PhysicsEngine.analyze(acousticOnly)
+        assertTrue(missing.limitations.any { "Built-in microphone route" in it })
+        assertTrue(missing.limitations.any { "Built-in speaker route" in it })
+        assertTrue(missing.limitations.any { "Haptic waveform request" in it })
+
+        val routed = acousticOnly.copy(
+            excitations = acousticOnly.excitations + ExcitationEvent("haptic_finite_waveform", 2L),
+            metadata = acousticOnly.metadata + mapOf(
+                "audioInputRoutedDeviceTypeObserved" to AudioDeviceInfo.TYPE_BUILTIN_MIC.toString(),
+                "audioOutputRoutedDeviceTypeObserved" to AudioDeviceInfo.TYPE_BUILTIN_SPEAKER.toString(),
+            ),
+        )
+        val evidence = PhysicsEngine.analyze(routed)
+        assertFalse(evidence.limitations.any { "Built-in microphone route" in it })
+        assertFalse(evidence.limitations.any { "Built-in speaker route" in it })
+        assertFalse(evidence.limitations.any { "Haptic waveform request" in it })
+        assertTrue(evidence.limitations.any { "Haptic physical onset" in it })
+
+        val externalOutput = routed.copy(metadata = routed.metadata +
+            ("audioOutputRoutedDeviceTypeObserved" to AudioDeviceInfo.TYPE_WIRED_HEADSET.toString()))
+        assertTrue(PhysicsEngine.analyze(externalOutput).limitations.any { "Built-in speaker route" in it })
     }
 
     @Test fun stationaryGravityIsCenteredAndRatesComeFromTimestamps() {
