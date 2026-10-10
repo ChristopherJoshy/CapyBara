@@ -24,6 +24,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -32,12 +34,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
@@ -117,6 +122,13 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun Instrument(capabilities: DeviceCapabilities) {
+        val focusManager = LocalFocusManager.current
+        val keyboardController = LocalSoftwareKeyboardController.current
+        val doneKeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+        val dismissKeyboardActions = KeyboardActions(onDone = {
+            keyboardController?.hide()
+            focusManager.clearFocus()
+        })
         var page by rememberSaveable { mutableStateOf("home") }
         var objectId by rememberSaveable { mutableStateOf("earbuds-case-01") }
         var sessionId by rememberSaveable { mutableStateOf("session-${System.currentTimeMillis()}") }
@@ -194,7 +206,7 @@ class MainActivity : ComponentActivity() {
         }
         ModalNavigationDrawer(drawerState = drawer, gesturesEnabled = false, drawerContent = {
             ModalDrawerSheet(drawerContainerColor = Charcoal) {
-                Column(Modifier.safeDrawingPadding().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                Column(Modifier.safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Text("Instrument", fontSize = 24.sp, color = Copper)
                         TextButton(onClick = { scope.launch { drawer.close() } }) { Text("Close menu") }
@@ -225,8 +237,24 @@ class MainActivity : ComponentActivity() {
                             logs.asReversed().forEach { Text(it, color = Muted, fontSize = 12.sp, lineHeight = 19.sp) }
                         }
                         else -> {
-                            OutlinedTextField(objectId, { objectId = it }, label = { Text("Object ID") }, singleLine = true, enabled = !busy)
-                            OutlinedTextField(sessionId, { sessionId = it }, label = { Text("Session ID") }, singleLine = true, enabled = !busy)
+                            OutlinedTextField(
+                                value = objectId,
+                                onValueChange = { objectId = it },
+                                label = { Text("Object ID") },
+                                singleLine = true,
+                                keyboardOptions = doneKeyboardOptions,
+                                keyboardActions = dismissKeyboardActions,
+                                enabled = !busy
+                            )
+                            OutlinedTextField(
+                                value = sessionId,
+                                onValueChange = { sessionId = it },
+                                label = { Text("Session ID") },
+                                singleLine = true,
+                                keyboardOptions = doneKeyboardOptions,
+                                keyboardActions = dismissKeyboardActions,
+                                enabled = !busy
+                            )
                             TextButton(onClick = { sessionId = "session-${System.currentTimeMillis()}" }, enabled = !busy) { Text("New session") }
                             Text("Same closed case, table and phone orientation. Mark four stable contact points. Disconnect charging and keep audio on the phone.", color = Muted, lineHeight = 21.sp)
                             Text("Audio and motion data stay private on this phone. These observed-state labels require physical preparation; captures are not model predictions.", color = Muted, fontSize = 12.sp)
@@ -236,7 +264,7 @@ class MainActivity : ComponentActivity() {
             }
         }) {
             Surface(Modifier.fillMaxSize(), color = Obsidian) {
-                Column(Modifier.safeDrawingPadding().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                Column(Modifier.safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                             Image(painterResource(R.drawable.ic_capybara), "Capybara", Modifier.size(38.dp).graphicsLayer { scaleX = introScale; scaleY = introScale })
@@ -309,6 +337,8 @@ class MainActivity : ComponentActivity() {
                                         onValueChange = { showcaseName = it },
                                         label = { Text("Object name") },
                                         singleLine = true,
+                                        keyboardOptions = doneKeyboardOptions,
+                                        keyboardActions = dismissKeyboardActions,
                                         enabled = !busy,
                                         modifier = Modifier.fillMaxWidth()
                                     )
@@ -318,11 +348,11 @@ class MainActivity : ComponentActivity() {
                                 }
                                 "capture" -> {
                                     Text("Place the phone on the object.", color = Sand, fontFamily = FontFamily.Serif, fontSize = 24.sp)
-                                    Text("Side ${showcasePositionIndex + 1} of 2 · approve the measured response before continuing.", color = Cyan)
-                                    ObjectGuide(showcasePositionIndex)
                                     Button(onClick = { startShowcasePosition() }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
                                         Text(if (microphoneGranted) "Capture side ${showcasePositionIndex + 1}" else "Enable microphone")
                                     }
+                                    Text("Side ${showcasePositionIndex + 1} of 2 · approve the measured response before continuing.", color = Cyan)
+                                    ObjectGuide(showcasePositionIndex)
                                 }
                                 "capturing" -> {
                                     Text("Capturing side ${showcasePositionIndex + 1}", color = Cyan, fontSize = 18.sp)
@@ -339,8 +369,6 @@ class MainActivity : ComponentActivity() {
                                     val measured = pendingShowcaseEvidence
                                     if (captured != null && measured != null) {
                                         Text("Side ${showcasePositionIndex + 1} · measured response", color = Copper, fontSize = 20.sp)
-                                        Waveform(captured.pcm)
-                                        ShowcaseEvidenceCard("Side ${showcasePositionIndex + 1}", measured)
                                         Text("Approve this real measurement, retry it, or reject the run.", color = Muted, lineHeight = 21.sp)
                                         if (busy) {
                                             LinearProgressIndicator(Modifier.fillMaxWidth(), color = Cyan)
@@ -375,14 +403,16 @@ class MainActivity : ComponentActivity() {
                                             problem = "This run was rejected; approved captures remain saved as research data."
                                             log("Showcase side ${showcasePositionIndex + 1} rejected; run ended")
                                         }, enabled = !busy) { Text("Reject and end") }
+                                        Waveform(captured.pcm)
+                                        ShowcaseEvidenceCard("Side ${showcasePositionIndex + 1}", measured)
                                     }
                                 }
                                 "rotate" -> {
-                                    ObjectGuide(showcasePositionIndex)
                                     Text("Scan the other side. Keep the object still while you turn the phone to the next contact surface.", color = Sand, lineHeight = 24.sp)
                                     Button(onClick = { startShowcasePosition() }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
                                         Text(if (microphoneGranted) "Scan other side" else "Enable microphone")
                                     }
+                                    ObjectGuide(showcasePositionIndex)
                                 }
                                 "result" -> AnimatedVisibility(
                                     visible = true,
@@ -427,7 +457,21 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         else -> {
-                            Spacer(Modifier.height(30.dp))
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Button(
+                                    onClick = { openShowcase("enroll") },
+                                    modifier = Modifier.weight(1f).heightIn(min = 56.dp),
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp)
+                                ) { Text("Enroll object", fontSize = 16.sp) }
+                                OutlinedButton(
+                                    onClick = { openShowcase("scan") },
+                                    modifier = Modifier.weight(1f).heightIn(min = 56.dp),
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp)
+                                ) { Text("Scan", fontSize = 16.sp) }
+                            }
                             AnimatedVisibility(
                                 visible = introVisible,
                                 enter = fadeIn(animationSpec = tween(700)) +
@@ -437,13 +481,6 @@ class MainActivity : ComponentActivity() {
                                     Text("Give the physical\nworld a memory.", fontFamily = FontFamily.Serif, fontSize = 37.sp, lineHeight = 44.sp)
                                     Text("Sound. Vibration. Physical evidence.", color = Muted, fontSize = 15.sp)
                                 }
-                            }
-                            Spacer(Modifier.height(16.dp))
-                            Button(onClick = { openShowcase("enroll") }, modifier = Modifier.fillMaxWidth().heightIn(min = 58.dp)) {
-                                Text("Enroll object", fontSize = 17.sp)
-                            }
-                            OutlinedButton(onClick = { openShowcase("scan") }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
-                                Text("Scan")
                             }
                             if (availableNames.isNotEmpty()) {
                                 HorizontalDivider(color = Color(0xFF394247))
