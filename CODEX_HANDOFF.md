@@ -150,6 +150,7 @@ Reproduce the scratch baseline with:
 - `prepare.capture` now requires the source capture's `audioSha256` and
   `imuSha256` to match the actual files. Training tests passed, including
   same-length audio/IMU tamper cases using schema-only fixtures.
+- Capture digest enforcement was committed and pushed as `c25035d`.
 - The licensed KAIST data and these adjacent datasets were not downloaded or used for task-model training; using their unrelated labels would not create Capybara specialists.
 
 ## Immediate continuation order

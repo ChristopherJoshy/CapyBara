@@ -378,6 +378,7 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
   and confirms the capture is rejected; all 10 training tests pass.
 - This detects file/metadata inconsistency, not a malicious actor able to rewrite
   both the artifact and its unkeyed metadata digest.
+- Commit `c25035d` was pushed to `codex/v6-handoff`.
 
 ## Next acceptance milestones
 
