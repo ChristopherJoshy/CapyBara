@@ -151,6 +151,7 @@ Reproduce the scratch baseline with:
   source `audioSha256`/`imuSha256` against the files. Training tests passed,
   including unsupported-encoding and same-length audio/IMU tamper cases using
   schema-only fixtures. Digest enforcement was pushed as `c25035d`.
+- PCM format enforcement was pushed as `09a73c4`.
 - The licensed KAIST data and these adjacent datasets were not downloaded or used for task-model training; using their unrelated labels would not create Capybara specialists.
 
 ## Immediate continuation order

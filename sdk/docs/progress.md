@@ -379,6 +379,7 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 - Embedded hashes detect file/metadata inconsistency, not a malicious actor able
   to rewrite both the artifact and its unkeyed metadata digest.
 - Digest enforcement was pushed as `c25035d`; format validation is in this slice.
+- Format validation was pushed as `09a73c4`.
 
 ## Next acceptance milestones
 
