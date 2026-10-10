@@ -405,7 +405,7 @@ internal class CaptureEngine(private val context: Context) {
                 cleanup { if (player.playState == AudioTrack.PLAYSTATE_PLAYING) player.stop() }
                 cleanup { player.release() }
             }
-            cleanup { haptic.cancel() }
+            cleanup { if (Build.VERSION.SDK_INT >= 31 && hapticManager != null) hapticManager.cancel() else haptic.cancel() }
             cleanup { handler.removeCallbacksAndMessages(null); sensorThread.quitSafely(); sensorThread.join(1_000) }
             cleanupErrors.forEach { failure?.addSuppressed(it) }
             if (failure == null && cleanupErrors.isNotEmpty()) throw IllegalStateException("Capture resource release failed.", cleanupErrors.first())

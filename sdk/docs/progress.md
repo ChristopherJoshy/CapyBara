@@ -491,3 +491,9 @@ an unvalidated threshold.
 - Downloaded the private Kaggle output into ignored artifacts; the model SHA256
   matches its report. It loads on host CPU and returns finite 18-class logits;
   this checks artifact loading only, not Android integration or latency.
+
+## Combined-vibrator cleanup
+
+- `CaptureEngine` now cancels all exposed actuators with `VibratorManager.cancel()` on API 31+ after combined haptic excitation; older releases retain `Vibrator.cancel()`.
+- `cmd.exe /c gradlew.bat :sdk:testDebugUnitTest :sdk:lintDebug :sdk:assembleDebugAndroidTest :apk:assembleDebug` passed.
+- `adb devices -l` returned no attached devices. Physical haptic output, cancellation and onset remain unverified; no device test was run.

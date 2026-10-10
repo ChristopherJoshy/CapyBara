@@ -469,3 +469,9 @@ measurement, haptic-onset measurement, model inference, or physical data
 collection was performed. The test confirms UI navigation only. Continue to
 request genuine, object-separated labeled recordings before training; do not
 interpret the generic showcase as validated generalization to arbitrary objects.
+
+## Combined-vibrator cancellation
+
+Android documents `VibratorManager.cancel()` as turning all vibrators off; the method is available from API 31: https://developer.android.com/reference/android/os/VibratorManager#cancel().
+
+`CaptureEngine` can start one `CombinedVibration` across all exposed vibrator IDs, but cleanup previously cancelled only the default `Vibrator`. Cleanup now uses `VibratorManager.cancel()` on API 31+ and retains default-vibrator cancellation on older releases. No device was connected during this host check, so physical haptic cancellation remains unverified.

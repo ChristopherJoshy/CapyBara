@@ -16,9 +16,7 @@ Root `AGENTS.md` remains authoritative. Do not interpret this handoff as relaxin
 - Use licensed pretrained weights where they fit the real sensor modality and task. The user explicitly selected Laya for the final decision stage; preserve its pinned source/checkpoint lineage. MOMENT was tested and rejected for the UCI fan transfer.
 - Kaggle CLI 2.2.4 authenticated successfully; quota reported 30 GPU-hours and 20 TPU-hours remaining but no accelerator allocation was tested. Searching the exact licensed Mendeley DOI found no Kaggle mirror. No cloud job was launched because the available public datasets do not match physical phone-to-object integrity labels. Do not upload private captures or credentials.
 - Commit and push each **verified coherent slice**. Stage only intended files; never push captures, downloaded data, weights, virtual environments or credentials. GitHub authentication is valid and the current branch is `codex/v6-handoff`.
-- The user has now paused all iQOO testing. Do not install, launch, capture, or
-  otherwise test on the iQOO until the user changes this instruction, even if
-  the authorized serial reconnects. Host-only work may continue.
+- The user reauthorized Capybara device testing in the current task, superseding the earlier pause. The latest `adb devices -l` check is empty; do not run device operations until the authorized iQOO 15 serial is attached and verified. Host-only work may continue.
 
 ## Safety invariants
 
