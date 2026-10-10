@@ -59,6 +59,10 @@ class TrainingSafetyTests(unittest.TestCase):
                     "annotationNotes", "answer"):
             with self.subTest(key=key), self.assertRaisesRegex(ValueError, "Annotation/identity"):
                 check_values({"nested": {key: "annotated"}})
+        for value in ({"quality": "CHANGED"}, {"metric": True}):
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, "numeric or null"):
+                check_values(value)
+        check_values({"missingFeature": None})
         check_values({"reference_reliability": 0.8, "acoustic_band_energy": [0.1, 0.2]})
 
     def test_primitive_physics_cannot_train_final_laya(self):

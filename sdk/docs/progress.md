@@ -355,16 +355,16 @@ Earlier 2026-10-09 full verification with device awake: `:apk:connectedDebugAndr
 - Commit `f0054d6` was pushed to `codex/v6-handoff`.
 - The updated SDK also passed `:sdk:assembleDebug :apk:assembleDebug :apk:lintDebug`.
 
+## Training evidence leakage guard (2026-10-10)
 
-## Training evidence key-leakage guard (2026-10-10)
-
-- Audit found `check_values` rejected only exact normalized forbidden keys.
-  Annotation fields such as `expectedLabel`, `conditionName` or `objectIDHash`
-  could therefore be nested in evidence without rejection.
-- The validator now tokenizes common snake/camel/acronym key spellings and rejects
-  annotation tokens plus compound object/capture/session/run identifiers. Regression
-  coverage also confirms legitimate features such as `reference_reliability` remain
-  accepted. This is a lexical guard, not proof against semantically encoded leakage.
+- Audit found `check_values` rejected only exact normalized forbidden keys and
+  accepted strings/booleans under innocuous feature names. This permitted nested
+  annotation or identity fields such as `expectedLabel`, `conditionName`, and
+  `objectIDHash` to evade checks or values like `"quality": "CHANGED"` to enter.
+- The validator now rejects common annotation/identity key variants and accepts
+  only finite numbers or `null` as evidence values. Regression coverage preserves
+  real numeric features and null missing values; this lexical/value-type gate
+  cannot prove semantic independence.
 - `sdk/training/test_training.py` passed all 10 tests. No physical data was used.
 
 ## Next acceptance milestones

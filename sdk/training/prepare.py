@@ -72,8 +72,13 @@ def check_values(value):
     elif isinstance(value, list):
         for item in value:
             check_values(item)
-    elif isinstance(value, float) and not math.isfinite(value):
-        raise ValueError("Evidence contains a nonfinite number")
+    elif value is None or isinstance(value, int) and not isinstance(value, bool):
+        return
+    elif isinstance(value, float):
+        if not math.isfinite(value):
+            raise ValueError("Evidence contains a nonfinite number")
+    else:
+        raise ValueError("Evidence values must be numeric or null; categorical/text inputs are forbidden")
 
 
 def capture(root, relative):
